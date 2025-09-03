@@ -4,9 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
+    public function showDashboardForLoggedInUser()
+    {
+        $employee = Auth::user()->employee;
+        if (! $employee) {
+            abort(404);
+        }
+
+        if (!$employee) {
+            return redirect()->route('logout')->withErrors(['error' => 'Employee profile not found!']);
+        }
+
+        return view('employee.employee-dashboard', compact('employee'));
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -3,7 +3,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StudentController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentPreferenceController;
@@ -11,7 +11,7 @@ use App\Http\Controllers\TwoFactorController;
 
 // Home page
 Route::get('/', function () {
-    return view('home');
+    return view('welcome');
 });
 
 Route::get('/dashboard', function () {
@@ -22,7 +22,7 @@ Route::get('/dashboard', function () {
             return redirect()->route('admin.dashboard');
         } else {
             // send students to their dashboard
-            return redirect()->route('student.dashboard');
+            return redirect()->route('employee.dashboard');
         }
     }
     // otherwise send guests to login
@@ -43,7 +43,7 @@ Route::get('cgpa-calculator', [StudentController::class, 'showCgpaCalculator'])
 
 //Route for DATABASE
 Route::middleware(['auth'])->group(function () {
-    Route::get('student-dashboard', [StudentController::class, 'showDashboardForLoggedInUser'])->name('student.dashboard');
+    Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
     Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
 
 });
@@ -76,19 +76,3 @@ Route::post('addcourse', [CourseController::class, 'storeCourse'])
      ->name('admin.course.store');
 
      Route::delete('/admin/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('admin.courses.bulkDelete');
-
-
-// Route::middleware([
-//     'auth:sanctum',
-//     config('jetstream.auth_session'),
-//     'verified',
-// ])->group(function () {
-//     Route::get('/dashboard', function () {
-//         return view('student/student-dashboard');
-//     })->name('student.dashboard');
-
-//     // Route for admin dashboard
-//     Route::get('admin-dashboard', function () {
-//         return view('admin/admin-dashboard');
-//     })->name('admin.dashboard');
-// });
