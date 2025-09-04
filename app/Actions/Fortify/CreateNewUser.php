@@ -33,15 +33,15 @@ class CreateNewUser implements CreatesNewUsers
             'name'     => $input['name'],
             'email'    => $input['email'],
             'password' => Hash::make($input['password']),
-            'role_id'  => 6, // default employee role
+            'role_id'  => 3, // default employee role
         ]);
 
-        // Create the associated student record with proper linkage.
+        // Create the associated employee record
         Employee::create([
-            'matric_no'   => $input['matric_no'],
-            'full_name'     => $input['name'],
-            'email'    => $input['email'],
-            'password' => Hash::make($input['password']),
+            'employee_id' => $input['employee_id'],
+            'full_name'   => $input['name'],
+            'email'      => $input['email'],
+            'password'   => Hash::make($input['password']),
             'user_id'     => $user->id,
         ]);
 

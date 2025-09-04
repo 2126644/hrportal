@@ -122,7 +122,7 @@
                                 <div id="calendar-doctor" class="calendar-container"></div>
                             </div>
 
-                        <!-- Upcoming Events Column -->
+                        {{-- <!-- Upcoming Events Column -->
                         <div class="col-12 col-md-6">
                         <div class="calendar-info calendar-info1">
                             <div class="up-come-header">
@@ -146,7 +146,7 @@
                                 </div>
                             @endforelse
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>

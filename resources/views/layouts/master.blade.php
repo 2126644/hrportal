@@ -209,19 +209,19 @@
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             @auth
-            @if(Auth::user()->role_id == '1')
+            @if(Auth::user()->role_id == '2')
             <!-- Admin clicks brand → go to Admin Dashboard -->
             <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
-                <img src="{{ asset('assets/img/kictlogo.png') }}" alt="MySystem Logo"
-                    style="height: 30px; width: auto; margin-right: 10px; vertical-align: middle;">
-                MyKICT Smart Study Planner
+                <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
+                    style="height: 50px; width: auto; margin-right: 10px; vertical-align: middle;">
+                Al-Hidayah Group HR Portal
             </a>
-            @elseif(Auth::user()->role_id == '6')
-            <!-- Student clicks brand → go to Student Dashboard -->
+            @elseif(Auth::user()->role_id == '3')
+            <!-- Student clicks brand → go to Employee Dashboard -->
             <a class="navbar-brand" href="{{ route('employee.dashboard') }}">
-                <img src="{{ asset('assets/img/kictlogo.png') }}" alt="MySystem Logo"
-                    style="height: 30px; width: auto; margin-right: 10px; vertical-align: middle;">
-                MyKICT Smart Study Planner
+                <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
+                    style="height: 50px; width: auto; margin-right: 10px; vertical-align: middle;">
+                Al-Hidayah Group HR Portal
             </a>
             @endif
             @endauth
@@ -231,8 +231,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     @auth
-                    <!-- Admin Navigation (Role ID: 1) -->
-                    @if (Auth::user()->role_id == '1')
+                    <!-- Admin Navigation (Role ID: 2) -->
+                    @if (Auth::user()->role_id == '2')
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.dashboard') }}">
                             <i class="bi bi-speedometer2"></i> Dashboard
@@ -245,25 +245,25 @@
                     </li>
                     </li>
 
-                    <!-- Student Navigation (Role ID: 6) -->
-                    @elseif (Auth::user()->role_id == '6')
+                    <!-- Student Navigation (Role ID: 3) -->
+                    @elseif (Auth::user()->role_id == '3')
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('employee.dashboard') }}">
                             <i class="bi bi-house-door-fill"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('employee.attendance') }}">
+                        {{-- <a class="nav-link" href="{{ route('employee.attendance') }}"> --}}
                             <i class="bi bi-journal-text"></i> Attendance
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('employee.leave') }}">
+                        {{-- <a class="nav-link" href="{{ route('employee.leave') }}"> --}}
                             <i class="bi bi-calculator-fill"></i> Leave
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('employee.task') }}">
+                        {{-- <a class="nav-link" href="{{ route('employee.task') }}"> --}}
                             <i class="bi bi-person-circle"></i> Task
                         </a>
                     </li>
