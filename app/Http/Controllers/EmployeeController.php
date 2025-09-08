@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Event;
+use App\Models\Attendance;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +22,18 @@ class EmployeeController extends Controller
             return redirect()->route('logout')->withErrors(['error' => 'Employee profile not found!']);
         }
 
-        return view('employee.employee-dashboard', compact('employee'));
+        // Fetch upcoming events (adjust your table column names)
+        $upcomingEvents = Event::where('event_date', '>=', now())
+            ->orderBy('event_date', 'asc')
+            ->take(5)
+            ->get();
+
+        $todayAttendance = Attendance::where('employee_id', $employee->id)
+    ->whereDate('date', Carbon::today())
+    ->first();
+
+return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance'));
+
     }
 
     /**

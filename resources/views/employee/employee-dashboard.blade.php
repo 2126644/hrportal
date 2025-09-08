@@ -1,171 +1,371 @@
 @extends('layouts.master')
 
 @section('content')
-    <style>
-        body {
-            background-color: #f4f8fb;
-        }
+<style>
+    body {
+        background-color: #f4f8fb;
+    }
 
-        .card {
-            background: #ffffff;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-body h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .card-body h6 {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .btn-info {
-            background-color: #5dade2;
-            border-color: #5dade2;
-            border-radius: 12px;
-            padding: 10px 20px;
-            font-weight: 500;
-        }
-
-        .btn-info:hover {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-
-        .card-title {
-            font-weight: 600;
-            color: #2980b9;
-        }
-
-        .card-header p {
-            color: #7f8c8d;
-            margin-top: 5px;
-            font-size: 0.95rem;
-        }
-
-        .db-icon img {
-            width: 50px;
-            opacity: 0.7;
-        }
-
-        .db-widgets {
-            padding: 10px;
-        }
-
-        /* .dash-details h4 {
-            font-weight: bold;
-            color: #34495e;
-        }
-        .lesson-imgs img {
-            width: 30px;
-            margin-right: 10px;
-        }
-        .lesson-activity {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .dash-circle .col-lg-3 {
-            margin-top: 20px;
-        }
-
-        .dash-details {
+    .datetime-punch {
         display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center; /* Center the content horizontally */
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .datetime {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    .btn-punch {
+        background-color: #ffc107;
+        border: none;
+        color: #212529;
+        font-weight: 600;
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+        white-space: nowrap;
+    }
+    .btn-punch:hover {
+        background-color: #e0a800;
+        color: #212529;
+    }
+    .events-calendar {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    .events {
+        flex: 1;
+        min-width: 280px;
+        background: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgb(0 0 0 / 0.1);
+    }
+    .events h5 {
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+    .event-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .event-item:last-child {
+        border-bottom: none;
+    }
+    .event-date-time {
+        font-weight: 600;
+        color: #212529;
+    }
+    .event-title {
+        color: #495057;
+    }
 
-        /* Optional: Mobile responsiveness */
-        @media (max-width: 768px) {
-            .dash-details {
-                flex-direction: row;
-                /* Stack columns in a row on smaller screens */
-            }
-        }
-    </style>
+    .card {
+        background: #ffffff;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+    }
 
-    <div class="content container-fluid">
+    .card:hover {
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
+    }
 
-        <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="page-sub-header">
-                        <h3 class="page-title"><br>Welcome {{ $employee->full_name }}!</h3>
-                    </div>
-                </div>
+    .card-body h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .card-body h6 {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .btn-info {
+        background-color: #5dade2;
+        border-color: #5dade2;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+
+    .btn-info:hover {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+
+    .card-title {
+        font-weight: 600;
+        color: #2980b9;
+    }
+
+    .card-header p {
+        color: #7f8c8d;
+        margin-top: 5px;
+        font-size: 0.95rem;
+    }
+
+    .db-icon img {
+        width: 50px;
+        opacity: 0.7;
+    }
+
+    .db-widgets {
+        padding: 10px;
+    }
+</style>
+
+<div class="content container-fluid">
+
+    <div class="page-header">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
             </div>
-        </div>
-
+        @endif
         <div class="row">
-
-            <div class="col-12 col-lg-12 col-xl-8 d-flex">
-                <div class="card flex-fill comman-shadow">
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Calendar Column -->
-                            <div class="col-12 col-md-6">
-                                <div id="calendar-doctor" class="calendar-container"></div>
-                            </div>
-
-                        {{-- <!-- Upcoming Events Column -->
-                        <div class="col-12 col-md-6">
-                        <div class="calendar-info calendar-info1">
-                            <div class="up-come-header">
-                                <h3>Upcoming Events</h3>
-                            </div>
-
-                            @forelse ($upcomingEvents as $subject)
-                                <div class="calendar-details">
-                                    <p>{{ $subject->course_code }}</p>
-                                    <div class="calendar-box normal-bg">
-                                        <div class="calandar-event-name">
-                                            <h4>{{ $subject->course_title }}</h4>
-                                            <h5>Time: {{ $event->event_time ?? '-' }}</h5>
-                                            <h5>Place: {{ $event->event_place }}</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="alert alert-warning mb-3">
-                                    No upcoming events.
-                                </div>
-                            @endforelse
-                        </div>
-                    </div> --}}
+            <div class="col-sm-12">
+                <div class="page-sub-header">
+                    <h3 class="page-title"><br>Welcome {{ $employee->full_name }}!</h3>
                 </div>
             </div>
         </div>
     </div>
 
-    
+    <div class="dashboard-header mb-4">
+        <div class="datetime-punch">
+    <div class="datetime" id="currentDateTime"></div>
 
-    <script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/feather.min.js"></script>
-    <script src="assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>
-    <script src="assets/plugins/apexchart/apexcharts.min.js"></script>
-    <script src="assets/js/circle-progress.min.js"></script>
-    <script src="assets/js/script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <button class="btn-punch" id="punchInBtn" 
+        @if($todayAttendance && $todayAttendance->time_in) disabled @endif>
+        Punch In
+    </button>
 
-    <script src="assets/plugins/simple-calendar/jquery.simple-calendar.js"></script>
-    <script src="assets/js/calander.js"></script>
+    <button class="btn-punch" id="punchOutBtn" 
+        @if(!$todayAttendance || $todayAttendance->time_out) disabled @endif>
+        Punch Out
+    </button>
+</div>
+</div>
+        
+    </div>
 
-    <link rel="stylesheet" href="assets/plugins/simple-calendar/simple-calendar.css"/>
+    <div class="row">
+        <!-- Upcoming Events Column -->
+        <div class="col-12 col-md-8 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Upcoming Events</h3>
+                    @forelse ($upcomingEvents as $event)
+                        <div class="event-item">
+                            <div class="event-date-time">{{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} - {{ $event->event_time }}</div>
+                            <div class="event-title">{{ $event->event_name }}</div>
+                        </div>
+                    @empty
+                        <div class="alert alert-warning">
+                            No upcoming events.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        <!-- Calendar Column -->
+        <div class="col-12 col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Calendar</h3>
+                    <div id="calendar-doctor" class="calendar-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    </body>
+    <!-- Attendance, Leave, Task Summary -->
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Attendance</h4>
+                    <ul>
+                        <li>Total Days Present: <span id="daysPresent">-</span></li>
+                        <li>Total Days Absent: <span id="daysAbsent">-</span></li>
+                        <li>Last Punch In: <span id="lastPunchIn">-</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Leave</h4>
+                    <ul>
+                        <li>Leave Balance: <span id="leaveBalance">-</span> days</li>
+                        <li>Pending Leave Requests: <span id="pendingLeave">-</span></li>
+                        <li>Approved Leaves: <span id="approvedLeaves">-</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Tasks</h4>
+                    <ul>
+                        <li>Pending Tasks: <span id="pendingTasks">-</span></li>
+                        <li>Completed Tasks: <span id="completedTasks">-</span></li>
+                        <li>Overdue Tasks: <span id="overdueTasks">-</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{{-- <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> --}}
+
+<script>
+    // Update date and time every second
+    function updateDateTime() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateStr = now.toLocaleDateString(undefined, options);
+        const timeStr = now.toLocaleTimeString();
+        document.getElementById('currentDateTime').textContent = `${dateStr} - ${timeStr}`;
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Punch In button
+    document.getElementById('punchInBtn').addEventListener('click', function() {
+        if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            fetch("{{ route('attendance.punchIn') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            // fetch("{{ route('attendance.punchIn') }}", {
+            //     method: "POST",
+            //     headers: {
+            //         "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            //         "Accept": "application/json"
+            //     },
+            // })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert(`You punched in at: ${data.time}`);
+        document.getElementById("lastPunchIn").textContent = data.time;
+    })
+    .catch(error => console.error("Error:", error));
+})
+        }
+    });
+
+
+    document.getElementById('punchOutBtn').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            fetch("{{ route('attendance.punchOut') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
+    })
+            .then(data => {
+                alert(`You punched out at: ${data.time} (${data.status})`);
+                // Show map for punch out
+                var map = L.map('mapOut').setView([latitude, longitude], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                L.marker([latitude, longitude]).addTo(map)
+                    .bindPopup("Punch Out Location<br>Status: " + data.status)
+                    .openPopup();
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    }
+});
+
+function sendPunch(url) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+
+                if (data.success && data.action === 'punchIn') {
+                    document.getElementById('punchInBtn').disabled = true;
+                    document.getElementById('punchOutBtn').disabled = false;
+                }
+                if (data.success && data.action === 'punchOut') {
+                    document.getElementById('punchOutBtn').disabled = true;
+                }
+        })
+            .catch(err => console.error(err));
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+
+document.getElementById('punchInBtn').addEventListener('click', function() {
+    sendPunch("{{ route('attendance.punchIn') }}");
+});
+
+document.getElementById('punchOutBtn').addEventListener('click', function() {
+    sendPunch("{{ route('attendance.punchOut') }}");
+});
+
+
+</script>
+
 @endsection

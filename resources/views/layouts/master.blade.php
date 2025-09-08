@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>@yield('title', 'MyKICT Smart Study Planner')</title>
+    <title>@yield('title', 'Al-Hidayah Group HR Portal')</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('assets/img/logokict2.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/ahglogonobg.png') }}">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -307,7 +307,7 @@
     <!-- Footer -->
     <footer class="text-center py-3 mt-4 text-muted">
         <div class="container">
-            &copy; {{ date('Y') }} MyKICT Smart Study Planner. All Rights Reserved.
+            &copy; {{ date('Y') }} Al-Hidayah Group HR Portal. All Rights Reserved.
         </div>
     </footer>
 

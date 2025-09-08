@@ -5,8 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\StudentPreferenceController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\TwoFactorController;
 
 // Home page
@@ -35,18 +34,23 @@ Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name
 // Handle submitted code
 Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
 
+//Route for DATABASE
+Route::middleware(['auth'])->group(function () {
+    Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
+    Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
+    Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
+});
+
+// Routes for old website
 
 //Route for CGPA Calculator
 Route::get('cgpa-calculator', [StudentController::class, 'showCgpaCalculator'])
      ->middleware('auth')
      ->name('cgpa.calculator');
-
-//Route for DATABASE
-Route::middleware(['auth'])->group(function () {
-    Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
-    Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
-
-});
 
 Route::get('admin-courses', [AdminController::class, 'showCoursesList'])->name('admin.courses');
 

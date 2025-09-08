@@ -28,7 +28,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: url('assets/img/background-kict2.jpg') no-repeat center center fixed;
+            background: url('assets/img/menarahidayah.png') no-repeat center center fixed;
             background-size: cover;
         }
 

@@ -28,7 +28,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: url('assets/img/menarahidayah(1).jpg') no-repeat center center fixed;
+            background: url('assets/img/menarahidayah.png') no-repeat center center fixed;
             background-size: cover;
         }
 
@@ -58,6 +58,7 @@
         .card {
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            
         }
     </style>
 </head>
