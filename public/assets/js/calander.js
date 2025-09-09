@@ -1,1 +1,33 @@
-$(document).ready(function(){$("#calendar-doctor").simpleCalendar({fixedStartDay:0,disableEmptyDetails:true,events:[{startDate:new Date(new Date().setHours(new Date().getHours()+24)).toDateString(),endDate:new Date(new Date().setHours(new Date().getHours()+25)).toISOString(),summary:'Conference with teachers'},{startDate:new Date(new Date().setHours(new Date().getHours()-new Date().getHours()-12,0)).toISOString(),endDate:new Date(new Date().setHours(new Date().getHours()-new Date().getHours()-11)).getTime(),summary:'Old classes'},{startDate:new Date(new Date().setHours(new Date().getHours()-48)).toISOString(),endDate:new Date(new Date().setHours(new Date().getHours()-24)).getTime(),summary:'Old Lessons'}],});});
+fetch("/holidays")
+    .then(response => response.text())
+    .then(icsData => {
+        let jcalData = ICAL.parse(icsData);
+        let comp = new ICAL.Component(jcalData);
+        let vevents = comp.getAllSubcomponents("vevent");
+
+        let events = vevents.map((evt) => {
+            let event = new ICAL.Event(evt);
+
+            let start = event.startDate.toJSDate();
+            let end = event.endDate.toJSDate();
+
+            // Fix: if it's an all-day event, subtract 1 day from the end date
+            if (event.startDate.isDate && event.endDate.isDate) {
+                end.setDate(end.getDate() - 1);
+            }
+
+            return {
+                startDate: start.toISOString(),
+                endDate: end.toISOString(),
+                summary: event.summary,
+            };
+        });
+
+        // Initialize the simple calendar with holiday events
+        $("#calendar-doctor").simpleCalendar({
+            fixedStartDay: 0,
+            disableEmptyDetails: true,
+            events: events,
+        });
+    })
+    .catch(err => console.error("Failed to load holidays:", err));

@@ -113,18 +113,18 @@
         /* Modern Navbar */
         .navbar {
             /* background-color: white; */
-            background-color: #2980b9;
+            background-color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 0.8rem 1rem;
         }
 
         .nav-item .nav-link {
-            color: white !important;
+            color: #2980b9 !important;
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: white !important;
+            color: #2980b9 !important;
             font-size: 1.5rem;
         }
 
@@ -318,6 +318,10 @@
     <script src="{{ asset('assets/js/feather.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/slimscroll/jquery.slimscroll.min.js') }}"></script>
     <script src="assets/plugins/simple-calendar/jquery.simple-calendar.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.4.0/ical.min.js"></script>
+    
+
     <script src="assets/js/calander.js"></script>
 
     <!-- Admin list course -->
