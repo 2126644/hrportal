@@ -35,9 +35,9 @@ class AttendanceController extends Controller
     // Punch in (mark attendance)
     public function punchIn(Request $request)
     {
+        // must use these to punchin/out work
         $user = Auth::user();
         $employee = Employee::where('user_id', $user->id)->first();
-
         if (! $employee) {
             return response()->json(['message' => 'Employee record not found.'], 404);
         }
@@ -45,14 +45,21 @@ class AttendanceController extends Controller
         // Office location
         $officeLat = 3.2017;
         $officeLng = 101.73256;
-        $maxDistance = 1; // km (radius)
+        $maxDistance = 1.5; // km (radius)
 
         $lat = $request->latitude;
         $lng = $request->longitude;
 
-        $status = $this->calculateDistance($officeLat, $officeLng, $lat, $lng) <= $maxDistance ? 'on-site' : 'off-site';
+        //If within office radius → status = "on-site". Else "off-site"
+        $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
+        $status = $distance <= $maxDistance ? 'on-site' : 'off-site';
 
         $now = Carbon::now();
+
+        // Punch In (before 8:30am) → ✅ On Time
+        // Punch In (8:30am) → ✅ Normal
+        // Punch In (after 8:30am) → ❌ Late
+
         $workStart = Carbon::createFromTime(8, 30, 0); // 08:30 AM
 
         // Check if late
@@ -62,17 +69,18 @@ class AttendanceController extends Controller
             'employee_id'   => $employee->employee_id,
             'date'          => $now->toDateString(),
             'time_in'       => $now->toTimeString(),
-            'location'      => $lat . ',' . $lng,
+            'location'      => $lat . ',' . $lng,   //Saved in DB with location = "3.1400,101.6900" etc
             'status'        => $status,
             'status_time_in' => $statusTimeIn,
         ]);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Punched in successfully at:',
-            'time' => $attendance->created_at->toDateTimeString(),
+            'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
             'status_time_in' => $statusTimeIn,
-            'action'  => 'punchIn',
+            'status'  => $status,
+            //to differentiate punch in and punch out:
+            'success' => true,
+            'action'  => 'punchIn'
         ]);
     }
 
@@ -90,17 +98,18 @@ class AttendanceController extends Controller
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-        return $earthRadius * $c; // Distance in KM
+        return $earthRadius * $c; // Distance in km
     }
 
     public function punchOut(Request $request)
     {
+        // must use these to punchin/out work
         $user = Auth::user();
         $employee = Employee::where('user_id', $user->id)->first();
-
         if (! $employee) {
             return response()->json(['message' => 'Employee record not found.'], 404);
         }
+        // just use this doesnt work: $employee = Auth::user()->employee;
 
         $now = Carbon::now();
 
@@ -113,35 +122,43 @@ class AttendanceController extends Controller
             return response()->json(['message' => 'No punch in record found for today.'], 400);
         }
 
-        // Check location again
-        $officeLat = 3.2017;
-        $officeLng = 101.73256;
-        $maxDistance = 1; // km
+        if ($attendance->time_out) {
+        return response()->json(['success' => false, 'message' => 'You already punched out today.']);
+    }
 
-        $lat = $request->latitude;
-        $lng = $request->longitude;
+        // // Check location again
+        // $officeLat = 3.2017;
+        // $officeLng = 101.73256;
+        // $maxDistance = 1; // km
 
-        $status = $this->calculateDistance($officeLat, $officeLng, $lat, $lng) <= $maxDistance
-            ? 'on-site'
-            : 'off-site';
+        // $lat = $request->latitude;
+        // $lng = $request->longitude;
+
+        // $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
+        // $status = $distance <= $maxDistance ? 'on-site' : 'off-site';
+
+        // Punch Out (before 5:30pm) → ❌ Early Leave
+        // Punch Out (5:30pm) → ✅ Normal
+        // Punch Out (after 5:30pm) → ⭐ Overtime
 
         // Official work end time (5:30pm)
         $workEnd = Carbon::createFromTime(17, 30, 0);
 
-        $statusOut = $now->lt($workEnd) ? 'Early Leave' : 'On Time';
+        // Check if early leave
+        $statusTimeOut = $now->lt($workEnd) ? 'Early Leave' : 'On Time';
 
         $attendance->update([
             'time_out'       => $now->toTimeString(),
-            'status_time_out' => $statusOut,
-            'status'         => $status, // override with punch out location
+            'status_time_out' => $statusTimeOut
+            // 'status'         => $status, // override with punch out location
         ]);
 
         return response()->json([
+            'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
+            'status_time_out' => $statusTimeOut,
+            //to differentiate punch in and punch out:
             'success' => true,
-            'message' => 'Punched out successfully at:',
-            'time'    => $attendance->time_out,
-            'status'  => $statusOut,
-            'action'  => 'punchOut',
+            'action'  => 'punchOut'
         ]);
     }
 

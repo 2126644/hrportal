@@ -156,10 +156,13 @@
                 <button class="btn-punch" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
                     Punch In
                 </button>
+                <div id="map" style="height: 300px; border-radius: 10px; margin-top:20px;"></div>
+
 
                 <button class="btn-punch" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
                     Punch Out
                 </button>
+                <div id="mapOut" style="height: 300px; border-radius: 10px; margin-top:20px;"></div>
             </div>
         </div>
 
@@ -240,8 +243,8 @@
 
     </div>
 
-    {{-- <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
         // Update date and time every second
@@ -260,88 +263,13 @@
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
-        // Punch In button
-        document.getElementById('punchInBtn').addEventListener('click', function() {
+        // Reusable punch function
+        function sendPunch(url, mapId, punchType) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
 
-                    fetch("{{ route('attendance.punchIn') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify({
-                                latitude: latitude,
-                                longitude: longitude
-                            })
-                        })
-                        // fetch("{{ route('attendance.punchIn') }}", {
-                        //     method: "POST",
-                        //     headers: {
-                        //         "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                        //         "Accept": "application/json"
-                        //     },
-                        // })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Network response was not ok");
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            alert(`You punched in at: ${data.time}`);
-                            document.getElementById("lastPunchIn").textContent = data.time;
-                        })
-                        .catch(error => console.error("Error:", error));
-                })
-            }
-        });
-
-
-        document.getElementById('punchOutBtn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const latitude = position.coords.latitude;
-                    const longitude = position.coords.longitude;
-
-                    fetch("{{ route('attendance.punchOut') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify({
-                                latitude: latitude,
-                                longitude: longitude
-                            })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Network response was not ok");
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            alert(`You punched out at: ${data.time} (${data.status})`);
-                            // Show map for punch out
-                            var map = L.map('mapOut').setView([latitude, longitude], 16);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(
-                            map);
-                            L.marker([latitude, longitude]).addTo(map)
-                                .bindPopup("Punch Out Location<br>Status: " + data.status)
-                                .openPopup();
-                        })
-                        .catch(error => console.error("Error:", error));
-                });
-            }
-        });
-
-        function sendPunch(url) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
                     fetch(url, {
                             method: "POST",
                             headers: {
@@ -349,19 +277,34 @@
                                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
                             },
                             body: JSON.stringify({
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude
+                                latitude: lat,
+                                longitude: lng
                             })
                         })
                         .then(res => res.json())
                         .then(data => {
-                            alert(data.message);
+                            alert(
+                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`);
 
-                            if (data.success && data.action === 'punchIn') {
+                            if (mapId) {
+                                var map = L.map(mapId).setView([lat, lng], 16);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    maxZoom: 19,
+                                }).addTo(map);
+
+                                L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(
+                                        `${punchType} Location<br>Status: ${data.status ?? data.status_time_in}`
+                                        )
+                                    .openPopup();
+                            }
+
+                            // Disable/enable buttons accordingly
+                            if (data.action === 'punchIn') {
                                 document.getElementById('punchInBtn').disabled = true;
                                 document.getElementById('punchOutBtn').disabled = false;
                             }
-                            if (data.success && data.action === 'punchOut') {
+                            if (data.action === 'punchOut') {
                                 document.getElementById('punchOutBtn').disabled = true;
                             }
                         })
@@ -372,12 +315,13 @@
             }
         }
 
+        // Bind buttons
         document.getElementById('punchInBtn').addEventListener('click', function() {
-            sendPunch("{{ route('attendance.punchIn') }}");
+            sendPunch("{{ route('attendance.punchIn') }}", "map", "punched in");
         });
 
         document.getElementById('punchOutBtn').addEventListener('click', function() {
-            sendPunch("{{ route('attendance.punchOut') }}");
+            sendPunch("{{ route('attendance.punchOut') }}", "mapOut", "punched out");
         });
     </script>
 @endsection

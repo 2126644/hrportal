@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\TwoFactorController;
 
 // Home page
@@ -44,6 +45,10 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
+    
+    Route::get('/leave', [LeaveController::class, 'index'])->name('employee.leave');
+    Route::post('/leave-approval/{id}/approve', [LeaveController::class, 'approve'])->name('leave.approve');
+    Route::post('/leave-approval/{id}/reject', [LeaveController::class, 'reject'])->name('leave.reject');
 });
 
 Route::get('/holidays', function () {

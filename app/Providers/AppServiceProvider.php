@@ -19,6 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        date_default_timezone_set(config('app.timezone'));
+        date_default_timezone_set(config('app.timezone'));  //added to set timezone globally
     }
 }

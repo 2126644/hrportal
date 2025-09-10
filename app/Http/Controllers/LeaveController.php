@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Leave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class LeaveController extends Controller
 {
@@ -20,11 +21,11 @@ class LeaveController extends Controller
         $pendingLeaves  = Leave::where('employee_id', $employee->id)->where('status', 'pending')->count();
         $approvedLeaves = Leave::where('employee_id', $employee->id)->where('status', 'approved')->count();
 
-        return response()->json([
-            'leave_balance'   => $leaveBalance,
-            'pending_requests'=> $pendingLeaves,
-            'approved_leaves' => $approvedLeaves,
-        ]);
+        return view('employee.leave', compact(
+            'leaveBalance',
+            'pendingLeaves',
+            'approvedLeaves'
+        ));
     }
 
     /**

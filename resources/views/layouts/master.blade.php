@@ -258,7 +258,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        {{-- <a class="nav-link" href="{{ route('employee.leave') }}"> --}}
+                        <a class="nav-link" href="{{ route('employee.leave') }}">
                             <i class="bi bi-calculator-fill"></i> Leave
                         </a>
                     </li>
