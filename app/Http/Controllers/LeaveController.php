@@ -17,14 +17,24 @@ class LeaveController extends Controller
     {
         $employee = Auth::user()->employee;
 
-        $leaveBalance   = 20 - Leave::where('employee_id', $employee->id)->where('status', 'approved')->sum('days'); // assuming 20 days yearly
+        // Total approved days used
+        $usedDays = Leave::where('employee_id', $employee->id)->where('status', 'approved')->sum('days');
+
+        $leaveBalance   = 14 - $usedDays; // assuming 14 days AL
         $pendingLeaves  = Leave::where('employee_id', $employee->id)->where('status', 'pending')->count();
         $approvedLeaves = Leave::where('employee_id', $employee->id)->where('status', 'approved')->count();
+        $totalRequests  = Leave::where('employee_id', $employee->id)->count();
+
+        // Get all requests to show in a table
+        $leaveRequests  = Leave::where('employee_id', $employee->id)->orderBy('created_at', 'desc')->get();
 
         return view('employee.leave', compact(
-            'leaveBalance',
+            'totalRequests',
+            'approvedLeaves',
             'pendingLeaves',
-            'approvedLeaves'
+            'leaveBalance',
+            'usedDays',
+            'leaveRequests'
         ));
     }
 
@@ -45,24 +55,44 @@ class LeaveController extends Controller
         $employee = Auth::user()->employee;
 
         $request->validate([
+            'leave_type'  => 'required|string|max:50',
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after_or_equal:start_date',
             'reason'     => 'required|string|max:255',
+            'attachment'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
         $days = (new \Carbon\Carbon($request->start_date))
-                ->diffInDays(new \Carbon\Carbon($request->end_date)) + 1;
+            ->diffInDays(new \Carbon\Carbon($request->end_date)) + 1;
 
-        Leave::create([
-            'employee_id' => $employee->id,
-            'start_date'  => $request->start_date,
-            'end_date'    => $request->end_date,
-            'days'        => $days,
-            'reason'      => $request->reason,
-            'status'      => 'pending',
-        ]);
+        // Leave::create([
+        //     'employee_id' => $employee->id,
+        //     'start_date'  => $request->start_date,
+        //     'end_date'    => $request->end_date,
+        //     'days'        => $days,
+        //     'reason'      => $request->reason,
+        //     'status'      => 'pending',
+        // ]);
 
-        return response()->json(['message' => 'Leave request submitted successfully']);
+        $leave = new Leave();
+        $leave->employee_id  = $employee->id;
+        $leave->name         = $employee->name; // assuming Employee has 'name'
+        $leave->applied_date = Carbon::now()->toDateString();
+        $leave->leave_type   = $request->leave_type;
+        $leave->reason       = $request->reason;
+        $leave->start_date   = $request->start_date;
+        $leave->end_date     = $request->end_date;
+        $leave->days         = $days;
+
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->store('leave_attachments', 'public');
+            $leave->attachment = $filePath;
+        }
+
+        $leave->status = 'pending';
+        $leave->save();
+
+        return redirect()->route('employee.leave')->with('success', 'Leave request submitted successfully!');
     }
 
     /**

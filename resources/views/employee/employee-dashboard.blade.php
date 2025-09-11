@@ -152,17 +152,12 @@
         <div class="dashboard-header mb-4">
             <div class="datetime-punch">
                 <div class="datetime" id="currentDateTime"></div>
-
                 <button class="btn-punch" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
                     Punch In
                 </button>
-                <div id="map" style="height: 300px; border-radius: 10px; margin-top:20px;"></div>
-
-
                 <button class="btn-punch" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
                     Punch Out
                 </button>
-                <div id="mapOut" style="height: 300px; border-radius: 10px; margin-top:20px;"></div>
             </div>
         </div>
 
@@ -241,8 +236,6 @@
         </div>
     </div>
 
-    </div>
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
@@ -284,7 +277,8 @@
                         .then(res => res.json())
                         .then(data => {
                             alert(
-                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`);
+                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
+                                );
 
                             if (mapId) {
                                 var map = L.map(mapId).setView([lat, lng], 16);
@@ -295,7 +289,7 @@
                                 L.marker([lat, lng]).addTo(map)
                                     .bindPopup(
                                         `${punchType} Location<br>Status: ${data.status ?? data.status_time_in}`
-                                        )
+                                    )
                                     .openPopup();
                             }
 

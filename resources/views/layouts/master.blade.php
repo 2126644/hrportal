@@ -253,7 +253,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        {{-- <a class="nav-link" href="{{ route('employee.attendance') }}"> --}}
+                        <a class="nav-link" href="{{ route('employee.attendance') }}">
                             <i class="bi bi-journal-text"></i> Attendance
                         </a>
                     </li>

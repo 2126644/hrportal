@@ -25,11 +25,13 @@ class AttendanceController extends Controller
         $daysAbsent  = $attendanceRecords->where('status', 'absent')->count();
         $lastPunchIn = $attendanceRecords->where('status', 'present')->last()?->created_at;
 
-        return response()->json([
-            'days_present' => $daysPresent,
-            'days_absent'  => $daysAbsent,
-            'last_punch_in' => $lastPunchIn ? $lastPunchIn->toDateTimeString() : '-',
-        ]);
+        $attendance = [
+        'days_present' => 0,
+        'days_absent' => 0,
+        'last_punch_in' => '-',
+    ];
+
+    return view('employee.attendance', compact('attendance'));
     }
 
     // Punch in (mark attendance)

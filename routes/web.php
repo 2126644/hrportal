@@ -47,8 +47,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
     
     Route::get('/leave', [LeaveController::class, 'index'])->name('employee.leave');
-    Route::post('/leave-approval/{id}/approve', [LeaveController::class, 'approve'])->name('leave.approve');
-    Route::post('/leave-approval/{id}/reject', [LeaveController::class, 'reject'])->name('leave.reject');
+    Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
+
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
+
 });
 
 Route::get('/holidays', function () {
