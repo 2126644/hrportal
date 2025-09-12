@@ -8,6 +8,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LeaveController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TwoFactorController;
 
 // Home page
@@ -50,6 +51,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
 
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
+
+    Route::get('/tasks', [TaskController::class, 'index'])->name('employee.task');
 
 });
 

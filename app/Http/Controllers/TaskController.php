@@ -16,18 +16,24 @@ class TaskController extends Controller
     {
         $employee = Auth::user()->employee;
 
-        $pendingTasks   = Task::where('employee_id', $employee->id)->where('status', 'pending')->count();
+        $totalTasks = Task::where('employee_id', $employee->id)->count();
+        $toDoTasks   = Task::where('employee_id', $employee->id)->where('status', 'to_do')->count();
+        $inProgressTasks = Task::where('employee_id', $employee->id)->where('status', 'in_progress')->count();
+        $inReviewTasks = Task::where('employee_id', $employee->id)->where('status', 'in_review')->count();
         $completedTasks = Task::where('employee_id', $employee->id)->where('status', 'completed')->count();
-        $overdueTasks   = Task::where('employee_id', $employee->id)
-                            ->where('status', '!=', 'completed')
-                            ->where('due_date', '<', now())
-                            ->count();
+        // $overdueTasks   = Task::where('employee_id', $employee->id)
+        //                     ->where('status', '!=', 'completed')
+        //                     ->where('due_date', '<', now())
+        //                     ->count();
 
-        return response()->json([
-            'pending'   => $pendingTasks,
-            'completed' => $completedTasks,
-            'overdue'   => $overdueTasks,
-        ]);
+        return view('employee.task', compact(
+            'totalTasks',
+            'toDoTasks',
+            'inProgressTasks',
+            'inReviewTasks',
+            'completedTasks'
+        ));
+
     }
 
     /**

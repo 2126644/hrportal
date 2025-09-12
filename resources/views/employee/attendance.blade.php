@@ -8,22 +8,26 @@
 
         .datetime-punch {
             display: flex;
-            flex-direction: column; /* stack time on top of date */
+            flex-direction: column;
+            /* stack time on top of date */
             justify-content: space-between;
             align-items: center;
-            text-align: center; /* center text */
+            text-align: center;
+            /* center text */
             flex-wrap: wrap;
             gap: 1rem;
         }
 
         .datetime-time {
-            font-size: 2rem; /* larger font for time */
+            font-size: 1.5rem;
+            /* larger font for time */
             font-weight: 600;
         }
 
         .datetime-date {
-            font-size: 1rem; /* smaller font for date */
-            font-weight: 500;
+            font-size: 0.75rem;
+            /* smaller font for date */
+            margin-top: -0.5rem;
         }
 
         .btn-leave {
@@ -87,9 +91,8 @@
         }
 
         .card-title {
-            font-weight: 600;
             color: #2980b9;
-            font-size: 1.25rem;
+            font-size: 1rem;
         }
 
         .card-header p {
@@ -135,16 +138,20 @@
         <!-- Total Requests -->
         <div class="col-12 col-md-4 mb-4">
             <div class="card">
-                <div class="card-body d-flex justify-content-between">
+                <div class="card-body">
                     {{-- makes content flexible row-pushes text left, icon right --}}
-                    
-                        <div class="card-title">Check In/Check Out</div>
-                        <div class="datetime-punch">
-                            <div class="datetime-time" id="currentDateTime"></div>
-                            <div class="datetime-date" id="currentDateTime"></div>
-                        </div>
-                    
-                    <i class="bi bi-files me-3 fs-4 text-primary"></i>
+
+                    <div class="card-title">Check In/Check Out</div>
+                    <div class="datetime-punch">
+                        <div class="datetime-time" id="currentTime"></div>
+                        <div class="datetime-date" id="currentDate"></div>
+                    </div>
+
+                <div>
+                    <h3>Check In:</h3>
+                    <h3>Check Out:</h3>
+                </div>
+
                 </div>
             </div>
         </div>
@@ -152,29 +159,57 @@
         <!-- Approved -->
         <div class="col-12 col-md-8 mb-4">
             <div class="card">
-                <div class="card-body d-flex justify-content-between">
-                    <div>
-                        <div class="card-title">Attendance History</div>
-                        <g>11</g>
-                    </div>
-                    <i class="bi bi-check-circle-fill me-3 fs-4 text-success"></i>
+                <div class="card-body">
+                    <h4 class="card-title">Attendance History</h4>
+                    <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Date</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Check In</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Check Out</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Hours</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-3 px-3 border-b border-gray-100">12/15/2024</td>
+                                <td class="py-3 px-3 border-b border-gray-100">8:00 AM</td>
+                                <td class="py-3 px-3 border-b border-gray-100">5:00 PM</td>
+                                <td class="py-3 px-3 border-b border-gray-100">8</td>
+                                <td class="py-3 px-3 border-b border-gray-100">
+                                    <span
+                                        class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-1 rounded-full">Present</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
     </div>
     <script>
-    function updateDateTime() {
+        function updateDateTime() {
             const now = new Date();
-            const options = {
+
+            // Format date
+            const dateStr = now.toLocaleDateString(undefined, {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
-            };
-            const dateStr = now.toLocaleDateString(undefined, options);
-            const timeStr = now.toLocaleTimeString();
-            document.getElementById('currentDateTime').textContent = `${dateStr} - ${timeStr}`;
+            });
+
+            // Format time (HH:MM:SS)
+            const timeStr = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            document.getElementById('currentTime').textContent = timeStr;
+            document.getElementById('currentDate').textContent = dateStr;
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
