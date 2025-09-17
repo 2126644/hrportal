@@ -20,11 +20,11 @@ class Attendance extends Model
         'status_time_out',
         'late_reason',
         'early_leave_reason',
-        'status', // on-site, off-site, missing
+        'status', 
     ];
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 }

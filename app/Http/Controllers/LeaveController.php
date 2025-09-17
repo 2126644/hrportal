@@ -28,7 +28,11 @@ class LeaveController extends Controller
         // Get all requests to show in a table
         $leaveRequests  = Leave::where('employee_id', $employee->id)->orderBy('created_at', 'desc')->get();
 
+        $query = Leave::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
+        $leaves = $query->get();
+
         return view('employee.leave', compact(
+            'leaves',
             'totalRequests',
             'approvedLeaves',
             'pendingLeaves',
@@ -43,7 +47,7 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        //
+        return view('employee.applyleave');
     }
 
     /**
@@ -55,11 +59,11 @@ class LeaveController extends Controller
         $employee = Auth::user()->employee;
 
         $request->validate([
-            'leave_type'  => 'required|string|max:50',
-            'start_date' => 'required|date',
-            'end_date'   => 'required|date|after_or_equal:start_date',
-            'reason'     => 'required|string|max:255',
-            'attachment'  => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
+            'leave_type'    => 'required|string|max:50',
+            'start_date'    => 'required|date',
+            'end_date'      => 'required|date|after_or_equal:start_date',
+            'reason'        => 'required|string|max:255',
+            'attachment'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
         $days = (new \Carbon\Carbon($request->start_date))
@@ -75,8 +79,8 @@ class LeaveController extends Controller
         // ]);
 
         $leave = new Leave();
-        $leave->employee_id  = $employee->id;
-        $leave->name         = $employee->name; // assuming Employee has 'name'
+        $leave->employee_id  = $employee->employee_id;
+        $leave->name         = $employee->full_name; // assuming Employee has 'name'
         $leave->applied_date = Carbon::now()->toDateString();
         $leave->leave_type   = $request->leave_type;
         $leave->reason       = $request->reason;
@@ -92,7 +96,7 @@ class LeaveController extends Controller
         $leave->status = 'pending';
         $leave->save();
 
-        return redirect()->route('employee.leave')->with('success', 'Leave request submitted successfully!');
+        return redirect()->route('leave.create')->with('success', 'Leave request submitted successfully!');
     }
 
     /**

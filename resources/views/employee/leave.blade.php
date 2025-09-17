@@ -117,7 +117,9 @@
                                 <h3 class="page-title"><br>Leave Management</h3>
                                 <p class="text-muted">Manage your leave requests and view your balance.</p>
                             </div>
-                            <button class="btn-leave" id="leaveBtn">Apply for Leave</button>
+                            <button class="btn-leave" onclick="window.location='{{ route('leave.create') }}'">
+                                Apply for Leave
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -182,7 +184,7 @@
                     @php
                         $total = 14;
                         $usedDays = 12;
-                        // $usedDays = $total - $leaveBalance;
+                        $usedDays = $total - $leaveBalance;
                         $percentage = ($usedDays / $total) * 100;
                     @endphp
 
@@ -214,7 +216,7 @@
                     @php
                         $total = 14;
                         $usedDays = 12;
-                        // $usedDays = $total - $leaveBalance;
+                        $usedDays = $total - $leaveBalance;
                         $percentage = ($usedDays / $total) * 100;
                     @endphp
 
@@ -247,7 +249,7 @@
                     @php
                         $total = 14;
                         $usedDays = 12;
-                        // $usedDays = $total - $leaveBalance;
+                        $usedDays = $total - $leaveBalance;
                         $percentage = ($usedDays / $total) * 100;
                     @endphp
 
@@ -282,9 +284,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- @foreach ($leaves as $leave)
+                            @foreach ($leaves as $leave)
                                 <tr>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $leave->type }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $leave->leave_type }}</td>
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $leave->start_date }}</td>
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $leave->end_date }}</td>
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $leave->reason }}</td>
@@ -303,18 +305,7 @@
                                     <td class="py-3 px-3 border-b border-gray-100">
                                         {{ $leave->created_at->format('d M Y') }}</td>
                                 </tr>
-                            @endforeach --}}
-                                <tr>
-                                    <td class="py-3 px-3 border-b border-gray-100">Sick Leave</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">12/15/2024</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">12/15/2024</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">Medical appointment</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">
-                                        <span
-                                            class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-1 rounded-full">Pending</span>
-                                    </td>
-                                    <td class="py-3 px-3 border-b border-gray-100">12/14/2024</td>
-                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

@@ -117,7 +117,9 @@
                                 <h3 class="page-title"><br>Tasks & Projects</h3>
                                 <p class="text-muted">Manage your tasks and track project progress.</p>
                             </div>
-                            <button class="btn-leave" id="leaveBtn">New Tasks</button>
+                            <button class="btn-leave" onclick="window.location='{{ route('task.create') }}'">
+                                New Tasks
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
-            $table->id(); // PK for relationships
-            $table->string('employee_id')->unique(); // staff number, matric, etc.
+            $table->string('employee_id')->primary();    // staff number, matric, etc. custom PK
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('full_name');
             $table->string('department')->nullable();

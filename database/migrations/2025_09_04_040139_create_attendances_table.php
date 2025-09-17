@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('employee_id');
+            $table->string('employee_id');  // add foreign key column
             $table->date('date');
             $table->time('time_in')->nullable();
             $table->string('location')->nullable();
@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string('late_reason')->nullable();
             $table->string('early_leave_reason')->nullable();
             $table->enum('status', ['on-site', 'off-site', 'leave'])->default('on-site');
+
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  
+            
             $table->timestamps();
         });
     }

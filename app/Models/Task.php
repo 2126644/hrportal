@@ -11,14 +11,20 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
+        'employee_id',
         'title',
         'description',
         'assigned_to',
         'assigned_by',
-        'status', // pending, completed
+        'status',
         'notes',
         'due_date',
     ];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
+    }
 
     public function assignedTo()
     {

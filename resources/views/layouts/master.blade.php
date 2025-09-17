@@ -420,6 +420,10 @@
                 <i class="bi bi-ui-checks"></i>
                 <span>Task</span>
             </a>
+            <a class="nav-link" href="{{ route('employee.event') }}">
+                <i class="bi bi-ui-checks"></i>
+                <span>Event</span>
+            </a>
             <a class="nav-link" href="{{ route('update.profile') }}">
                 <i class="bi bi-person-circle"></i>
                 <span>Profile</span>

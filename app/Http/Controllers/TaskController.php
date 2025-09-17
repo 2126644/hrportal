@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -16,11 +17,11 @@ class TaskController extends Controller
     {
         $employee = Auth::user()->employee;
 
-        $totalTasks = Task::where('employee_id', $employee->id)->count();
-        $toDoTasks   = Task::where('employee_id', $employee->id)->where('status', 'to_do')->count();
-        $inProgressTasks = Task::where('employee_id', $employee->id)->where('status', 'in_progress')->count();
-        $inReviewTasks = Task::where('employee_id', $employee->id)->where('status', 'in_review')->count();
-        $completedTasks = Task::where('employee_id', $employee->id)->where('status', 'completed')->count();
+        $totalTasks         = Task::where('employee_id', $employee->id)->count();
+        $toDoTasks          = Task::where('employee_id', $employee->id)->where('status', 'to_do')->count();
+        $inProgressTasks    = Task::where('employee_id', $employee->id)->where('status', 'in_progress')->count();
+        $inReviewTasks      = Task::where('employee_id', $employee->id)->where('status', 'in_review')->count();
+        $completedTasks     = Task::where('employee_id', $employee->id)->where('status', 'completed')->count();
         // $overdueTasks   = Task::where('employee_id', $employee->id)
         //                     ->where('status', '!=', 'completed')
         //                     ->where('due_date', '<', now())
@@ -41,7 +42,7 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        return view('employee.createtask');
     }
 
     /**
@@ -53,20 +54,40 @@ class TaskController extends Controller
         $employee = Auth::user()->employee;
 
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'due_date'    => 'required|date',
+            'title'         => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'assigned_to'   => 'required|string|max:255',
+            'assigned_by'   => 'required|string|max:255',
+            'status'        => 'required|in:pending,completed',
+            'notes'         => 'nullable|string',
+            'due_date'      => 'nullable|date',
         ]);
 
-        Task::create([
-            'employee_id' => $employee->id,
-            'title'       => $request->title,
-            'description' => $request->description,
-            'due_date'    => $request->due_date,
-            'status'      => 'pending',
-        ]);
+        // Task::create([
+        //     'employee_id' => $employee->employee_id,
+        //     'title'       => $request->title,
+        //     'description' => $request->description,
+        //     'assigned_to'  => $request->assigned_to,
+        //     'assigned_by'  => $request->assigned_by,
+        //     'status'      => $request->status,
+        //     'notes'       => $request->notes,
+        //     'due_date'    => $request->due_date,
+        // ]);
 
-        return response()->json(['message' => 'Task created successfully']);
+        $task = new Task();
+        $task->employee_id  = $employee->employee_id;
+        $task->title        = $request->title;
+        $task->description  = $request->description;
+        $task->assigned_to  = $request->assigned_to;
+        $task->assigned_by  = $request->assigned_by;
+        $task->status       = $request->status;
+        $task->notes        = $request->notes;
+        $task->due_date     = $request->due_date;
+
+        $task->status = 'pending';
+        $task->save();
+
+        return redirect()->route('task.create')->with('success','Task created successfully!');
     }
 
     // Mark task as completed

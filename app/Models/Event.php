@@ -14,6 +14,7 @@ class Event extends Model
         'event_name',
         'event_date',
         'event_time',
+        'event_location',
     ];
 
     // Optional: format date for easy usage in Blade

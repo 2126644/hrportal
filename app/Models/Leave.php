@@ -15,6 +15,7 @@ class Leave extends Model
         'name',
         'applied_date',
         'leave_type',
+        'leave_length',
         'reason',
         'start_date',
         'end_date',
@@ -28,7 +29,7 @@ class Leave extends Model
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
 
     public function approvedBy()

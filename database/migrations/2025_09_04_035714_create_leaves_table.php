@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('employee_id');
+            $table->string('employee_id');  // add foreign key column
             $table->string('name');
             $table->date('applied_date');
-            $table->string('leave_type'); // annual, sick, emergency
+            $table->enum('leave_type', ['annual', 'sick', 'emergency']);
+            $table->enum('leave_length', ['full_day', 'AM', 'PM']);
             $table->text('reason')->nullable();
             $table->date('start_date');
             $table->date('end_date');
@@ -26,6 +27,9 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('reject_reason')->nullable();
             $table->string('action')->nullable();
+
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  // when the parent record is deleted, the child is deleted.
+            
             $table->timestamps();
         });
     }
