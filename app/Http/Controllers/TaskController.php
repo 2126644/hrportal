@@ -17,22 +17,23 @@ class TaskController extends Controller
     {
         $employee = Auth::user()->employee;
 
-        $totalTasks         = Task::where('employee_id', $employee->id)->count();
-        $toDoTasks          = Task::where('employee_id', $employee->id)->where('status', 'to_do')->count();
-        $inProgressTasks    = Task::where('employee_id', $employee->id)->where('status', 'in_progress')->count();
-        $inReviewTasks      = Task::where('employee_id', $employee->id)->where('status', 'in_review')->count();
-        $completedTasks     = Task::where('employee_id', $employee->id)->where('status', 'completed')->count();
-        // $overdueTasks   = Task::where('employee_id', $employee->id)
-        //                     ->where('status', '!=', 'completed')
-        //                     ->where('due_date', '<', now())
-        //                     ->count();
+        $totalTasks         = Task::where('employee_id', $employee->employee_id)->count();
+        $toDoTasks          = Task::where('employee_id', $employee->employee_id)->where('status', 'to-do')->count();
+        $inProgressTasks    = Task::where('employee_id', $employee->employee_id)->where('status', 'in-progress')->count();
+        $inReviewTasks      = Task::where('employee_id', $employee->employee_id)->where('status', 'in-review')->count();
+        $completedTasks     = Task::where('employee_id', $employee->employee_id)->where('status', 'completed')->count();
 
+        // Get all requests to show in a table
+        $query = Task::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
+        $tasks = $query->get();
+       
         return view('employee.task', compact(
             'totalTasks',
             'toDoTasks',
             'inProgressTasks',
             'inReviewTasks',
-            'completedTasks'
+            'completedTasks',
+            'tasks'
         ));
 
     }
@@ -58,7 +59,7 @@ class TaskController extends Controller
             'description'   => 'nullable|string',
             'assigned_to'   => 'required|string|max:255',
             'assigned_by'   => 'required|string|max:255',
-            'status'        => 'required|in:pending,completed',
+            'status'        => 'required|in:to-do,in-progress,in-review,completed',
             'notes'         => 'nullable|string',
             'due_date'      => 'nullable|date',
         ]);
@@ -79,12 +80,11 @@ class TaskController extends Controller
         $task->title        = $request->title;
         $task->description  = $request->description;
         $task->assigned_to  = $request->assigned_to;
-        $task->assigned_by  = $request->assigned_by;
+        $task->assigned_by  = $employee->employee_id; // Assuming the assigner is the logged-in employee
         $task->status       = $request->status;
         $task->notes        = $request->notes;
         $task->due_date     = $request->due_date;
 
-        $task->status = 'pending';
         $task->save();
 
         return redirect()->route('task.create')->with('success','Task created successfully!');

@@ -127,7 +127,7 @@
                         <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Assigned To</label>
-                            <input type="text" name="assigned_to" class="form-control" placeholder="Enter your employee's id" required>
+                            <input type="text" name="assigned_to" class="form-control" placeholder="Enter employee's id" required>
                             @error('assigned_to')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -146,7 +146,9 @@
                             <label class="form-label">Task Status</label>
                             <select name="status" class="form-select" required>
                                 <option value="">-- Select Status --</option>
-                                <option value="pending">Pending</option>
+                                <option value="to-do">To-Do</option>
+                                <option value="in-progress">In-Progress</option>
+                                <option value="in-review">In-Review</option>
                                 <option value="completed">Completed</option>
                             </select>
                             @error('status')

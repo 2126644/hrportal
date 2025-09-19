@@ -19,19 +19,22 @@ class AttendanceController extends Controller
     {
         $employee = Auth::user()->employee;
 
-        $attendanceRecords = Attendance::where('employee_id', $employee->employee_id)->get();
+        // Get all requests to show in a table
+        $query = Attendance::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
+        $attendances = $query->get();
 
-        $daysPresent = $attendanceRecords->where('status', 'present')->count();
-        $daysAbsent  = $attendanceRecords->where('status', 'absent')->count();
-        $lastPunchIn = $attendanceRecords->where('status', 'present')->last()?->created_at;
+        // 🔹 Latest record (also filter by today)
+        $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
+        ->whereDate('date', Carbon::today())
+        ->orderBy('date', 'desc')
+        ->orderBy('created_at', 'desc')
+        ->first();
 
-        $attendance = [
-        'days_present' => 0,
-        'days_absent' => 0,
-        'last_punch_in' => '-',
-    ];
+        return view('employee.attendance', compact(
+            'attendances', 
+            'todayAttendance'
+        ));
 
-    return view('employee.attendance', compact('attendance'));
     }
 
     // Punch in (mark attendance)

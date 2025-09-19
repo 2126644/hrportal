@@ -137,7 +137,7 @@
                         <div class="card-title">Total Tasks</div>
                         <b>{{ $totalTasks }}</b>
                     </div>
-                    <i class="bi bi-list-task me-2 fs-5 text-primary"></i>  
+                    <i class="bi bi-list-task me-2 fs-5 text-primary"></i>
                     {{-- fs-smaller>bigger icon --}}
                 </div>
             </div>
@@ -198,18 +198,56 @@
         </div>
     </div>
 
-        <div class="row">
-        
-        <div class="col-12 col-md-12 mb-4">
+    <div class="row">
+
+        <div class="col-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div>
-                            <div class="card-title">Tasks</div>
-                            <b>{{ $completedTasks }}</b>
-                        </div>
-                        <i class="bi bi-person-badge me-3 fs-5 text-secondary"></i>
-                    </div>
+                    <h4 class="card-title">Tasks</h4>
+                    <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
+                        {{-- full width, text left aligned, small text, gray text, border collapse, vertical align middle --}}
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Title</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Description</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Assigned To</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Assigned By</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Notes</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Due Date</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Created At</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Last Update At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($tasks as $task)
+                                <tr>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->title }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->description }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->assigned_to }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->assigned_by }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">
+                                        <span
+                                            class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                            @if ($task->status === 'in-progress')
+                                                <span class="badge bg-info text-dark">In-Progress</span>
+                                            @elseif ($task->status === 'in-review')
+                                                <span class="badge bg-info text-dark">In-Review</span>
+                                            @elseif ($task->status === 'completed')
+                                                <span class="badge bg-success">Completed</span>
+                                            @elseif ($task->status === 'to-do')
+                                                <span class="badge bg-danger">To-Do</span>
+                                            @endif
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->notes }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->due_date }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->created_at->format('d M Y') }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->updated_at->format('d M Y') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

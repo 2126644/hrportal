@@ -11,6 +11,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TwoFactorController;
+use App\Models\Employee;
 
 // Home page
 Route::get('/', function () {
@@ -33,10 +34,11 @@ Route::get('/dashboard', function () {
 })->middleware('auth')->name('dashboard');
 
 // Two-Factor Routes
+
 // Show 2FA challenge page
-Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name('two-factor.login');
-// Handle submitted code
-Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
+// Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name('two-factor.login');
+// // Handle submitted code
+// Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
 
 //Route for DATABASE
 Route::middleware(['auth'])->group(function () {
@@ -73,12 +75,10 @@ Route::get('/holidays', function () {
 // Route::get('admin-courses', [AdminController::class, 'showCoursesList'])->name('admin.courses');
 
 
-// //Student update profile to student database
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/update-profile', [StudentController::class, 'editProfile'])->name('update.profile');
-//     Route::put('/student/update-profile', [StudentController::class, 'updateProfile'])->name('student.profile.update');
-//     Route::get('/ajax/specializations/{programme}', [StudentController::class, 'getSpecializations'])->name('ajax.specializations');
-// });
+//Student update profile to student database
+Route::middleware(['auth'])->group(function () {
+    Route::get('/update-profile', [EmployeeController::class, 'show'])->name('profile.show');
+});
 
 // Route::get('/admin/course/edit/{course_code}', [CourseController::class, 'editCourse'])->name('admin.course.edit');
 // Route::post('/admin/course/update/{course_code}', [CourseController::class, 'updateCourse'])->name('admin.course.update');

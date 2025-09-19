@@ -201,9 +201,9 @@
                 <div class="card-body">
                     <h4 class="card-title">Attendance</h4>
                     <ul>
-                        <li>Total Days Present: <span id="daysPresent">-</span></li>
-                        <li>Total Days Absent: <span id="daysAbsent">-</span></li>
-                        <li>Last Punch In: <span id="lastPunchIn">-</span></li>
+                        <li>Total Days Present: <span id="daysPresent">{{ $attendance['days_present'] }}</span></li>
+                        <li>Total Days Absent: <span id="daysAbsent">{{ $attendance['days_absent'] }}</span></li>
+                        <li>Last Punch In: <span id="lastPunchIn">{{ $attendance['last_punch_in'] }}</span></li>
                     </ul>
                 </div>
             </div>
@@ -227,9 +227,9 @@
                 <div class="card-body">
                     <h4 class="card-title">Tasks</h4>
                     <ul>
-                        <li>Pending Tasks: <span id="pendingTasks">-</span></li>
-                        <li>Completed Tasks: <span id="completedTasks">-</span></li>
-                        <li>Overdue Tasks: <span id="overdueTasks">-</span></li>
+                        <li>Pending Tasks: <span id="pendingTasks">{{ $task['pending_task'] }}</span></li>
+                        <li>Completed Tasks: <span id="completedTasks">{{ $task['completed_task'] }}</span></li>
+                        <li>Overdue Tasks: <span id="overdueTasks">{{ $task['overdue_task'] }}</span></li>
                     </ul>
                 </div>
             </div>

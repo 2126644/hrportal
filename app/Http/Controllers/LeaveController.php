@@ -18,27 +18,24 @@ class LeaveController extends Controller
         $employee = Auth::user()->employee;
 
         // Total approved days used
-        $usedDays = Leave::where('employee_id', $employee->id)->where('status', 'approved')->sum('days');
+        $usedDays = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->sum('days');
 
         $leaveBalance   = 14 - $usedDays; // assuming 14 days AL
-        $pendingLeaves  = Leave::where('employee_id', $employee->id)->where('status', 'pending')->count();
-        $approvedLeaves = Leave::where('employee_id', $employee->id)->where('status', 'approved')->count();
-        $totalRequests  = Leave::where('employee_id', $employee->id)->count();
+        $pendingLeaves  = Leave::where('employee_id', $employee->employee_id)->where('status', 'pending')->count();
+        $approvedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->count();
+        $totalRequests  = Leave::where('employee_id', $employee->employee_id)->count();
 
         // Get all requests to show in a table
-        $leaveRequests  = Leave::where('employee_id', $employee->id)->orderBy('created_at', 'desc')->get();
-
         $query = Leave::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
         $leaves = $query->get();
 
         return view('employee.leave', compact(
-            'leaves',
             'totalRequests',
             'approvedLeaves',
             'pendingLeaves',
             'leaveBalance',
             'usedDays',
-            'leaveRequests'
+            'leaves'
         ));
     }
 

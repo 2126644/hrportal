@@ -122,6 +122,19 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Leave Length</label>
+                            <select name="leave_length" class="form-select" required>
+                                <option value="">-- Select Length --</option>
+                                <option value="full_day">Full Day</option>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                            @error('leave_length')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Start Date</label>

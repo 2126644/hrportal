@@ -11,9 +11,49 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Event::query();
+
+        // Apply filters
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('event_name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('tags', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('event_status') && $request->event_status !== 'all') {
+            $query->where('event_status', $request->event_status);
+        }
+
+        if ($request->filled('price_filter')) {
+            if ($request->price_filter === 'free') {
+                $query->where('price', 0);
+            } elseif ($request->price_filter === 'paid') {
+                $query->where('price', '>', 0);
+            }
+        }
+
+        $events = $query->orderBy('event_date', 'asc')->get();
+        
+        // Calculate stats
+        $stats = [
+            'total_events' => Event::count(),
+            'upcoming_events' => Event::where('event_status', 'upcoming')->count(),
+            'total_attendees' => Event::sum('attendees'),
+            'average_attendance' => Event::count() > 0 ? round(Event::sum('attendees') / Event::count()) : 0
+        ];
+
+        $viewMode = $request->get('view', 'grid');
+
+        return view('employee.event', compact('events', 'stats', 'viewMode'));
     }
 
     /**

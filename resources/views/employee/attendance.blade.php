@@ -141,16 +141,24 @@
                 <div class="card-body">
                     {{-- makes content flexible row-pushes text left, icon right --}}
 
-                    <div class="card-title">Check In/Check Out</div>
+                    <div class="card-title">Today's Attendance</div>
                     <div class="datetime-punch">
                         <div class="datetime-time" id="currentTime"></div>
                         <div class="datetime-date" id="currentDate"></div>
                     </div>
 
-                <div>
-                    <h3>Check In:</h3>
-                    <h3>Check Out:</h3>
-                </div>
+                    <div class="mt-3">
+                        <h5>Time In:
+                            <span class="text-primary">
+                                {{ $todayAttendance?->time_in ?? '—' }}
+                            </span>
+                        </h5>
+                        <h5>Time Out:
+                            <span class="text-primary">
+                                {{ $todayAttendance?->time_out ?? '—' }}
+                            </span>
+                        </h5>
+                    </div>
 
                 </div>
             </div>
@@ -165,23 +173,35 @@
                         <thead>
                             <tr>
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Date</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Check In</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Check Out</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Hours</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Time-In</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Status Time-In</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Time-Out</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Status Time-Out</th>
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="py-3 px-3 border-b border-gray-100">12/15/2024</td>
-                                <td class="py-3 px-3 border-b border-gray-100">8:00 AM</td>
-                                <td class="py-3 px-3 border-b border-gray-100">5:00 PM</td>
-                                <td class="py-3 px-3 border-b border-gray-100">8</td>
-                                <td class="py-3 px-3 border-b border-gray-100">
-                                    <span
-                                        class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-1 rounded-full">Present</span>
-                                </td>
-                            </tr>
+                            @foreach ($attendances as $attendance)
+                                <tr>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->date }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->time_in }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->status_time_in }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->time_out }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->status_time_out }}</td>
+                                    <td class="py-3 px-3 border-b border-gray-100">
+                                        @if ($attendance->status == 'on-site')
+                                            <span
+                                                class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">On-Site</span>
+                                        @elseif ($attendance->status == 'leave')
+                                            <span
+                                                class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full">Leave</span>
+                                        @else
+                                            <span
+                                                class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-1 rounded-full">Off-Site</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

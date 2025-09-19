@@ -421,10 +421,10 @@
                 <span>Task</span>
             </a>
             <a class="nav-link" href="{{ route('employee.event') }}">
-                <i class="bi bi-ui-checks"></i>
+                <i class="bi bi-megaphone"></i>
                 <span>Event</span>
             </a>
-            <a class="nav-link" href="{{ route('update.profile') }}">
+            <a class="nav-link" href="{{ route('profile.show') }}">
                 <i class="bi bi-person-circle"></i>
                 <span>Profile</span>
             </a>
