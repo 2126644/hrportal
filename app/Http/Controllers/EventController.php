@@ -18,10 +18,10 @@ class EventController extends Controller
         // Apply filters
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('event_name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('tags', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('tags', 'like', "%{$search}%");
             });
         }
 
@@ -42,7 +42,7 @@ class EventController extends Controller
         }
 
         $events = $query->orderBy('event_date', 'asc')->get();
-        
+
         // Calculate stats
         $stats = [
             'total_events' => Event::count(),
@@ -71,18 +71,49 @@ class EventController extends Controller
     {
         $employee = Auth::user()->employee;
 
+        // ✅ 1. Validate all important columns that are NOT nullable
         $request->validate([
             'event_name'        => 'required|string|max:100',
+            'description'       => 'required|string',
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
+            'category'          => 'required|in:meeting,conference,workshop,networking,webinar,social,other',
+            'capacity'          => 'required|integer|min:1',
+            'attendees'         => 'nullable|integer|min:0',
+            'price'             => 'nullable|numeric|min:0',
+            'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // max 2MB
+            'event_status'      => 'required|in:upcoming,ongoing,completed,cancelled',
+            'organizer'         => 'required|string|max:100',
+            'tags'              => 'nullable|array',    // expecting an array from form
+            'rsvp_required'     => 'nullable|boolean',
+            
         ]);
 
+        // ✅ 2. Handle image upload if provided
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('events', 'public');
+            // saves files to storage/app/public/events.
+        }
+
+        // ✅ 3. Create and save event
         $event = new Event();
+        $event->created_by       = $employee->employee_id;
         $event->event_name       = $request->event_name;
+        $event->description      = $request->description;
         $event->event_date       = $request->event_date;
         $event->event_time       = $request->event_time;
         $event->event_location   = $request->event_location;
+        $event->category         = $request->category;
+        $event->capacity         = $request->capacity;
+        $event->attendees        = $request->attendees ?? 0; // default
+        $event->price            = $request->price ?? 0;     // default
+        $event->image            = $imagePath; // can be null
+        $event->organizer        = $request->organizer;
+        $event->tags             = $request->tags ? json_encode($request->tags) : null; // store as JSON or null
+        $event->rsvp_required    = $request->boolean('rsvp_required', false);
+        // event_status defaults to "upcoming" in the migration
 
         $event->save();
 
@@ -94,7 +125,8 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        return view('employee.ref', compact('event'));
     }
 
     /**

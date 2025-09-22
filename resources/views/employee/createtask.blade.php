@@ -100,83 +100,88 @@
             <div class="card">
                 <div class="card-body justify-content-between">
                     {{-- makes content flexible row-pushes text left, icon right --}}
-                    {{-- <div>
-                        <div class="card-title">Total Requests</div>
-                        <b>{{ $totalRequests }}</b>
-                    </div> --}}
 
-                    <form action="{{ route('task.store') }}" method="POST">
+                    <form action="{{ route('task.store') }}" method="POST" novalidate>
                         @csrf
 
                         <div class="mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" name="title" class="form-control" placeholder="Name the task" required>
+                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" id="title" name="title" class="form-control"
+                                placeholder="Name the task" value="{{ old('title') }}" required>
                             @error('title')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="mt-3">
-                            <label class="form-label">Description</label>
-                            <textarea name="description" rows="3" class="form-control" placeholder="Describe the task"></textarea>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea id="description" name="description" rows="3" class="form-control" placeholder="Describe the task">{{ old('description') }}</textarea>
                             @error('description')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Assigned To</label>
-                            <input type="text" name="assigned_to" class="form-control" placeholder="Enter employee's id" required>
-                            @error('assigned_to')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Assigned By</label>
-                            <input type="text" name="assigned_by" class="form-control" placeholder="Enter employee's id" required>
-                            @error('assigned_by')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        </div>
-
-                        <div class="mt-3">
-                            <label class="form-label">Task Status</label>
-                            <select name="status" class="form-select" required>
-                                <option value="">-- Select Status --</option>
-                                <option value="to-do">To-Do</option>
-                                <option value="in-progress">In-Progress</option>
-                                <option value="in-review">In-Review</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                            @error('status')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="assigned_to" class="form-label">Assigned To <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="assigned_to" name="assigned_to" class="form-control"
+                                    placeholder="Enter employee's id" value="{{ old('assigned_to') }}" required>
+                                @error('assigned_to')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Due Date</label>
-                                <input type="date" name="due_date" class="form-control">
+                                <label for="assigned_by" class="form-label">Assigned By <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" id="assigned_by" name="assigned_by" class="form-control"
+                                    placeholder="Enter employee's id" value="{{ old('assigned_by') }}" required>
+                                @error('assigned_by')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Task Status <span
+                                        class="text-danger">*</span></label>
+                                <select id="status"name="status" class="form-select" required>
+                                    <option value="" disabled {{ old('status') ? '' : 'selected' }}>Select Status</option>
+                                    <option value="to-do" {{ old('status') === 'to-do' ? 'selected' : '' }}>To-Do</option>
+                                    <option value="in-progress" {{ old('status') === 'in-progress' ? 'selected' : '' }}>
+                                        In-Progress</option>
+                                    <option value="in-review" {{ old('status') === 'in-review' ? 'selected' : '' }}>
+                                        In-Review</option>
+                                    <option value="completed" {{ old('status') === 'completed' ? 'selected' : '' }}>
+                                        Completed</option>
+                                </select>
+                                @error('status')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="due_date" class="form-label">Due Date</label>
+                                <input type="date" id="due_date" name="due_date" class="form-control"
+                                    value="{{ old('due_date') }}">
                                 @error('due_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
-                        
-                        <div class="mt-3">
-                            <label class="form-label">Notes</label>
-                            <textarea name="notes" rows="3" class="form-control" placeholder="Additional notes"></textarea>
-                            @error('notes')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
 
-                        <div class="mt-4 d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary px-4">
-                                Create Task
-                            </button>
-                        </div>
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Notes</label>
+                                <textarea id="notes" name="notes" rows="3" class="form-control" placeholder="Additional notes">{{ old('notes') }}</textarea>
+                                @error('notes')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary px-4">Create Task</button>
+                            </div>
                     </form>
                 </div>
             </div>

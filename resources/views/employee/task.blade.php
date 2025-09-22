@@ -111,8 +111,8 @@
             @endif
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="page-sub-header">
-                        <div class="d-flex justify-content-between align-items-center">
+                    <div class="page-sub-header w-100">
+                        <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
                                 <h3 class="page-title"><br>Tasks & Projects</h3>
                                 <p class="text-muted">Manage your tasks and track project progress.</p>

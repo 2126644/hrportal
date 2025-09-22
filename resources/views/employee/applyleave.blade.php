@@ -100,22 +100,23 @@
             <div class="card">
                 <div class="card-body justify-content-between">
                     {{-- makes content flexible row-pushes text left, icon right --}}
-                    {{-- <div>
-                        <div class="card-title">Total Requests</div>
-                        <b>{{ $totalRequests }}</b>
-                    </div> --}}
 
-                    <form action="{{ route('leave.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('leave.store') }}" method="POST" enctype="multipart/form-data" novalidate>
                         {{-- enctype tells the browser to send the request body in multipart MIME format, necessary for file uploads --}}
                         @csrf
 
                         <div class="mb-3">
-                            <label class="form-label">Leave Type</label>
-                            <select name="leave_type" class="form-select" required>
-                                <option value="">-- Select Type --</option>
-                                <option value="annual">Annual Leave</option>
-                                <option value="sick">Sick Leave</option>
-                                <option value="unpaid">Unpaid Leave</option>
+                            <label for="leave_type" class="form-label">Leave Type <span class="text-danger">*</span></label>
+                            <select id="leave_type" name="leave_type" class="form-select" required>
+                                <option value="" disabled {{ old('leave_type') ? '' : 'selected' }}>Select Type
+                                </option>
+                                <option value="annual" {{ old('leave_type') === 'annual' ? 'selected' : '' }}>Annual Leave
+                                </option>
+                                <option value="sick" {{ old('leave_type') === 'sick' ? 'selected' : '' }}>Sick Leave
+                                </option>
+                                <option value="emergency" {{ old('leave_type') === 'emergency' ? 'selected' : '' }}>
+                                    Emergency Leave
+                                </option>
                             </select>
                             @error('leave_type')
                                 <div class="text-danger small">{{ $message }}</div>
@@ -123,57 +124,61 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Leave Length</label>
-                            <select name="leave_length" class="form-select" required>
-                                <option value="">-- Select Length --</option>
-                                <option value="full_day">Full Day</option>
-                                <option value="AM">AM</option>
-                                <option value="PM">PM</option>
+                            <label for="leave_length" class="form-label">Leave Length <span
+                                    class="text-danger">*</span></label>
+                            <select id="leave_length" name="leave_length" class="form-select" required>
+                                <option value="" disabled {{ old('leave_length') ? '' : 'selected' }}>Select Length</option>
+                                <option value="full_day" {{ old('leave_length') === 'full_day' ? 'selected' : '' }}>Full Day
+                                </option>
+                                <option value="AM" {{ old('leave_length') === 'AM' ? 'selected' : '' }}>AM</option>
+                                <option value="PM" {{ old('leave_length') === 'PM' ? 'selected' : '' }}>PM</option>
                             </select>
                             @error('leave_length')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="row g-3">
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" name="start_date" class="form-control" required>
+                                <label for="start_date" class="form-label">Start Date <span
+                                        class="text-danger">*</span></label>
+                                <input type="date" id="start_date" name="start_date" class="form-control"
+                                    value="{{ old('start_date') }}" required>
                                 @error('start_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-md-6">
-                                <label class="form-label">End Date</label>
-                                <input type="date" name="end_date" class="form-control" required>
+                                <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                                <input type="date" id="end_date" name="end_date" class="form-control"
+                                    value="{{ old('end_date') }}" required>
                                 @error('end_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
-                        <div class="mt-3">
-                            <label class="form-label">Reason</label>
-                            <textarea name="reason" rows="3" class="form-control" placeholder="Describe the reason for your leave" required></textarea>
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason <span class="text-danger">*</span></label>
+                            <textarea id="reason" name="reason" rows="3" class="form-control"
+                                placeholder="Describe the reason for your leave" required>{{ old('reason') }}</textarea>
                             @error('reason')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="mt-3">
-                            <label class="form-label">Supporting Document (optional)</label>
-                            <input type="file" class="form-control" id="attachment" name="attachment"
-                                accept=".pdf,.jpg,.jpeg,.png">
+                        <div class="mb-3">
+                            <label for="attachment" class="form-label">Supporting Document (optional)</label>
+                            <input type="file" id="attachment" name="attachment" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
                             <small class="text-muted">PDF or image (max 2 MB)</small>
                             @error('attachment')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        <div class="mt-4 d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary px-4">
-                                Submit Application
-                            </button>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary px-4">Submit Application</button>
                         </div>
                     </form>
                 </div>
