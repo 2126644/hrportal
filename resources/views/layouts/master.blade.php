@@ -27,8 +27,11 @@
     <!-- Custom Styles -->
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 
-    <!-- Simple Calendar (student dashboard page) -->
+    <!-- Simple Calendar (employee dashboard page) -->
     <link rel="stylesheet" href="{{ asset('assets/plugins/simple-calendar/simple-calendar.css') }}">
+
+    <!-- FullCalendar CSS (leave page) -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
 
     <!-- DataTables (admin courses page) -->
     <link rel="stylesheet" href="{{ asset('assets/plugins/datatables/datatables.min.css') }}">
@@ -132,8 +135,22 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1030;
+            z-index: 1060;
+            /* higher than sidebar(1050) and overlay(1040) */
+            /* z-index is the layer, like 3-D */
             border-bottom: 1px solid #e0e0e0;
+            transition: margin-left .3s ease;
+        }
+
+        /* when sidebar is open */
+        body:not(.sidebar-collapsed) .top-navbar {
+            margin-left: 250px;
+            /* same as .sidebar width */
+        }
+
+        /* when sidebar is collapsed */
+        body.sidebar-collapsed .top-navbar {
+            margin-left: 0;
         }
 
         .navbar-brand {
@@ -166,15 +183,17 @@
         .sidebar {
             position: fixed;
             top: 0;
-            left: -280px;
-            width: var(--sidebar-width);
-            height: 100vh;
-            background-color: white;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            transition: left 0.3s ease;
-            z-index: 1040;
-            overflow-y: auto;
-            border-right: 1px solid #e0e0e0;
+            left: 0;
+            width: 250px;
+            /* sidebar width */
+            height: 100%;
+            background: #fff;
+            /* your sidebar background */
+            box-shadow: 2px 0 6px rgba(0, 0, 0, .1);
+            transform: translateX(0);
+            transition: transform .3s ease;
+            z-index: 1050;
+            /* above content */
         }
 
         .sidebar.show {
@@ -182,7 +201,7 @@
         }
 
         .sidebar-header {
-            padding: 1.5rem;
+            padding: 1.25rem;
             border-bottom: 1px solid #e0e0e0;
             display: flex;
             align-items: center;
@@ -253,24 +272,43 @@
             color: var(--primary-color) !important;
         }
 
+        /* --- Hidden state --- */
+        body.sidebar-collapsed .sidebar {
+            transform: translateX(-250px);
+            /* slide out to left */
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 0;
+            /* content moves right to fill space */
+        }
+
         /* Sidebar Overlay */
         .sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
+            /* height: 100vh; */
+            height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1035;
+            /* z-index: 1035; */
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            /* transition: all 0.3s ease; */
+            transition: opacity .3s ease;
+            z-index: 1040;
         }
 
-        .sidebar-overlay.show {
+        body.show-overlay .sidebar-overlay {
             opacity: 1;
             visibility: visible;
         }
+
+        /* .sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        } */
 
         /* Top navbar right items */
         .top-nav-items {
@@ -299,6 +337,12 @@
         /* Main Content */
         .main-content {
             transition: margin-left 0.3s ease;
+            margin-left: 250px;
+            /* reserve space when sidebar is open */
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: 0;
         }
 
         .content-wrapper {
@@ -315,11 +359,11 @@
                 width: 100%;
                 left: -100%;
             }
-            
+
             .navbar-brand {
                 font-size: 1.2rem;
             }
-            
+
             .navbar-brand img {
                 height: 35px !important;
             }
@@ -337,39 +381,39 @@
     <!-- Top Navigation (minimal) -->
     <nav class="top-navbar">
         {{-- container-fluid spans full width (0 side padding), while .container (used for the content card) has fixed width + padding --}}
-        <div class="container d-flex justify-content-between align-items-center">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <button class="sidebar-toggle" id="sidebarToggle">
                     <i class="bi bi-list"></i>
                 </button>
                 @auth
-                @if(Auth::user()->role_id == '2')
-                <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
-                    <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
-                        style="height: 45px; width: auto; margin-right: 10px;">
-                    Al-Hidayah Group HR Portal
-                </a>
-                @elseif(Auth::user()->role_id == '3')
-                <a class="navbar-brand" href="{{ route('employee.dashboard') }}">
-                    <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
-                        style="height: 45px; width: auto; margin-right: 10px;">
-                    Al-Hidayah Group HR Portal
-                </a>
-                @endif
+                    @if (Auth::user()->role_id == '2')
+                        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
+                            <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
+                                style="height: 45px; width: auto; margin-right: 10px;">
+                            Al-Hidayah Group HR Portal
+                        </a>
+                    @elseif(Auth::user()->role_id == '3')
+                        <a class="navbar-brand" href="{{ route('employee.dashboard') }}">
+                            <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
+                                style="height: 45px; width: auto; margin-right: 10px;">
+                            Al-Hidayah Group HR Portal
+                        </a>
+                    @endif
                 @endauth
             </div>
-            
+
             <div class="top-nav-items">
                 @auth
-                <a class="logout-link" href="{{ route('logout') }}"
-                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
+                    <a class="logout-link" href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
                 @endauth
-                
+
                 <button id="themeToggle" class="theme-toggle">
                     <i class="bi bi-moon-stars-fill"></i>
                 </button>
@@ -381,54 +425,55 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="d-flex align-items-center">
-                <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="Logo" style="height: 30px; margin-right: 8px;">
+                <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="Logo"
+                    style="height: 30px; margin-right: 8px;">
                 <span class="fw-bold text-primary">Menu</span>
             </div>
             <button class="sidebar-close" id="sidebarClose">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
-        
+
         <div class="sidebar-nav">
             @auth
-            <!-- Admin Navigation (Role ID: 2) -->
-            @if (Auth::user()->role_id == '2')
-            <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                <i class="bi bi-house-door-fill"></i>
-                <span>Dashboard</span>
-            </a>
-            <a class="nav-link" href="{{ route('admin.courses') }}">
-                <i class="bi bi-book-half"></i>
-                <span>Courses</span>
-            </a>
+                <!-- Admin Navigation (Role ID: 2) -->
+                @if (Auth::user()->role_id == '2')
+                    <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                        <i class="bi bi-house-door-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('admin.courses') }}">
+                        <i class="bi bi-book-half"></i>
+                        <span>Courses</span>
+                    </a>
 
-            <!-- Employee Navigation (Role ID: 3) -->
-            @elseif (Auth::user()->role_id == '3')
-            <a class="nav-link" href="{{ route('employee.dashboard') }}">
-                <i class="bi bi-house-door-fill"></i>
-                <span>Dashboard</span>
-            </a>
-            <a class="nav-link" href="{{ route('employee.attendance') }}">
-                <i class="bi bi-clock-history"></i>
-                <span>Attendance</span>
-            </a>
-            <a class="nav-link" href="{{ route('employee.leave') }}">
-                <i class="bi bi-calendar3"></i>
-                <span>Leave</span>
-            </a>
-            <a class="nav-link" href="{{ route('employee.task') }}">
-                <i class="bi bi-ui-checks"></i>
-                <span>Task</span>
-            </a>
-            <a class="nav-link" href="{{ route('employee.event') }}">
-                <i class="bi bi-megaphone"></i>
-                <span>Event</span>
-            </a>
-            <a class="nav-link" href="{{ route('profile.show') }}">
-                <i class="bi bi-person-circle"></i>
-                <span>Profile</span>
-            </a>
-            @endif
+                    <!-- Employee Navigation (Role ID: 3) -->
+                @elseif (Auth::user()->role_id == '3')
+                    <a class="nav-link" href="{{ route('employee.dashboard') }}">
+                        <i class="bi bi-house-door-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.attendance') }}">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Attendance</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.leave') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Leave</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.task') }}">
+                        <i class="bi bi-ui-checks"></i>
+                        <span>Task</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.event') }}">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Event</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('profile.show') }}">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Profile</span>
+                    </a>
+                @endif
             @endauth
         </div>
     </div>
@@ -438,7 +483,7 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="container">
+        <div class="container-fluid">
             @yield('content')
         </div>
     </div>
@@ -459,7 +504,7 @@
     <script src="assets/plugins/simple-calendar/jquery.simple-calendar.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.4.0/ical.min.js"></script>
-    
+
     <script src="assets/js/calander.js"></script>
 
     <!-- Admin list course -->
@@ -473,6 +518,22 @@
     <!-- C3 & D3 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
+
+    <script>
+        const body = document.body;
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const closeBtn = document.getElementById('sidebarClose');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function toggleSidebar() {
+            body.classList.toggle('sidebar-collapsed');
+            body.classList.toggle('show-overlay');
+        }
+
+        toggleBtn.addEventListener('click', toggleSidebar);
+        closeBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+    </script>
 
     <script>
         // Sidebar Toggle Script
@@ -508,7 +569,7 @@
             // Highlight active nav link
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.sidebar .nav-link');
-            
+
             navLinks.forEach(link => {
                 if (link.getAttribute('href') === currentPath) {
                     link.classList.add('active');
@@ -545,6 +606,8 @@
             });
         });
     </script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     @stack('scripts')
 </body>
 

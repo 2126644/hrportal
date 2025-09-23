@@ -127,190 +127,184 @@
         </div>
     </div>
 
-    <div class="row">
-        <!-- Total Requests -->
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body d-flex justify-content-between">
-                    {{-- makes content flexible row-pushes text left, icon right --}}
-                    <div>
-                        <div class="card-title">Total Requests</div>
-                        <b>{{ $totalRequests }}</b>
+
+    <div class="container-fluid mt-4">
+        <!-- Tabs navigation -->
+        <ul class="nav nav-tabs" id="leaveTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar"
+                    type="button" role="tab" aria-controls="calendar" aria-selected="true">
+                    Calendar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="leave-application-tab" data-bs-toggle="tab" data-bs-target="#leave-application"
+                    type="button" role="tab" aria-controls="leave-application" aria-selected="false">
+                    Leave Application
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="leave-report-tab" data-bs-toggle="tab" data-bs-target="#leave-report"
+                    type="button" role="tab" aria-controls="leave-report" aria-selected="false">
+                    Leave Report
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tabs content -->
+        <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="leaveTabsContent"
+            style="min-height: 500px;">
+            <!-- Calendar tab -->
+            <div class="tab-pane fade show active" id="calendar" role="tabpanel" aria-labelledby="calendar-tab">
+                <div id="leaveCalendar"></div>
+            </div>
+
+            <!-- Leave Application tab -->
+            <div class="tab-pane fade" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
+                {{-- Insert your leave application form here --}}
+                <div class="row">
+                    <!-- Total Requests -->
+                    <div class="col-12 col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body d-flex justify-content-between">
+                                {{-- makes content flexible row-pushes text left, icon right --}}
+                                <div>
+                                    <div class="card-title">Total Requests</div>
+                                    <b>{{ $totalRequests }}</b>
+                                </div>
+                                <i class="bi bi-files me-3 fs-4 text-primary"></i>
+                            </div>
+                        </div>
                     </div>
-                    <i class="bi bi-files me-3 fs-4 text-primary"></i>
+
+                    <!-- Approved -->
+                    <div class="col-12 col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body d-flex justify-content-between">
+                                <div>
+                                    <div class="card-title">Approved</div>
+                                    <g>{{ $approvedLeaves }}</g>
+                                </div>
+                                <i class="bi bi-check-circle-fill me-3 fs-4 text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending -->
+                    <div class="col-12 col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body d-flex justify-content-between">
+                                <div>
+                                    <div class="card-title">Pending</div>
+                                    <y>{{ $pendingLeaves }}</y>
+                                </div>
+                                <i class="bi bi-hourglass-split me-3 fs-4 text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Leave Requests</h4>
+                            <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
+                                <thead>
+                                    <tr>
+                                        <th class="py-2 px-3 border-b border-gray-200 font-medium">Type</th>
+                                        <th class="py-2 px-3 border-b border-gray-200 font-medium">Start Date</th>
+                                        <th class="py-2 px-3 border-b border-gray-200 font-medium">End Date</th>
+                                        <th class="py-2 px-3 border-b border-gray-200 font-medium">Reason</th>
+                                        <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
+                                        <th class="py-2 px-3 border-b border-gray-200 font-medium">Applied</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($leaves as $leave)
+                                        <tr>
+                                            <td class="py-3 px-3 border-b border-gray-100">{{ $leave->leave_type }}</td>
+                                            <td class="py-3 px-3 border-b border-gray-100">{{ $leave->start_date }}</td>
+                                            <td class="py-3 px-3 border-b border-gray-100">{{ $leave->end_date }}</td>
+                                            <td class="py-3 px-3 border-b border-gray-100">{{ $leave->reason }}</td>
+                                            <td class="py-3 px-3 border-b border-gray-100">
+                                                <span
+                                                    class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
+                                                    @if ($leave->status === 'Approved')
+                                                        <span class="badge bg-success">Approved</span>
+                                                    @elseif ($leave->status === 'Rejected')
+                                                        <span class="badge bg-danger">Rejected</span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark">Pending</span>
+                                                    @endif
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 border-b border-gray-100">
+                                                {{ $leave->created_at->format('d M Y') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Approved -->
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body d-flex justify-content-between">
-                    <div>
-                        <div class="card-title">Approved</div>
-                        <g>{{ $approvedLeaves }}</g>
-                    </div>
-                    <i class="bi bi-check-circle-fill me-3 fs-4 text-success"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending -->
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body d-flex justify-content-between">
-                    <div>
-                        <div class="card-title">Pending</div>
-                        <y>{{ $pendingLeaves }}</y>
-                    </div>
-                    <i class="bi bi-hourglass-split me-3 fs-4 text-warning"></i>
-                </div>
+            <!-- Leave Report tab -->
+            <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
+                {{-- Insert your leave report content here --}}
+                
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div>
-                            <div class="card-title">Annual Leave Balance</div>
-                            <b>{{ $leaveBalance }}</b>
-                        </div>
-                        <i class="bi bi-calendar-check me-3 fs-4 text-info"></i>
-                    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('leaveCalendar');
 
-                    @php
-                        $total = 14;
-                        $usedDays = 12;
-                        $usedDays = $total - $leaveBalance;
-                        $percentage = ($usedDays / $total) * 100;
-                    @endphp
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 500,
+                themeSystem: 'bootstrap5',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: ''
+                },
+                events: [
+                    // Example event data - replace with your dynamic leave data from backend
+                    {
+                        title: 'John Doe - Annual Leave',
+                        start: '2024-06-05',
+                        color: '#ffc107', // yellow for annual leave
+                    },
+                    {
+                        title: 'Jane Smith - Sick Leave',
+                        start: '2024-06-10',
+                        color: '#dc3545', // red for sick leave
+                    },
+                    {
+                        title: 'Bob Johnson - Unpaid Leave',
+                        start: '2024-06-10',
+                        color: '#6c757d', // gray for unpaid leave
+                    },
+                    {
+                        title: 'Alice Williams - Annual Leave',
+                        start: '2024-06-15',
+                        color: '#ffc107',
+                    }
+                ],
+                eventDidMount: function(info) {
+                    // Tooltip on hover (using Bootstrap tooltip)
+                    var tooltip = new bootstrap.Tooltip(info.el, {
+                        title: info.event.title,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }
+            });
 
-                    <!-- Progress Bar -->
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage }}%;"
-                            aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                        </div>
-                    </div>
-
-                    <small class="text-muted d-block mt-2">
-                        {{ $usedDays }} used of {{ $total }} days
-                    </small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div>
-                            <div class="card-title">Sick Leave Balance</div>
-                            <b>{{ $leaveBalance }}</b>
-                        </div>
-                        <i class="bi bi-emoji-dizzy me-3 fs-4 text-danger"></i>
-                    </div>
-
-                    @php
-                        $total = 14;
-                        $usedDays = 12;
-                        $usedDays = $total - $leaveBalance;
-                        $percentage = ($usedDays / $total) * 100;
-                    @endphp
-
-                    <!-- Progress Bar -->
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage }}%;"
-                            aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                        </div>
-                    </div>
-
-                    <small class="text-muted d-block mt-2">
-                        {{ $usedDays }} used of {{ $total }} days
-                    </small>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <div>
-                            <div class="card-title">Personal Leave Balance</div>
-                            <b>{{ $leaveBalance }}</b>
-                        </div>
-                        <i class="bi bi-person-badge me-3 fs-4 text-secondary"></i>
-                    </div>
-
-                    @php
-                        $total = 14;
-                        $usedDays = 12;
-                        $usedDays = $total - $leaveBalance;
-                        $percentage = ($usedDays / $total) * 100;
-                    @endphp
-
-                    <!-- Progress Bar -->
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage }}%;"
-                            aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                        </div>
-                    </div>
-
-                    <small class="text-muted d-block mt-2">
-                        {{ $usedDays }} used of {{ $total }} days
-                    </small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Leave Requests</h4>
-                    <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
-                        {{-- full width, text left aligned, small text, gray text, border collapse, vertical align middle --}}
-                        <thead>
-                            <tr>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Type</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Start Date</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">End Date</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Reason</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Applied</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($leaves as $leave)
-                                <tr>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $leave->leave_type }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $leave->start_date }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $leave->end_date }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $leave->reason }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">
-                                        <span
-                                            class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                                            @if ($leave->status === 'Approved')
-                                                <span class="badge bg-success">Approved</span>
-                                            @elseif ($leave->status === 'Rejected')
-                                                <span class="badge bg-danger">Rejected</span>
-                                            @else
-                                                <span class="badge bg-warning text-dark">Pending</span>
-                                            @endif
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-3 border-b border-gray-100">
-                                        {{ $leave->created_at->format('d M Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </div>
+            calendar.render();
+        });
+    </script>
 @endsection

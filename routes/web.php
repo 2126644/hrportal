@@ -36,9 +36,9 @@ Route::get('/dashboard', function () {
 // Two-Factor Routes
 
 // Show 2FA challenge page
-// Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name('two-factor.login');
-// // Handle submitted code
-// Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
+Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name('two-factor.login');
+// Handle submitted code
+Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
 
 //Route for DATABASE
 Route::middleware(['auth'])->group(function () {

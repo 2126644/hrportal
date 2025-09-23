@@ -163,11 +163,11 @@
                     </div>
                         @if (!$todayAttendance)
                             <button class="btn-leave mt-3"
-                                onclick="window.location='{{ route('attendance.punch', ['type' => 'in']) }}'">Punch
+                                onclick="window.location='{{ route('attendance.punchIn', ['type' => 'in']) }}'">Punch
                                 In</button>
                         @elseif ($todayAttendance && !$todayAttendance->time_out)
                             <button class="btn-leave mt-3"
-                                onclick="window.location='{{ route('attendance.punch', ['type' => 'out']) }}'">Punch
+                                onclick="window.location='{{ route('attendance.punchOut', ['type' => 'out']) }}'">Punch
                                 Out</button>
                         @else
                             <span class="text-success mt-3">You have punched out for today.</span>
