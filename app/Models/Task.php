@@ -21,6 +21,13 @@ class Task extends Model
         'due_date',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'due_date' => 'datetime',
+        ];
+    }
+
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');

@@ -8,16 +8,29 @@
 
         .datetime-punch {
             display: flex;
-            justify-content: space-between;
+            /* put children side-by-side */
             align-items: center;
-            flex-wrap: wrap;
+            /* vertically center items */
             gap: 1rem;
+            /* spacing between blocks */
         }
 
-        .datetime {
-            font-size: 1.25rem;
-            font-weight: 600;
+        #currentDateTime {
+            margin-right: auto;
+            /* push buttons to the right */
         }
+
+        .datetime-punch .date,
+        .datetime-punch .time {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+
+        .datetime-punch i {
+            margin-right: .5rem;
+        }
+
 
         .btn-punch {
             background-color: #ffc107;
@@ -151,7 +164,16 @@
 
         <div class="dashboard-header mb-4">
             <div class="datetime-punch">
-                <div class="datetime" id="currentDateTime"></div>
+                <div id="currentDateTime">
+                    <div class="date mb-1">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="currentDate"></span>
+                    </div>
+                    <div class="time">
+                        <i class="bi bi-clock"></i>
+                        <span id="currentTime"></span>
+                    </div>
+                </div>
                 <button class="btn-punch" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
                     Punch In
                 </button>
@@ -165,10 +187,10 @@
 
     <div class="row">
         <!-- Upcoming Events Column -->
-        <div class="col-12 col-md-8 mb-4">
+        <div class="col-12 col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title">Upcoming Events</h3>
+                    <h4 class="card-title">Upcoming Events</h4>
                     @forelse ($upcomingEvents as $event)
                         <div class="event-item">
                             <div class="event-date-time">{{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} -
@@ -183,54 +205,40 @@
                 </div>
             </div>
         </div>
+        {{-- Upcoming Tasks Column --}}
+        <div class="col-12 col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">My Tasks</h4>
+                    @foreach (['to-do' => 'To-Do', 'in-progress' => 'In-Progress', 'in-review' => 'In-Review', 'completed' => 'Completed'] as $key => $label)
+                        @if (isset($tasksByStatus[$key]) && $tasksByStatus[$key]->count())
+                            <h6 class="fw-bold mt-3">{{ $label }}</h6>
+                            <ul class="list-unstyled mb-2">
+                                @foreach ($tasksByStatus[$key] as $task)
+                                    <li class="d-flex align-items-start mb-2">
+                                        <span class="me-2 mt-1 text-primary">
+                                            <i class="bi bi-circle-fill" style="font-size:0.5rem"></i>
+                                        </span>
+                                        <div>
+                                            <strong>{{ $task->title }}</strong><br>
+                                            <small class="text-muted">
+                                                Due {{ optional($task->due_date)->format('d M Y h:i A') ?? '-' }}
+                                            </small>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        </div>
         <!-- Calendar Column -->
         <div class="col-12 col-md-4 mb-4">
             <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title">Calendar</h3>
+                    <h4 class="card-title">Calendar</h4>
                     <div id="calendar-doctor" class="calendar-container"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Attendance, Leave, Task Summary -->
-    <div class="row">
-        <div class="col-12 col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Attendance</h4>
-                    <ul>
-                        <li>Total Days Present: <span id="daysPresent">{{ $attendance['days_present'] }}</span></li>
-                        <li>Total Days Absent: <span id="daysAbsent">{{ $attendance['days_absent'] }}</span></li>
-                        <li>Last Punch In: <span id="lastPunchIn">{{ $attendance['last_punch_in'] }}</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Leave</h4>
-                    <ul>
-                        <li>Leave Balance: <span id="leaveBalance">-</span> days</li>
-                        <li>Pending Leave Requests: <span id="pendingLeave">-</span></li>
-                        <li>Approved Leaves: <span id="approvedLeaves">-</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Tasks</h4>
-                    <ul>
-                        <li>Pending Tasks: <span id="pendingTasks">{{ $task['pending_task'] }}</span></li>
-                        <li>Completed Tasks: <span id="completedTasks">{{ $task['completed_task'] }}</span></li>
-                        <li>Overdue Tasks: <span id="overdueTasks">{{ $task['overdue_task'] }}</span></li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -243,15 +251,15 @@
         // Update date and time every second
         function updateDateTime() {
             const now = new Date();
-            const options = {
+            const dateOptions = {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             };
-            const dateStr = now.toLocaleDateString(undefined, options);
-            const timeStr = now.toLocaleTimeString();
-            document.getElementById('currentDateTime').textContent = `${dateStr} - ${timeStr}`;
+
+            document.getElementById('currentDate').textContent = now.toLocaleDateString(undefined, dateOptions);
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
@@ -278,7 +286,7 @@
                         .then(data => {
                             alert(
                                 `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
-                                );
+                            );
 
                             if (mapId) {
                                 var map = L.map(mapId).setView([lat, lng], 16);

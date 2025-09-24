@@ -164,8 +164,8 @@
                 {{-- Insert your leave application form here --}}
                 <div class="row">
                     <!-- Total Requests -->
-                    <div class="col-12 col-md-4 mb-4">
-                        <div class="card">
+                    <div class="col-12 col-md-3 mb-4">
+                        <div class="card filter-card active" data-status="all" style="cursor: pointer">
                             <div class="card-body d-flex justify-content-between">
                                 {{-- makes content flexible row-pushes text left, icon right --}}
                                 <div>
@@ -178,8 +178,8 @@
                     </div>
 
                     <!-- Approved -->
-                    <div class="col-12 col-md-4 mb-4">
-                        <div class="card">
+                    <div class="col-12 col-md-3 mb-4">
+                        <div class="card filter-card" data-status="Approved" style="cursor: pointer">
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <div class="card-title">Approved</div>
@@ -191,12 +191,25 @@
                     </div>
 
                     <!-- Pending -->
-                    <div class="col-12 col-md-4 mb-4">
-                        <div class="card">
+                    <div class="col-12 col-md-3 mb-4">
+                        <div class="card filter-card" data-status="Pending" style="cursor: pointer">
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <div class="card-title">Pending</div>
                                     <y>{{ $pendingLeaves }}</y>
+                                </div>
+                                <i class="bi bi-hourglass-split me-3 fs-4 text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rejected -->
+                    <div class="col-12 col-md-3 mb-4">
+                        <div class="card filter-card" data-status="Rejected" style="cursor: pointer">
+                            <div class="card-body d-flex justify-content-between">
+                                <div>
+                                    <div class="card-title">Rejected</div>
+                                    <y>{{ $rejectedLeaves }}</y>
                                 </div>
                                 <i class="bi bi-hourglass-split me-3 fs-4 text-warning"></i>
                             </div>
@@ -219,9 +232,9 @@
                                         <th class="py-2 px-3 border-b border-gray-200 font-medium">Applied</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="leaveTableBody">
                                     @foreach ($leaves as $leave)
-                                        <tr>
+                                        <tr data-status="{{ $leave->status }}">>
                                             <td class="py-3 px-3 border-b border-gray-100">{{ $leave->leave_type }}</td>
                                             <td class="py-3 px-3 border-b border-gray-100">{{ $leave->start_date }}</td>
                                             <td class="py-3 px-3 border-b border-gray-100">{{ $leave->end_date }}</td>
@@ -252,7 +265,40 @@
             <!-- Leave Report tab -->
             <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
                 {{-- Insert your leave report content here --}}
-                
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Leave Report – {{ now()->year }}</h4>
+
+                        <table class="table table-bordered text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Leave Type</th>
+                                    @for ($m = 1; $m <= 12; $m++)
+                                        <th>{{ \Carbon\Carbon::create()->month($m)->shortMonthName }}</th>
+                                    @endfor
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($leaveTypes as $type)
+                                    @php $rowTotal = 0; @endphp
+                                    <tr>
+                                        <td class="text-start fw-semibold">{{ $type }}</td>
+                                        @for ($m = 1; $m <= 12; $m++)
+                                            @php
+                                                $count = $reportData[$type][$m] ?? 0;
+                                                $rowTotal += $count;
+                                            @endphp
+                                            <td>{{ $count }}</td>
+                                        @endfor
+                                        <td class="fw-bold">{{ $rowTotal }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -305,6 +351,25 @@
             });
 
             calendar.render();
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('.filter-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // remove active class from all cards 
+                document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+
+                let status = this.dataset.status; // all, approved, pending, rejected
+                document.querySelectorAll('#leavesTable tbody tr').forEach(row => {
+                    if (status === 'all' || row.dataset.status === status) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
         });
     </script>
 @endsection

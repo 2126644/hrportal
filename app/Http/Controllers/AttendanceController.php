@@ -162,7 +162,7 @@ class AttendanceController extends Controller
             'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
             'status_time_out' => $statusTimeOut,
             //to differentiate punch in and punch out:
-            'success' => true,
+            'success' => true,  
             'action'  => 'punchOut'
         ]);
     }

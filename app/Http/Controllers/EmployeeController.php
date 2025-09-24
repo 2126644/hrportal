@@ -57,7 +57,11 @@ class EmployeeController extends Controller
             'overdue_task' => $overdueTask
         ];
 
-        return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance', 'attendance', 'task'));
+        $tasksByStatus = Task::where('employee_id', $employee->employee_id)
+            ->get()
+            ->groupBy('status');
+
+        return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance', 'attendance', 'task', 'tasksByStatus'));
 
     }
 

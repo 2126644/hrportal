@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Leave;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class LeaveController extends Controller
@@ -17,25 +18,48 @@ class LeaveController extends Controller
     {
         $employee = Auth::user()->employee;
 
+        // FOR LEAVE APPLICATION TAB
         // Total approved days used
         $usedDays = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->sum('days');
 
         $leaveBalance   = 14 - $usedDays; // assuming 14 days AL
         $pendingLeaves  = Leave::where('employee_id', $employee->employee_id)->where('status', 'pending')->count();
         $approvedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->count();
+        $rejectedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'rejected')->count();
         $totalRequests  = Leave::where('employee_id', $employee->employee_id)->count();
+        // count(), sum(), first() end the query; cannot chain orderBy() or get() after them
 
-        // Get all requests to show in a table
-        $query = Leave::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
-        $leaves = $query->get();
+        // All leave records for the table
+        $leaves = Leave::where('employee_id', $employee->employee_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // FOR LEAVE REPORT TABwer
+        $leaveReport = DB::table('leaves')
+            ->selectRaw('leave_type, MONTH(start_date) as month, COUNT(*) as total')
+            ->whereYear('start_date', now()->year)
+            ->groupBy('leave_type', 'month')
+            ->get();
+
+        // pivot the results into [leave_type => [1=>count, 2=>count, ...]]
+        $reportData = [];
+        foreach ($leaveReport as $row) {
+            $reportData[$row->leave_type][$row->month] = $row->total;
+        }
+
+        // get all leave types to ensure rows exist even if zero (still display row with zero)
+        $leaveTypes = DB::table('leaves')->distinct()->pluck('leave_type');
 
         return view('employee.leave', compact(
             'totalRequests',
             'approvedLeaves',
             'pendingLeaves',
+            'rejectedLeaves',
             'leaveBalance',
             'usedDays',
-            'leaves'
+            'leaves',
+            'reportData',
+            'leaveTypes'
         ));
     }
 
