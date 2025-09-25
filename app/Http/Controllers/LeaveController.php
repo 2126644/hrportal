@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Leave;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,17 @@ class LeaveController extends Controller
     public function index()
     {
         $employee = Auth::user()->employee;
+
+        // FOR CALENDAR TAB
+        $allApprovedLeaves = Leave::with('employee')->where('status', 'approved')->get();
+        $employeeLeaves = $allApprovedLeaves->map(function ($allApprovedLeaves) {
+            return [
+                'title'         => $allApprovedLeaves->employee->full_name,
+                'start'         => Carbon::parse($allApprovedLeaves->start_date)->toDateString(),
+                'end'           => Carbon::parse($allApprovedLeaves->end_date)->addDay()->toDateString(), // include end date
+                'color'          => '#f87171',
+            ];
+        });
 
         // FOR LEAVE APPLICATION TAB
         // Total approved days used
@@ -34,7 +46,7 @@ class LeaveController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // FOR LEAVE REPORT TABwer
+        // FOR LEAVE REPORT TAB
         $leaveReport = DB::table('leaves')
             ->selectRaw('leave_type, MONTH(start_date) as month, COUNT(*) as total')
             ->whereYear('start_date', now()->year)
@@ -59,7 +71,8 @@ class LeaveController extends Controller
             'usedDays',
             'leaves',
             'reportData',
-            'leaveTypes'
+            'leaveTypes',
+            'employeeLeaves'
         ));
     }
 

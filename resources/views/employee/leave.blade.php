@@ -179,7 +179,7 @@
 
                     <!-- Approved -->
                     <div class="col-12 col-md-3 mb-4">
-                        <div class="card filter-card" data-status="Approved" style="cursor: pointer">
+                        <div class="card filter-card" data-status="approved" style="cursor: pointer">
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <div class="card-title">Approved</div>
@@ -192,7 +192,7 @@
 
                     <!-- Pending -->
                     <div class="col-12 col-md-3 mb-4">
-                        <div class="card filter-card" data-status="Pending" style="cursor: pointer">
+                        <div class="card filter-card" data-status="pending" style="cursor: pointer">
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <div class="card-title">Pending</div>
@@ -205,7 +205,7 @@
 
                     <!-- Rejected -->
                     <div class="col-12 col-md-3 mb-4">
-                        <div class="card filter-card" data-status="Rejected" style="cursor: pointer">
+                        <div class="card filter-card" data-status="rejected" style="cursor: pointer">
                             <div class="card-body d-flex justify-content-between">
                                 <div>
                                     <div class="card-title">Rejected</div>
@@ -232,9 +232,9 @@
                                         <th class="py-2 px-3 border-b border-gray-200 font-medium">Applied</th>
                                     </tr>
                                 </thead>
-                                <tbody id="leaveTableBody">
+                                <tbody id="leavesTable">
                                     @foreach ($leaves as $leave)
-                                        <tr data-status="{{ $leave->status }}">>
+                                        <tr data-status="{{ $leave->status }}">
                                             <td class="py-3 px-3 border-b border-gray-100">{{ $leave->leave_type }}</td>
                                             <td class="py-3 px-3 border-b border-gray-100">{{ $leave->start_date }}</td>
                                             <td class="py-3 px-3 border-b border-gray-100">{{ $leave->end_date }}</td>
@@ -242,9 +242,9 @@
                                             <td class="py-3 px-3 border-b border-gray-100">
                                                 <span
                                                     class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                                                    @if ($leave->status === 'Approved')
+                                                    @if ($leave->status === 'approved')
                                                         <span class="badge bg-success">Approved</span>
-                                                    @elseif ($leave->status === 'Rejected')
+                                                    @elseif ($leave->status === 'rejected')
                                                         <span class="badge bg-danger">Rejected</span>
                                                     @else
                                                         <span class="badge bg-warning text-dark">Pending</span>
@@ -252,7 +252,7 @@
                                                 </span>
                                             </td>
                                             <td class="py-3 px-3 border-b border-gray-100">
-                                                {{ $leave->created_at->format('d M Y') }}</td>
+                                                {{ $leave->applied_date }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -265,14 +265,14 @@
             <!-- Leave Report tab -->
             <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
                 {{-- Insert your leave report content here --}}
-                <div class="card">
-                    <div class="card-body">
+             
                         <h4 class="card-title mb-4">Leave Report – {{ now()->year }}</h4>
 
                         <table class="table table-bordered text-center align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th>Leave Type</th>
+                                    <th>Entitlement</th>
                                     @for ($m = 1; $m <= 12; $m++)
                                         <th>{{ \Carbon\Carbon::create()->month($m)->shortMonthName }}</th>
                                     @endfor
@@ -283,7 +283,9 @@
                                 @foreach ($leaveTypes as $type)
                                     @php $rowTotal = 0; @endphp
                                     <tr>
-                                        <td class="text-start fw-semibold">{{ $type }}</td>
+                                        <td class="text-start">{{ $type }}</td> 
+                                        {{-- text-start:align to left --}}
+                                        <td>0</td>
                                         @for ($m = 1; $m <= 12; $m++)
                                             @php
                                                 $count = $reportData[$type][$m] ?? 0;
@@ -300,8 +302,7 @@
                 </div>
 
             </div>
-        </div>
-    </div>
+       
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -316,29 +317,7 @@
                     center: 'title',
                     right: ''
                 },
-                events: [
-                    // Example event data - replace with your dynamic leave data from backend
-                    {
-                        title: 'John Doe - Annual Leave',
-                        start: '2024-06-05',
-                        color: '#ffc107', // yellow for annual leave
-                    },
-                    {
-                        title: 'Jane Smith - Sick Leave',
-                        start: '2024-06-10',
-                        color: '#dc3545', // red for sick leave
-                    },
-                    {
-                        title: 'Bob Johnson - Unpaid Leave',
-                        start: '2024-06-10',
-                        color: '#6c757d', // gray for unpaid leave
-                    },
-                    {
-                        title: 'Alice Williams - Annual Leave',
-                        start: '2024-06-15',
-                        color: '#ffc107',
-                    }
-                ],
+                events: @json($employeeLeaves),
                 eventDidMount: function(info) {
                     // Tooltip on hover (using Bootstrap tooltip)
                     var tooltip = new bootstrap.Tooltip(info.el, {
@@ -362,7 +341,7 @@
                 this.classList.add('active');
 
                 let status = this.dataset.status; // all, approved, pending, rejected
-                document.querySelectorAll('#leavesTable tbody tr').forEach(row => {
+                document.querySelectorAll('#leavesTable tr').forEach(row => {
                     if (status === 'all' || row.dataset.status === status) {
                         row.style.display = '';
                     } else {

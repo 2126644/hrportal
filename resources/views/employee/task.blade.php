@@ -130,11 +130,11 @@
     <div class="row">
         <!-- Total Tasks -->
         <div class="col-12 col-md-2 mb-4">
-            <div class="card">
+            <div class="card filter-card active" data-status="all" style="cursor: pointer">
                 <div class="card-body d-flex justify-content-between">
                     {{-- makes content flexible row-pushes text left, icon right --}}
                     <div>
-                        <div class="card-title">Total Tasks</div>
+                        <div class="card-title ">Total Tasks</div>
                         <b>{{ $totalTasks }}</b>
                     </div>
                     <i class="bi bi-list-task me-2 fs-5 text-primary"></i>
@@ -143,9 +143,9 @@
             </div>
         </div>
 
-        <!-- Approved -->
+        <!-- To-Do Tasks -->
         <div class="col-12 col-md-3 mb-4">
-            <div class="card">
+            <div class="card filter-card" data-status="to-do" style="cursor: pointer">
                 <div class="card-body d-flex justify-content-between">
                     <div>
                         <div class="card-title">To-Do</div>
@@ -156,9 +156,9 @@
             </div>
         </div>
 
-        <!-- Pending -->
+        <!-- In-Progress Tasks -->
         <div class="col-12 col-md-3 mb-4">
-            <div class="card">
+            <div class="card filter-card" data-status="in-progress" style="cursor: pointer">
                 <div class="card-body d-flex justify-content-between">
                     <div>
                         <div class="card-title">In Progress</div>
@@ -169,8 +169,9 @@
             </div>
         </div>
 
+        <!-- In-Review Tasks -->
         <div class="col-12 col-md-2 mb-4">
-            <div class="card">
+            <div class="card filter-card active" data-status="in-review" style="cursor: pointer">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <div>
@@ -183,8 +184,9 @@
             </div>
         </div>
 
+        <!-- Completed Tasks -->
         <div class="col-12 col-md-2 mb-4">
-            <div class="card">
+            <div class="card filter-card" data-status="completed" style="cursor: pointer">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <div>
@@ -199,131 +201,104 @@
     </div>
 
     <div class="row">
-
         <div class="col-12 col-md-12">
-            <div class="card">
+            <div class="card" id="tasksCard">
                 <div class="card-body">
-                    <h4 class="card-title mb-3">Tasks</h4>
+                    <h4 class="card-title mb-3 ">Tasks</h4>
 
-@forelse ($tasks as $task)
-    <div class="card mb-3 shadow-sm">
-        <div class="card-body d-flex justify-content-between align-items-start flex-wrap">
-            {{-- Left side: title & details --}}
-            <div class="me-3 flex-grow-1">
-                <h5 class="fw-bold mb-2">
-                    {{ $task->title }}
-                </h5>
+                    @forelse ($tasks as $task)
+                        <div class="card task-item mb-3 shadow-sm" data-status="{{ $task->status }}">
+                            <div class="card-body d-flex justify-content-between align-items-start flex-wrap">
+                                {{-- Left side: title & details --}}
+                                <div class="me-3 flex-grow-1">
+                                    <h5 class="fw-bold mb-2">
+                                        {{ $task->title }}
+                                    </h5>
 
-                <p class="mb-2 text-muted">
-                    {{ $task->description }}
-                </p>
+                                    <p class="mb-2 text-muted">
+                                        {{ $task->description }}
+                                    </p>
 
-                <div class="mb-1">
-                    <i class="bi bi-person-fill me-1 text-secondary"></i>
-                    <strong>Assigned To:</strong> {{ $task->assigned_to }}
-                </div>
+                                    <div class="mb-1">
+                                        <i class="bi bi-person-fill me-1 text-secondary"></i>
+                                        <strong>Assigned To:</strong> {{ $task->assigned_to }}
+                                    </div>
 
-                <div class="mb-1">
-                    <i class="bi bi-person-badge-fill me-1 text-secondary"></i>
-                    <strong>Assigned By:</strong> {{ $task->assigned_by }}
-                </div>
+                                    <div class="mb-1">
+                                        <i class="bi bi-person-badge-fill me-1 text-secondary"></i>
+                                        <strong>Assigned By:</strong> {{ $task->assigned_by }}
+                                    </div>
 
-                @if($task->notes)
-                    <div class="mb-1">
-                        <i class="bi bi-stickies-fill me-1 text-secondary"></i>
-                        <strong>Notes:</strong> {{ $task->notes }}
+                                    @if ($task->notes)
+                                        <div class="mb-1">
+                                            <i class="bi bi-stickies-fill me-1 text-secondary"></i>
+                                            <strong>Notes:</strong> {{ $task->notes }}
+                                        </div>
+                                    @endif
+
+                                    <small class="text-muted d-block mt-2">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Created: {{ $task->created_at->format('d M Y') }} |
+                                        Updated: {{ $task->updated_at->format('d M Y') }}
+                                    </small>
+                                </div>
+
+                                {{-- Right side: status & due date --}}
+                                <div class="text-end">
+                                    @switch($task->status)
+                                        @case('in-progress')
+                                            <span class="badge bg-info text-dark mb-2">In-Progress
+                                            </span>
+                                        @break
+
+                                        @case('in-review')
+                                            <span class="badge bg-primary mb-2">In-Review
+                                            </span>
+                                        @break
+
+                                        @case('completed')
+                                            <span class="badge bg-success mb-2">Completed
+                                            </span>
+                                        @break
+
+                                        @case('to-do')
+                                            <span class="badge bg-danger mb-2">To-Do
+                                            </span>
+                                        @break
+                                    @endswitch
+
+                                    <div>
+                                        <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                                        <strong>Due:</strong> {{ $task->due_date }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                            <p class="text-muted">No tasks found.</p>
+                        @endforelse
+
                     </div>
-                @endif
-
-                <small class="text-muted d-block mt-2">
-                    <i class="bi bi-clock-history me-1"></i>
-                    Created: {{ $task->created_at->format('d M Y') }} |
-                    Updated: {{ $task->updated_at->format('d M Y') }}
-                </small>
-            </div>
-
-            {{-- Right side: status & due date --}}
-            <div class="text-end">
-                @switch($task->status)
-                    @case('in-progress')
-                        <span class="badge bg-info text-dark mb-2">In-Progress
-                        </span>
-                        @break
-                    @case('in-review')
-                        <span class="badge bg-primary mb-2">In-Review
-                        </span>
-                        @break
-                    @case('completed')
-                        <span class="badge bg-success mb-2">Completed
-                        </span>
-                        @break
-                    @case('to-do')
-                        <span class="badge bg-danger mb-2">To-Do
-                        </span>
-                        @break
-                @endswitch
-
-                <div>
-                    <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                    <strong>Due:</strong> {{ $task->due_date }}
                 </div>
             </div>
         </div>
-    </div>
-@empty
-    <p class="text-muted">No tasks found.</p>
-@endforelse
 
-                    </div>
+         <script>
+        document.querySelectorAll('.filter-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // remove active class from all cards 
+                document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
 
-                    {{-- <div class="card-body">
-                    <h4 class="card-title">Tasks</h4>
-                    <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
-                        <thead>
-                            <tr>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Title</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Description</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Assigned To</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Assigned By</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Notes</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Due Date</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Created At</th>
-                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Last Update At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($tasks as $task)
-                                <tr>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->title }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->description }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->assigned_to }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->assigned_by }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">
-                                        <span
-                                            class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded-full">
-                                            @if ($task->status === 'in-progress')
-                                                <span class="badge bg-info text-dark">In-Progress</span>
-                                            @elseif ($task->status === 'in-review')
-                                                <span class="badge bg-info text-dark">In-Review</span>
-                                            @elseif ($task->status === 'completed')
-                                                <span class="badge bg-success">Completed</span>
-                                            @elseif ($task->status === 'to-do')
-                                                <span class="badge bg-danger">To-Do</span>
-                                            @endif
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->notes }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->due_date }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->created_at->format('d M Y') }}</td>
-                                    <td class="py-3 px-3 border-b border-gray-100">{{ $task->updated_at->format('d M Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div> --}}
-                </div>
-            </div>
-
-        </div>
+                let status = this.dataset.status; // all, to-do, in-progress, in-review, completed
+                document.querySelectorAll('#tasksCard .task-item').forEach(item => {
+                    if (status === 'all' || item.dataset.status === status) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
     @endsection

@@ -21,7 +21,7 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     if (Auth::check()) {
         // If the user is already logged in
-        if (Auth::user()->role_id === 1) {
+        if (Auth::user()->role_id === 2) {
             // Send admins to their dashboard
             return redirect()->route('admin.dashboard');
         } else {
