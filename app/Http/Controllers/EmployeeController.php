@@ -103,9 +103,11 @@ class EmployeeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit()
     {
-        //
+        $employee = Auth::user()->employee;
+
+        return view('profile.settings', compact('employee'));
     }
 
     /**

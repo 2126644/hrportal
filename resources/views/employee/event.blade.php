@@ -48,6 +48,30 @@
             gap: 30px;
         }
 
+        .card {
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-body h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-body h6 {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
         .event-card {
             background: #fff;
             border-radius: 15px;
@@ -205,8 +229,9 @@
         <!-- Tabs navigation -->
         <ul class="nav nav-tabs" id="eventTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="upcoming-event-tab" data-bs-toggle="tab" data-bs-target="#upcoming-event"
-                    type="button" role="tab" aria-controls="upcoming-event" aria-selected="true">
+                <button class="nav-link active" id="upcoming-event-tab" data-bs-toggle="tab"
+                    data-bs-target="#upcoming-event" type="button" role="tab" aria-controls="upcoming-event"
+                    aria-selected="true">
                     Upcoming Events
                 </button>
             </li>
@@ -224,108 +249,134 @@
 
             <!-- Upcoming Events tab -->
             <div class="tab-pane fade show active" id="upcoming-event" role="tabpanel" aria-labelledby="upcoming-event-tab">
-                <div id="eventCalendar"></div>
-            </div>
+                <div class="row">
+                <!-- Calendar Column -->
+                <div class="col-12 col-md-10 mb-4">
+                    <div id="eventCalendar"></div>
+                </div>
 
-        <!-- Past Events tab -->
-        <div class="tab-pane fade" id="past-event" role="tabpanel" aria-labelledby="past-event-tab">
-            {{-- Insert your leave report content here --}}
-
-            <div class="events-grid">
-                @forelse($events as $event)
-                    @php
-                        $eventDate = \Carbon\Carbon::parse($event->event_date);
-                        $eventTime = \Carbon\Carbon::parse($event->event_time);
-                        $now = \Carbon\Carbon::now();
-                        $isPast = $eventDate->lt($now);
-                        $eventImage = $event->image
-                            ? asset('storage/' . $event->image) // public/storage/events
-                            : asset('img/event-corporate.jpg'); // public/img-default image
-                    @endphp
-
-                    <div class="event-card">
-                        <img src="{{ $eventImage }}" alt="{{ $event->event_name }}">
-                        <div class="event-card-body">
-                            <h3 onclick="window.location='{{ route('event.show', $event->id) }}'">
-                                {{ $event->event_name }}
-                            </h3>
-
-                            <div class="event-meta">
-                                <span title="Date">📅 {{ $eventDate->format('d F Y') }}</span>
-                                <span title="Time">⏰ {{ $eventTime->format('g:i A') }}</span>
-                                <span title="Location">📍 {{ $event->event_location }}</span>
-
-                                @if ($event->rsvp_required)
-                                    <span class="badge-rsvp" title="RSVP Required">RSVP</span>
-                                @endif
-                                <span class="event-status {{ $isPast ? 'status-past' : 'status-upcoming' }}">
-                                    {{ $isPast ? 'Past' : 'Upcoming' }}
-                                </span>
-                            </div>
-
-                            <p class="event-description">{{ Str::limit($event->description, 140) }}</p>
-
-                            @if (!$isPast && $event->rsvp_required)
-                                <a href="{{ route('event.show', $event->id) }}" class="btn-primary">Register Now</a>
-                            @endif
+                <!-- Upcoming Events Column -->
+                <div class="col-12 col-md-2 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Upcoming Events</h3>
+                            @forelse ($upcomingEvents as $event)
+                                <div class="event-item">
+                                    <div class="event-date-time">
+                                        {{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} -
+                                        {{ $event->event_time }}</div>
+                                    <div class="event-title">{{ $event->event_name }}</div>
+                                </div>
+                            @empty
+                                <div class="alert alert-warning">
+                                    No upcoming events.
+                                </div>
+                            @endforelse
                         </div>
                     </div>
-                @empty
-                    <p class="text-center text-muted fs-5">No upcoming events at the moment.</p>
-                @endforelse
+                </div>
+                </div>
+            </div>
+
+            <!-- Past Events tab -->
+            <div class="tab-pane fade" id="past-event" role="tabpanel" aria-labelledby="past-event-tab">
+                {{-- Insert your leave report content here --}}
+
+                <div class="events-grid">
+                    @forelse($events as $event)
+                        @php
+                            $eventDate = \Carbon\Carbon::parse($event->event_date);
+                            $eventTime = \Carbon\Carbon::parse($event->event_time);
+                            $now = \Carbon\Carbon::now();
+                            $isPast = $eventDate->lt($now);
+                            $eventImage = $event->image
+                                ? asset('storage/' . $event->image) // public/storage/events
+                                : asset('img/event-corporate.jpg'); // public/img-default image
+                        @endphp
+
+                        <div class="event-card">
+                            <img src="{{ $eventImage }}" alt="{{ $event->event_name }}">
+                            <div class="event-card-body">
+                                <h3 onclick="window.location='{{ route('event.show', $event->id) }}'">
+                                    {{ $event->event_name }}
+                                </h3>
+
+                                <div class="event-meta">
+                                    <span title="Date">📅 {{ $eventDate->format('d F Y') }}</span>
+                                    <span title="Time">⏰ {{ $eventTime->format('g:i A') }}</span>
+                                    <span title="Location">📍 {{ $event->event_location }}</span>
+
+                                    @if ($event->rsvp_required)
+                                        <span class="badge-rsvp" title="RSVP Required">RSVP</span>
+                                    @endif
+                                    <span class="event-status {{ $isPast ? 'status-past' : 'status-upcoming' }}">
+                                        {{ $isPast ? 'Past' : 'Upcoming' }}
+                                    </span>
+                                </div>
+
+                                <p class="event-description">{{ Str::limit($event->description, 140) }}</p>
+
+                                @if (!$isPast && $event->rsvp_required)
+                                    <a href="{{ route('event.show', $event->id) }}" class="btn-primary">Register Now</a>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-center text-muted fs-5">No upcoming events at the moment.</p>
+                    @endforelse
+                </div>
+
             </div>
 
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var calendarEl = document.getElementById('eventCalendar');
 
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('eventCalendar');
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 500,
-                themeSystem: 'bootstrap5',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: ''
-                },
-                events: [
-                    // Example event data - replace with your dynamic leave data from backend
-                    {
-                        title: 'John Doe - Annual Leave',
-                        start: '2024-06-05',
-                        color: '#ffc107', // yellow for annual leave
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    height: 500,
+                    themeSystem: 'bootstrap5',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: ''
                     },
-                    {
-                        title: 'Jane Smith - Sick Leave',
-                        start: '2024-06-10',
-                        color: '#dc3545', // red for sick leave
-                    },
-                    {
-                        title: 'Bob Johnson - Unpaid Leave',
-                        start: '2024-06-10',
-                        color: '#6c757d', // gray for unpaid leave
-                    },
-                    {
-                        title: 'Alice Williams - Annual Leave',
-                        start: '2024-06-15',
-                        color: '#ffc107',
+                    events: [
+                        // Example event data - replace with your dynamic leave data from backend
+                        {
+                            title: 'John Doe - Annual Leave',
+                            start: '2024-06-05',
+                            color: '#ffc107', // yellow for annual leave
+                        },
+                        {
+                            title: 'Jane Smith - Sick Leave',
+                            start: '2024-06-10',
+                            color: '#dc3545', // red for sick leave
+                        },
+                        {
+                            title: 'Bob Johnson - Unpaid Leave',
+                            start: '2024-06-10',
+                            color: '#6c757d', // gray for unpaid leave
+                        },
+                        {
+                            title: 'Alice Williams - Annual Leave',
+                            start: '2024-06-15',
+                            color: '#ffc107',
+                        }
+                    ],
+                    eventDidMount: function(info) {
+                        // Tooltip on hover (using Bootstrap tooltip)
+                        var tooltip = new bootstrap.Tooltip(info.el, {
+                            title: info.event.title,
+                            placement: 'top',
+                            trigger: 'hover',
+                            container: 'body'
+                        });
                     }
-                ],
-                eventDidMount: function(info) {
-                    // Tooltip on hover (using Bootstrap tooltip)
-                    var tooltip = new bootstrap.Tooltip(info.el, {
-                        title: info.event.title,
-                        placement: 'top',
-                        trigger: 'hover',
-                        container: 'body'
-                    });
-                }
-            });
+                });
 
-            calendar.render();
-        });
-    </script>
-@endsection
+                calendar.render();
+            });
+        </script>
+    @endsection

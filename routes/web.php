@@ -82,6 +82,7 @@ Route::get('/holidays', function () {
 //Student update profile to student database
 Route::middleware(['auth'])->group(function () {
     Route::get('/update-profile', [EmployeeController::class, 'show'])->name('profile.show');
+    Route::get('/update-profile/edit', [EmployeeController::class, 'edit'])->name('profile.edit');
 });
 
 // Route::get('/admin/course/edit/{course_code}', [CourseController::class, 'editCourse'])->name('admin.course.edit');

@@ -41,6 +41,12 @@ class EventController extends Controller
             }
         }
 
+        // Fetch upcoming events (adjust your table column names)
+        $upcomingEvents = Event::where('event_date', '>=', now())
+            ->orderBy('event_date', 'asc')
+            ->take(5)
+            ->get();
+
         $events = $query->orderBy('event_date', 'asc')->get();
 
         // Calculate stats
@@ -53,7 +59,7 @@ class EventController extends Controller
 
         $viewMode = $request->get('view', 'grid');
 
-        return view('employee.event', compact('events', 'stats', 'viewMode'));
+        return view('employee.event', compact('events', 'stats', 'viewMode', 'upcomingEvents'));
     }
 
     /**
