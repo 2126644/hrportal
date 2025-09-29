@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -41,13 +42,22 @@ class EventController extends Controller
             }
         }
 
-        // Fetch upcoming events (adjust your table column names)
+        // Fetch upcoming events (beside calendar)
         $upcomingEvents = Event::where('event_date', '>=', now())
             ->orderBy('event_date', 'asc')
             ->take(5)
             ->get();
 
         $events = $query->orderBy('event_date', 'asc')->get();
+
+        // FOR CALENDAR
+        $calendarEvents = $events->map(function ($event) {
+            return [
+                'title'         => $event->event_name,
+                'start'         => Carbon::parse($event->event_date)->toDateString(),
+                'color'          => '#71b0f8ff',
+            ];
+        });
 
         // Calculate stats
         $stats = [
@@ -59,7 +69,14 @@ class EventController extends Controller
 
         $viewMode = $request->get('view', 'grid');
 
-        return view('employee.event', compact('events', 'stats', 'viewMode', 'upcomingEvents'));
+        return view('employee.event', [
+        'events' => $events, // Eloquent collection for cards/list
+        'calendarEvents' => $calendarEvents, // Array for FullCalendar
+        'stats' => $stats,
+        'viewMode' => $viewMode,
+        'upcomingEvents' => $upcomingEvents,
+        ]);
+
     }
 
     /**

@@ -264,45 +264,73 @@
 
             <!-- Leave Report tab -->
             <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
-                {{-- Insert your leave report content here --}}
-             
-                        <h4 class="card-title mb-4">Leave Report – {{ now()->year }}</h4>
+                <h4 class="card-title mb-4">Leave Report – {{ now()->year }}</h4>
 
-                        <table class="table table-bordered text-center align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Leave Type</th>
-                                    <th>Entitlement</th>
-                                    @for ($m = 1; $m <= 12; $m++)
-                                        <th>{{ \Carbon\Carbon::create()->month($m)->shortMonthName }}</th>
-                                    @endfor
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($leaveTypes as $type)
-                                    @php $rowTotal = 0; @endphp
-                                    <tr>
-                                        <td class="text-start">{{ $type }}</td> 
-                                        {{-- text-start:align to left --}}
-                                        <td>0</td>
-                                        @for ($m = 1; $m <= 12; $m++)
-                                            @php
-                                                $count = $reportData[$type][$m] ?? 0;
-                                                $rowTotal += $count;
-                                            @endphp
-                                            <td>{{ $count }}</td>
-                                        @endfor
-                                        <td class="fw-bold">{{ $rowTotal }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-end">
+                        <a href="{{ route('leave.export', ['from' => request('from'), 'to' => request('to')]) }}"
+                            class="btn btn-success">
+                            <i class="bi bi-file-earmark-excel"></i> Export to Excel
+                        </a>
                     </div>
                 </div>
 
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Leave Type</th>
+                            <th>Entitlement</th>
+                            @for ($m = 1; $m <= 12; $m++)
+                                <th>{{ \Carbon\Carbon::create()->month($m)->shortMonthName }}</th>
+                            @endfor
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($leaveTypes as $type)
+                            @php $rowTotal = 0; @endphp
+                            <tr>
+                                <td class="text-start">{{ $type }}</td>
+                                {{-- text-start:align to left --}}
+                                <td>0</td>
+                                @for ($m = 1; $m <= 12; $m++)
+                                    @php
+                                        $count = $reportData[$type][$m] ?? 0;
+                                        $rowTotal += $count;
+                                    @endphp
+                                    <td>{{ $count }}</td>
+                                @endfor
+                                <td class="fw-bold">{{ $rowTotal }}</td>
+                            </tr>
+                        @endforeach
+                        @php
+                            // first initialise monthly and grand totals
+                            $monthlyTotals = array_fill(1, 12, 0);
+                            $grandTotal = 0;
+                            foreach ($leaveTypes as $type) {
+                                for ($m = 1; $m <= 12; $m++) {
+                                    $count = $reportData[$type][$m] ?? 0;
+                                    $monthlyTotals[$m] += $count;
+                                    $grandTotal += $count;
+                                }
+                            }
+                        @endphp
+
+                        <tr class="fw-bold table-secondary">
+                            <td class="text-start">Total</td>
+                            <td></td>
+                            @for ($m = 1; $m <= 12; $m++)
+                                <td>{{ $monthlyTotals[$m] }}</td>
+                            @endfor
+                            <td>{{ $grandTotal }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-       
+        </div>
+
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

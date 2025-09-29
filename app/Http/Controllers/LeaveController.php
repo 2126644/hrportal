@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Exports\LeavesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LeaveController extends Controller
 {
@@ -74,6 +76,16 @@ class LeaveController extends Controller
             'leaveTypes',
             'employeeLeaves'
         ));
+    }
+
+    public function export(Request $request)
+    {
+        $year = $request->input('year', now()->year);
+        // collect any filters passed by users (optional)
+        // $filters = $request->only(['start_date', 'end_date']);
+
+        return Excel::download(new LeavesExport($year), 'leave_report.xlsx');
+
     }
 
     /**

@@ -161,24 +161,24 @@
                         </h5>
 
                     </div>
-                        @if (!$todayAttendance)
-                            <button class="btn-leave mt-3"
-                                onclick="window.location='{{ route('attendance.punchIn', ['type' => 'in']) }}'">Punch
-                                In</button>
-                        @elseif ($todayAttendance && !$todayAttendance->time_out)
-                            <button class="btn-leave mt-3"
-                                onclick="window.location='{{ route('attendance.punchOut', ['type' => 'out']) }}'">Punch
-                                Out</button>
-                        @else
-                            <span class="text-success mt-3">You have punched out for today.</span>
-                        @endif
-                        
-                    </div>
-
-                    
+                    @if (!$todayAttendance)
+                        <button class="btn-leave mt-3"
+                            onclick="window.location='{{ route('attendance.punchIn', ['type' => 'in']) }}'">Punch
+                            In</button>
+                    @elseif ($todayAttendance && !$todayAttendance->time_out)
+                        <button class="btn-leave mt-3"
+                            onclick="window.location='{{ route('attendance.punchOut', ['type' => 'out']) }}'">Punch
+                            Out</button>
+                    @else
+                        <span class="text-success mt-3">You have punched out for today.</span>
+                    @endif
 
                 </div>
+
+
+
             </div>
+        </div>
 
         <!-- Attendance History -->
         <div class="col-12 col-md-8 mb-4">
@@ -204,25 +204,21 @@
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->time_in }}</td>
                                     {{-- Status Time In with color --}}
                                     <td class="py-3 px-3 border-b border-gray-100">
-                                    @if ($attendance->status_time_in === 'On Time')
-                                            <span
-                                                class="badge bg-success">{{ $attendance->status_time_in }}</span>
+                                        @if ($attendance->status_time_in === 'On Time')
+                                            <span class="badge bg-success">{{ $attendance->status_time_in }}</span>
                                         @elseif ($attendance->status_time_in === 'Late')
-                                            <span
-                                                class="badge bg-danger">{{ $attendance->status_time_in }}</span>
+                                            <span class="badge bg-danger">{{ $attendance->status_time_in }}</span>
                                         @endif
                                     </td>
-                                    
+
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->time_out }}</td>
 
                                     {{-- Status Time Out with color --}}
                                     <td class="py-3 px-3 border-b border-gray-100">
                                         @if ($attendance->status_time_out === 'On Time')
-                                            <span
-                                                class="badge bg-success">{{ $attendance->status_time_out }}</span>
+                                            <span class="badge bg-success">{{ $attendance->status_time_out }}</span>
                                         @elseif ($attendance->status_time_out === 'Early Leave')
-                                            <span
-                                                class="badge bg-danger">{{ $attendance->status_time_out }}</span>
+                                            <span class="badge bg-danger">{{ $attendance->status_time_out }}</span>
                                         @endif
                                     </td>
 
@@ -231,12 +227,21 @@
                             @endforeach
 
                         </tbody>
+                        
                     </table>
+                    <div class="container">
+                    <div class="d-flex justify-content-center mt-3">
+                        {{ $attendances->links() }}
+                    </div>
+                    </div>
+
+                    
+
                 </div>
             </div>
         </div>
-
     </div>
+
     <script>
         function updateDateTime() {
             const now = new Date();

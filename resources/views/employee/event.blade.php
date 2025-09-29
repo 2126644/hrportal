@@ -197,6 +197,12 @@
         .status-past {
             background-color: #95a5a6;
         }
+
+        #eventCalendar,
+        .calendar-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
     </style>
 
     <div class="content container-fluid">
@@ -250,31 +256,31 @@
             <!-- Upcoming Events tab -->
             <div class="tab-pane fade show active" id="upcoming-event" role="tabpanel" aria-labelledby="upcoming-event-tab">
                 <div class="row">
-                <!-- Calendar Column -->
-                <div class="col-12 col-md-10 mb-4">
-                    <div id="eventCalendar"></div>
-                </div>
+                    <!-- Calendar Column -->
+                    <div class="col-12 col-md-10 mb-4 calendar-col">
+                            <div id="eventCalendar"></div>
+                    </div>
 
-                <!-- Upcoming Events Column -->
-                <div class="col-12 col-md-2 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="card-title">Upcoming Events</h3>
-                            @forelse ($upcomingEvents as $event)
-                                <div class="event-item">
-                                    <div class="event-date-time">
-                                        {{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} -
-                                        {{ $event->event_time }}</div>
-                                    <div class="event-title">{{ $event->event_name }}</div>
-                                </div>
-                            @empty
-                                <div class="alert alert-warning">
-                                    No upcoming events.
-                                </div>
-                            @endforelse
+                    <!-- Upcoming Events Column -->
+                    <div class="col-12 col-md-2 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">Upcoming Events</h3>
+                                @forelse ($upcomingEvents as $event)
+                                    <div class="event-item">
+                                        <div class="event-date-time">
+                                            {{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} -
+                                            {{ $event->event_time }}</div>
+                                        <div class="event-title">{{ $event->event_name }}</div>
+                                    </div>
+                                @empty
+                                    <div class="alert alert-warning">
+                                        No upcoming events.
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
             </div>
 
@@ -342,29 +348,7 @@
                         center: 'title',
                         right: ''
                     },
-                    events: [
-                        // Example event data - replace with your dynamic leave data from backend
-                        {
-                            title: 'John Doe - Annual Leave',
-                            start: '2024-06-05',
-                            color: '#ffc107', // yellow for annual leave
-                        },
-                        {
-                            title: 'Jane Smith - Sick Leave',
-                            start: '2024-06-10',
-                            color: '#dc3545', // red for sick leave
-                        },
-                        {
-                            title: 'Bob Johnson - Unpaid Leave',
-                            start: '2024-06-10',
-                            color: '#6c757d', // gray for unpaid leave
-                        },
-                        {
-                            title: 'Alice Williams - Annual Leave',
-                            start: '2024-06-15',
-                            color: '#ffc107',
-                        }
-                    ],
+                    events: @json($calendarEvents),
                     eventDidMount: function(info) {
                         // Tooltip on hover (using Bootstrap tooltip)
                         var tooltip = new bootstrap.Tooltip(info.el, {

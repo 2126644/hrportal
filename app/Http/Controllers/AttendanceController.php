@@ -20,8 +20,9 @@ class AttendanceController extends Controller
         $employee = Auth::user()->employee;
 
         // Get all requests to show in a table
-        $query = Attendance::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
-        $attendances = $query->get();
+        $attendances = Attendance::where('employee_id', $employee->employee_id)
+    ->orderBy('created_at', 'desc')
+    ->paginate(5);
 
         // 🔹 Latest record (also filter by today)
         $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
