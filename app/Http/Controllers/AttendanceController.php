@@ -8,6 +8,8 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\AttendanceExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceController extends Controller
 {
@@ -21,21 +23,20 @@ class AttendanceController extends Controller
 
         // Get all requests to show in a table
         $attendances = Attendance::where('employee_id', $employee->employee_id)
-    ->orderBy('created_at', 'desc')
-    ->paginate(5);
+            ->orderBy('created_at', 'desc')
+            ->paginate(7);
 
         // 🔹 Latest record (also filter by today)
         $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
-        ->whereDate('date', Carbon::today())
-        ->orderBy('date', 'desc')
-        ->orderBy('created_at', 'desc')
-        ->first();
+            ->whereDate('date', Carbon::today())
+            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
         return view('employee.attendance', compact(
-            'attendances', 
+            'attendances',
             'todayAttendance'
         ));
-
     }
 
     // Punch in (mark attendance)
@@ -129,8 +130,8 @@ class AttendanceController extends Controller
         }
 
         if ($attendance->time_out) {
-        return response()->json(['success' => false, 'message' => 'You already punched out today.']);
-    }
+            return response()->json(['success' => false, 'message' => 'You already punched out today.']);
+        }
 
         // // Check location again
         // $officeLat = 3.2017;
@@ -163,11 +164,21 @@ class AttendanceController extends Controller
             'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
             'status_time_out' => $statusTimeOut,
             //to differentiate punch in and punch out:
-            'success' => true,  
+            'success' => true,
             'action'  => 'punchOut'
         ]);
     }
 
+    // Export attendance to Excel
+    public function export(Request $request)
+    {
+        // get year filter from request, default to current year
+        $year = $request->input('year', now()->year);
+        // collect any filters passed by users (optional)
+        // $filters = $request->only(['start_date', 'end_date']);
+
+        return Excel::download(new AttendanceExport($year), 'attendance_report.xlsx');
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -196,9 +207,18 @@ class AttendanceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, Attendance $attendance)
     {
-        //
+        $request->validate([
+            'late_reason' => 'nullable|string|max:255',
+            'early_leave_reason' => 'nullable|string|max:255',
+        ]);
+
+        $attendance->late_reason = $request->late_reason;
+        $attendance->early_leave_reason = $request->early_leave_reason;
+        $attendance->save();
+
+        return redirect()->back()->with('success', 'Attendance updated successfully.');
     }
 
     /**

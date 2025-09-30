@@ -50,6 +50,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
+    Route::get('/attendance/report', [AttendanceController::class, 'export'])->name('attendance.export');
+    Route::post('/attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
     
     Route::get('/leave', [LeaveController::class, 'index'])->name('employee.leave');
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');

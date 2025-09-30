@@ -284,6 +284,7 @@
                                 <th>{{ \Carbon\Carbon::create()->month($m)->shortMonthName }}</th>
                             @endfor
                             <th>Total</th>
+                            <th>Leave Balance</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -301,6 +302,7 @@
                                     <td>{{ $count }}</td>
                                 @endfor
                                 <td class="fw-bold">{{ $rowTotal }}</td>
+                                <td class="fw-bold">{{ $rowTotal }}</td>
                             </tr>
                         @endforeach
                         @php
@@ -316,12 +318,14 @@
                             }
                         @endphp
 
+                        {{-- last row --}}
                         <tr class="fw-bold table-secondary">
                             <td class="text-start">Total</td>
                             <td></td>
                             @for ($m = 1; $m <= 12; $m++)
                                 <td>{{ $monthlyTotals[$m] }}</td>
                             @endfor
+                            <td>{{ $grandTotal }}</td>
                             <td>{{ $grandTotal }}</td>
                         </tr>
                     </tbody>

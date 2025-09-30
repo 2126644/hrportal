@@ -127,7 +127,8 @@
                             <label for="leave_length" class="form-label">Leave Length <span
                                     class="text-danger">*</span></label>
                             <select id="leave_length" name="leave_length" class="form-select" required>
-                                <option value="" disabled {{ old('leave_length') ? '' : 'selected' }}>Select Length</option>
+                                <option value="" disabled {{ old('leave_length') ? '' : 'selected' }}>Select Length
+                                </option>
                                 <option value="full_day" {{ old('leave_length') === 'full_day' ? 'selected' : '' }}>Full Day
                                 </option>
                                 <option value="AM" {{ old('leave_length') === 'AM' ? 'selected' : '' }}>AM</option>
@@ -170,16 +171,19 @@
 
                         <div class="mb-3">
                             <label for="attachment" class="form-label">Supporting Document (optional)</label>
-                            <input type="file" id="attachment" name="attachment" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                            <input type="file" id="attachment" name="attachment" class="form-control"
+                                accept=".pdf,image/*" capture="environment">
                             <small class="text-muted">PDF or image (max 2 MB)</small>
                             @error('attachment')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
+
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary px-4">Submit Application</button>
                         </div>
+
                     </form>
                 </div>
             </div>

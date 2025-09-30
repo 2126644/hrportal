@@ -161,21 +161,20 @@
                         </h5>
 
                     </div>
+
                     @if (!$todayAttendance)
-                        <button class="btn-leave mt-3"
-                            onclick="window.location='{{ route('attendance.punchIn', ['type' => 'in']) }}'">Punch
-                            In</button>
+                        <button class="btn-punch" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
+                            Punch In
+                        </button>
                     @elseif ($todayAttendance && !$todayAttendance->time_out)
-                        <button class="btn-leave mt-3"
-                            onclick="window.location='{{ route('attendance.punchOut', ['type' => 'out']) }}'">Punch
-                            Out</button>
+                        <button class="btn-punch" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
+                            Punch Out
+                        </button>
                     @else
                         <span class="text-success mt-3">You have punched out for today.</span>
                     @endif
 
                 </div>
-
-
 
             </div>
         </div>
@@ -185,6 +184,16 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Attendance History</h4>
+
+                    <div class="row mb-3">
+                        <div class="col-12 d-flex justify-content-end">
+                            <a href="{{ route('attendance.export', ['from' => request('from'), 'to' => request('to')]) }}"
+                                class="btn btn-success">
+                                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+                            </a>
+                        </div>
+                    </div>
+
                     <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
                         <thead>
                             <tr>
@@ -194,6 +203,8 @@
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Time-Out</th>
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Status Time-Out</th>
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Status</th>
+                                <th class="py-2 px-3 border-b border-gray-200 font-medium">Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -202,6 +213,7 @@
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->date }}</td>
 
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->time_in }}</td>
+
                                     {{-- Status Time In with color --}}
                                     <td class="py-3 px-3 border-b border-gray-100">
                                         @if ($attendance->status_time_in === 'On Time')
@@ -223,19 +235,102 @@
                                     </td>
 
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->status }}</td>
+
+                                    <td class="py-3 px-3 border-b border-gray-100">
+                                        <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                            data-bs-target="#attendanceModal{{ $attendance->id }}" title="View Details">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </td>
+
                                 </tr>
                             @endforeach
 
                         </tbody>
-                        
+
                     </table>
+                    @foreach ($attendances as $attendance)
+                        <div class="modal fade" id="attendanceModal{{ $attendance->id }}" tabindex="-1"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <form action="{{ route('attendance.edit', $attendance->id) }}" method="POST">
+                                        @csrf
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Attendance Details ({{ $attendance->date }})</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <td>{{ $attendance->date }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Time In</th>
+                                                    <td>{{ $attendance->time_in }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status In</th>
+                                                    <td>{{ $attendance->status_time_in }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Time Out</th>
+                                                    <td>{{ $attendance->time_out }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status Out</th>
+                                                    <td>{{ $attendance->status_time_out }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status</th>
+                                                    <td>{{ $attendance->status }}</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Late Reason</th>
+                                                    <td>
+                                                        @if ($attendance->status_time_in === 'Late')
+                                                            <textarea name="late_reason" class="form-control" rows="1">{{ $attendance->late_reason }}</textarea>
+                                                        @else
+                                                            <span class="text-muted fst-italic">Not Applicable</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Early Leave Reason</th>
+                                                    <td>
+                                                        @if ($attendance->status_time_out === 'Early Leave')
+                                                            <textarea name="early_leave_reason" class="form-control" rows="1">{{ $attendance->early_leave_reason }}</textarea>
+                                                        @else
+                                                            <span class="text-muted fst-italic">Not Applicable</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
                     <div class="container">
-                    <div class="d-flex justify-content-center mt-3">
-                        {{ $attendances->links() }}
-                    </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $attendances->links() }}
+                        </div>
                     </div>
 
-                    
+
 
                 </div>
             </div>
@@ -266,5 +361,58 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        // Reusable punch function
+        function sendPunch(url, mapId, punchType) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    fetch(url, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                latitude: lat,
+                                longitude: lng
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(
+                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
+                            );
+
+                            if (mapId) {
+                                var map = L.map(mapId).setView([lat, lng], 16);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    maxZoom: 19,
+                                }).addTo(map);
+
+                                L.marker([lat, lng]).addTo(map)
+                                    .bindPopup(
+                                        `${punchType} Location<br>Status: ${data.status ?? data.status_time_in}`
+                                    )
+                                    .openPopup();
+                            }
+
+                            // Disable/enable buttons accordingly
+                            if (data.action === 'punchIn') {
+                                document.getElementById('punchInBtn').disabled = true;
+                                document.getElementById('punchOutBtn').disabled = false;
+                            }
+                            if (data.action === 'punchOut') {
+                                document.getElementById('punchOutBtn').disabled = true;
+                            }
+                        })
+                        .catch(err => console.error(err));
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
     </script>
 @endsection

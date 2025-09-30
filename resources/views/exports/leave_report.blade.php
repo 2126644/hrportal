@@ -1,4 +1,3 @@
-{{-- filepath: resources/views/exports/leave_report.blade.php --}}
 <table>
     <thead>
         <tr>

@@ -135,8 +135,8 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1060;
-            /* higher than sidebar(1050) and overlay(1040) */
+            z-index: 1030;
+            /* must behigher than sidebar and sidebar overlay */
             /* z-index is the layer, like 3-D */
             border-bottom: 1px solid #e0e0e0;
             transition: margin-left .3s ease;
@@ -192,7 +192,7 @@
             box-shadow: 2px 0 6px rgba(0, 0, 0, .1);
             transform: translateX(0);
             transition: transform .3s ease;
-            z-index: 1050;
+            z-index: 1020;
             /* above content */
         }
 
@@ -292,12 +292,11 @@
             /* height: 100vh; */
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            /* z-index: 1035; */
             opacity: 0;
             visibility: hidden;
             /* transition: all 0.3s ease; */
             transition: opacity .3s ease;
-            z-index: 1040;
+            z-index: 1010;
         }
 
         body.show-overlay .sidebar-overlay {
