@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
         TaskSeeder::class,
         AttendanceSeeder::class,
         EventSeeder::class,
+        LeaveEntitlementSeeder::class, // Seed fixed leave types & entitlement first 
         LeaveSeeder::class,
     ]);
     }

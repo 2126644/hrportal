@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('employee_id');  // add foreign key column
             $table->string('name');
             $table->date('applied_date');
-            $table->enum('leave_type', ['annual', 'sick', 'emergency']);
+            $table->enum('leave_type', ['annual_leave', 'medical_leave', 'emergency_leave', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid_leave', 'marriage']); 
             $table->enum('leave_length', ['full_day', 'AM', 'PM']);
             $table->text('reason')->nullable();
             $table->date('start_date');

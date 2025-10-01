@@ -20,6 +20,7 @@ class Employee extends Model
         'full_name',
         'department',
         'position',
+        'date_joined',
         'email',
         'phone_number',
         'address',
@@ -30,6 +31,11 @@ class Employee extends Model
         'nationality',
         'emergency_contact',
         'profile_pic',
+    ];
+
+    protected $casts = [
+        'date_joined' => 'date',
+        'birthday' => 'date',
     ];
 
     public function user()

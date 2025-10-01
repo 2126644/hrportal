@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Leave;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Exports\LeavesExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\LeaveEntitlement;
 
 class LeaveController extends Controller
 {
@@ -36,7 +36,6 @@ class LeaveController extends Controller
         // Total approved days used
         $usedDays = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->sum('days');
 
-        $leaveBalance   = 14 - $usedDays; // assuming 14 days AL
         $pendingLeaves  = Leave::where('employee_id', $employee->employee_id)->where('status', 'pending')->count();
         $approvedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->count();
         $rejectedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'rejected')->count();
@@ -49,8 +48,14 @@ class LeaveController extends Controller
             ->get();
 
         // FOR LEAVE REPORT TAB
+
+        // -------------------------
+        // Build reportData: days taken per leave_type per month
+        // Use SUM(days) so we count days, not number of records
+        // -------------------------
         $leaveReport = DB::table('leaves')
-            ->selectRaw('leave_type, MONTH(start_date) as month, COUNT(*) as total')
+            ->selectRaw('leave_type, MONTH(start_date) AS month, SUM(days) AS total')
+            ->where('employee_id', $employee->employee_id)
             ->whereYear('start_date', now()->year)
             ->groupBy('leave_type', 'month')
             ->get();
@@ -58,23 +63,58 @@ class LeaveController extends Controller
         // pivot the results into [leave_type => [1=>count, 2=>count, ...]]
         $reportData = [];
         foreach ($leaveReport as $row) {
-            $reportData[$row->leave_type][$row->month] = $row->total;
+            $reportData[$row->leave_type][(int)$row->month] = (float)$row->total;
         }
 
-        // get all leave types to ensure rows exist even if zero (still display row with zero)
-        $leaveTypes = DB::table('leaves')->distinct()->pluck('leave_type');
+        // -------------------------
+        // Leave types (entitlements master)
+        // Prefer the master table LeaveEntitlement. If empty, fallback to leave types present in reportData.
+        // -------------------------
+        $leaveTypes = LeaveEntitlement::all();
+        // returns a Collection of LeaveEntitlement MODELS (objects with ->leave_type)
+
+        if ($leaveTypes->isEmpty()) {
+            // fallback: convert the keys found in reportData to objects with leave_type and full_entitlement=0
+            $leaveTypeNames = array_keys($reportData);
+            $leaveTypes = collect(array_map(function ($name) {
+                return (object)['leave_type' => $name, 'full_entitlement' => 0];
+            }, $leaveTypeNames));
+        }
+
+        // -------------------------
+        // Compute final entitlements (prorated if joined this year)
+        // -------------------------
+        $finalEntitlements = [];
+        // make sure join date is Carbon (employee model should cast it)
+        $joinDate = $employee->date_joined ? Carbon::parse($employee->date_joined) : null;
+
+        foreach ($leaveTypes as $lt) {
+            // lt may be model or fallback object; unify to string and full value
+            $typeName = is_object($lt) ? ($lt->leave_type ?? '') : (string)$lt;
+            $full     = is_object($lt) ? ($lt->full_entitlement ?? 0) : 0;
+
+            if ($joinDate && $joinDate->year == now()->year) {
+                // prorate for first calendar year (months remaining including join month)
+                $monthsLeft = 12 - $joinDate->month + 1;
+                $prorated = round(($full / 12) * $monthsLeft, 2); // keep 2 decimal precision
+                $finalEntitlements[$typeName] = $prorated;
+            } else {
+                $finalEntitlements[$typeName] = (float) $full;
+            }
+        }
+
 
         return view('employee.leave', compact(
             'totalRequests',
             'approvedLeaves',
             'pendingLeaves',
             'rejectedLeaves',
-            'leaveBalance',
             'usedDays',
             'leaves',
             'reportData',
             'leaveTypes',
-            'employeeLeaves'
+            'employeeLeaves',
+            'finalEntitlements',
         ));
     }
 
@@ -85,7 +125,6 @@ class LeaveController extends Controller
         // $filters = $request->only(['start_date', 'end_date']);
 
         return Excel::download(new LeavesExport($year), 'leave_report.xlsx');
-
     }
 
     /**
