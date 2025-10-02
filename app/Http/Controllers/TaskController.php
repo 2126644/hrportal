@@ -64,17 +64,6 @@ class TaskController extends Controller
             'due_date'      => 'nullable|date',
         ]);
 
-        // Task::create([
-        //     'employee_id' => $employee->employee_id,
-        //     'title'       => $request->title,
-        //     'description' => $request->description,
-        //     'assigned_to'  => $request->assigned_to,
-        //     'assigned_by'  => $request->assigned_by,
-        //     'status'      => $request->status,
-        //     'notes'       => $request->notes,
-        //     'due_date'    => $request->due_date,
-        // ]);
-
         $task = new Task();
         $task->employee_id  = $employee->employee_id;
         $task->title        = $request->title;
@@ -110,7 +99,7 @@ class TaskController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit()
     {
         //
     }
@@ -118,9 +107,18 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Task $task)
     {
-        //
+         $request->validate([
+            'status' => 'required|in:to-do,in-progress,in-review,completed',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $task->status = $request->status;
+        $task->due_date = $request->due_date;
+        $task->save();
+
+        return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
     /**

@@ -207,7 +207,9 @@
                     <h4 class="card-title mb-3 ">Tasks</h4>
 
                     @forelse ($tasks as $task)
-                        <div class="card task-item mb-3 shadow-sm" data-status="{{ $task->status }}">
+                        <div class="card task-item mb-3 shadow-sm" data-status="{{ $task->status }}" data-bs-toggle="modal"
+                            data-bs-target="#taskModal{{ $task->id }}" style="cursor:pointer;">
+
                             <div class="card-body d-flex justify-content-between align-items-start flex-wrap">
                                 {{-- Left side: title & details --}}
                                 <div class="me-3 flex-grow-1">
@@ -279,26 +281,120 @@
                         @endforelse
 
                     </div>
+
+                    {{-- Update/edit task modal --}}
+                    @foreach ($tasks as $task)
+                        <div class="modal fade" id="taskModal{{ $task->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <form action="{{ route('task.update', $task->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Task Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <table class="table table-sm">
+                                                <tr>
+                                                    <th>Task Title</th>
+                                                    <td>{{ $task->title }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Description</th>
+                                                    <td>{{ $task->description }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Assigned to</th>
+                                                    <td>{{ $task->assigned_to }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Assigned by</th>
+                                                    <td>{{ $task->assigned_by }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Notes</th>
+                                                    <td>{{ $task->notes }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status</th>
+                                                    <td>
+                                                        <select id="status" name="status" class="form-select" required>
+                                                            <option value="" disabled
+                                                                {{ !$task->status ? 'selected' : '' }}>Select Status</option>
+
+                                                            <option value="to-do"
+                                                                {{ old('status', $task->status) === 'to-do' ? 'selected' : '' }}>
+                                                                To-Do
+                                                            </option>
+
+                                                            <option value="in-progress"
+                                                                {{ old('status', $task->status) === 'in-progress' ? 'selected' : '' }}>
+                                                                In-Progress
+                                                            </option>
+
+                                                            <option value="in-review"
+                                                                {{ old('status', $task->status) === 'in-review' ? 'selected' : '' }}>
+                                                                In-Review
+                                                            </option>
+
+                                                            <option value="completed"
+                                                                {{ old('status', $task->status) === 'completed' ? 'selected' : '' }}>
+                                                                Completed
+                                                            </option>
+                                                        </select>
+                                                        @error('status')
+                                                            <div class="text-danger small">{{ $message }}</div>
+                                                        @enderror
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Due Date</th>
+                                                    <td>
+                                                        <input type="date" name="due_date" class="form-control"
+                                                            value="{{ old('due_date', $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('Y-m-d') : '') }}">
+                                                        @error('due_date')
+                                                            <div class="text-danger small">{{ $message }}</div>
+                                                        @enderror
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
                 </div>
             </div>
         </div>
 
-         <script>
-        document.querySelectorAll('.filter-card').forEach(card => {
-            card.addEventListener('click', function() {
-                // remove active class from all cards 
-                document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
+        <script>
+            document.querySelectorAll('.filter-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // remove active class from all cards 
+                    document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
 
-                let status = this.dataset.status; // all, to-do, in-progress, in-review, completed
-                document.querySelectorAll('#tasksCard .task-item').forEach(item => {
-                    if (status === 'all' || item.dataset.status === status) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
+                    let status = this.dataset.status; // all, to-do, in-progress, in-review, completed
+                    document.querySelectorAll('#tasksCard .task-item').forEach(item => {
+                        if (status === 'all' || item.dataset.status === status) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
                 });
             });
-        });
-    </script>
+        </script>
     @endsection

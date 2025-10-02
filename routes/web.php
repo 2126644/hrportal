@@ -51,7 +51,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
     Route::get('/attendance/report', [AttendanceController::class, 'export'])->name('attendance.export');
-    Route::post('/attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
+    // Route::post('/attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
+    Route::put('/attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
     
     Route::get('/leave', [LeaveController::class, 'index'])->name('employee.leave');
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
@@ -61,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tasks', [TaskController::class, 'index'])->name('employee.task');
     Route::post('/task', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/create', [TaskController::class, 'create'])->name('task.create');
+    // Route::get('/task/{task}/edit', [TaskController::class, 'edit'])->name('task.edit');
+    Route::put('/task/{task}', [TaskController::class, 'update'])->name('task.update');
 
     Route::get('/event', [EventController::class, 'index'])->name('employee.event');
     Route::post('/event', [EventController::class, 'store'])->name('event.store');

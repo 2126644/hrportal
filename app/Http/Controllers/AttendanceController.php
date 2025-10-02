@@ -207,7 +207,15 @@ class AttendanceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Attendance $attendance)
+    public function edit()
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Attendance $attendance)
     {
         $request->validate([
             'late_reason' => 'nullable|string|max:255',
@@ -219,14 +227,6 @@ class AttendanceController extends Controller
         $attendance->save();
 
         return redirect()->back()->with('success', 'Attendance updated successfully.');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
     }
 
     /**

@@ -30,7 +30,7 @@
             margin-top: -0.5rem;
         }
 
-        .btn-leave {
+        .btn-punch {
             background-color: #ffc107;
             border: none;
             color: #212529;
@@ -143,36 +143,49 @@
 
                     <div class="card-title">Today's Attendance</div>
 
-                    <div class="datetime-punch">
-                        <div class="datetime-time" id="currentTime"></div>
-                        <div class="datetime-date" id="currentDate"></div>
+                    <div class="datetime-punch d-flex align-items-center gap-3 mt-2">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock-history text-secondary me-2"></i>
+                            <div class="datetime-time fw-bold" id="currentTime"></div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="datetime-date" id="currentDate"></div>
+                        </div>
                     </div>
 
                     <div class="mt-3">
-                        <h5>Time In:
-                            <span class="text-primary">
+                        <h5>
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Time In:
+                            <span class="text-primary" id="timeInDisplay">
                                 {{ $todayAttendance?->time_in ?? '—' }}
                             </span>
                         </h5>
-                        <h5>Time Out:
-                            <span class="text-primary">
+                        <h5>
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Time Out:
+                            <span class="text-primary" id="timeOutDisplay">
                                 {{ $todayAttendance?->time_out ?? '—' }}
                             </span>
                         </h5>
 
                     </div>
 
-                    @if (!$todayAttendance)
-                        <button class="btn-punch" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
-                            Punch In
-                        </button>
-                    @elseif ($todayAttendance && !$todayAttendance->time_out)
-                        <button class="btn-punch" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
-                            Punch Out
-                        </button>
-                    @else
-                        <span class="text-success mt-3">You have punched out for today.</span>
-                    @endif
+                    <div id="punchContainer">
+                        @if (!$todayAttendance)
+                            <button class="btn btn-punch" id="punchInBtn">
+                                <i class="bi bi-hand-index-thumb me-1"></i> Punch In
+                            </button>
+                        @elseif ($todayAttendance && !$todayAttendance->time_out)
+                            <button class="btn btn-punch" id="punchOutBtn">
+                                <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
+                            </button>
+                        @else
+                            <span class="text-success mt-3">
+                                <i class="bi bi-check-circle-fill me-1"></i>You have punched out for today.
+                            </span>
+                        @endif
+                    </div>
 
                 </div>
 
@@ -207,7 +220,7 @@
 
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="attendanceHistoryTable">
                             @foreach ($attendances as $attendance)
                                 <tr>
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->date }}</td>
@@ -254,8 +267,9 @@
                             aria-hidden="true">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
-                                    <form action="{{ route('attendance.edit', $attendance->id) }}" method="POST">
+                                    <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
                                         @csrf
+                                        @method('PUT')
 
                                         <div class="modal-header">
                                             <h5 class="modal-title">Attendance Details ({{ $attendance->date }})</h5>
@@ -323,15 +337,11 @@
                             </div>
                         </div>
                     @endforeach
-
                     <div class="container">
                         <div class="d-flex justify-content-center mt-3">
                             {{ $attendances->links() }}
                         </div>
                     </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -362,7 +372,7 @@
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
-        // Reusable punch function
+        // reusable punch function
         function sendPunch(url, mapId, punchType) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function(position) {
@@ -382,6 +392,85 @@
                         })
                         .then(res => res.json())
                         .then(data => {
+                            // AUTO-UPDATE TODAY'S ATTENDANCE CARD
+
+                            // must change date/time and buttons first before alert to function
+                            // button punch-in/punch-out auto swap
+                            if (data.action === 'punchIn') {
+                                const container = document.getElementById('punchContainer');
+                                container.innerHTML = `
+                                <button class="btn btn-punch" id="punchOutBtn">
+                                    <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
+                                </button>
+                            `;
+                            }
+
+                            if (data.action === 'punchOut') {
+                                const container = document.getElementById('punchContainer');
+                                container.innerHTML = `
+                                <span class="text-success mt-3">
+                                    <i class="bi bi-check-circle-fill me-1"></i> You have punched out for today.
+                                </span>
+                            `;
+                            }
+
+                            // text time-in/time-out auto update 
+                            if (data.action === 'punchIn') {
+                                document.getElementById('timeInDisplay').textContent = new Date()
+                                    .toLocaleTimeString();
+                            }
+
+                            if (data.action === 'punchOut') {
+                                document.getElementById('timeOutDisplay').textContent = new Date()
+                                    .toLocaleTimeString();
+                            }
+
+                            // AUTO-UPDATE ATTENDANCE HISTORY CARD
+                            const historyTable = document.getElementById('attendanceHistoryTable');
+                            if (data.action === 'punchIn') {
+                                const newRow = `
+                                <tr>
+                                    <td>${new Date().toLocaleDateString()}</td>
+                                    <td>${new Date().toLocaleTimeString()}</td>
+                                    <td>
+                                        ${data.status_time_in === 'On Time'
+                                            ? '<span class="badge bg-success">On Time</span>'
+                                            : '<span class="badge bg-danger">Late</span>'}
+                                    </td>
+                                    <td>—</td>
+                                    <td>—</td>
+                                    <td>${data.status}</td>
+                                    <td><span class="text-muted fst-italic">Not Applicable</span></td>
+                                </tr>
+                            `;
+                                historyTable.insertAdjacentHTML("afterbegin", newRow);
+                            }
+
+                            if (data.action === 'punchOut') {
+                                // Find the first row (today’s record) and update Time Out + Status
+                                const firstRow = historyTable.querySelector("tr");
+                                if (firstRow) {
+                                    const cells = firstRow.querySelectorAll("td");
+                                    cells[3].textContent = new Date().toLocaleTimeString(); // Time Out
+                                    cells[4].innerHTML = data.status_time_out === 'On Time' ?
+                                        '<span class="badge bg-success">On Time</span>' :
+                                        '<span class="badge bg-danger">Early Leave</span>';
+                                }
+                            }
+
+                            if (data.action === 'punchOut') {
+                                // Find the first row (today’s record) and update Time Out + Status
+                                const firstRow = historyTable.querySelector("tr");
+                                if (firstRow) {
+                                    const cells = firstRow.querySelectorAll("td");
+                                    cells[3].textContent = new Date().toLocaleTimeString(); // Time Out
+                                    cells[4].innerHTML = data.status_time_out === 'On Time' ?
+                                        '<span class="badge bg-success">On Time</span>' :
+                                        '<span class="badge bg-danger">Early Leave</span>';
+                                }
+                            }
+
+                            // UPDATE SUCCESS POPUP
                             alert(
                                 `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
                             );
@@ -399,14 +488,7 @@
                                     .openPopup();
                             }
 
-                            // Disable/enable buttons accordingly
-                            if (data.action === 'punchIn') {
-                                document.getElementById('punchInBtn').disabled = true;
-                                document.getElementById('punchOutBtn').disabled = false;
-                            }
-                            if (data.action === 'punchOut') {
-                                document.getElementById('punchOutBtn').disabled = true;
-                            }
+
                         })
                         .catch(err => console.error(err));
                 });
@@ -414,5 +496,15 @@
                 alert("Geolocation is not supported by your browser.");
             }
         }
+
+        // Bind Punch In if exists
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'punchInBtn') {
+                sendPunch("{{ route('attendance.punchIn') }}", "map", "punched in");
+            }
+            if (e.target && e.target.id === 'punchOutBtn') {
+                sendPunch("{{ route('attendance.punchOut') }}", "mapOut", "punched out");
+            }
+        })
     </script>
 @endsection
