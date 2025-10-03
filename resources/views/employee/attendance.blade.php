@@ -209,7 +209,7 @@
 
                     <table class="w-100 text-left text-sm text-gray-600 border-collapse align-middle">
                         <thead>
-                            <tr>
+                            <tr class="text-start">
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Date</th>
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Time-In</th>
                                 <th class="py-2 px-3 border-b border-gray-200 font-medium">Status Time-In</th>
@@ -222,7 +222,7 @@
                         </thead>
                         <tbody id="attendanceHistoryTable">
                             @foreach ($attendances as $attendance)
-                                <tr>
+                                <tr class="text-start">
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->date }}</td>
 
                                     <td class="py-3 px-3 border-b border-gray-100">{{ $attendance->time_in }}</td>
@@ -262,81 +262,83 @@
                         </tbody>
 
                     </table>
-                    @foreach ($attendances as $attendance)
-                        <div class="modal fade" id="attendanceModal{{ $attendance->id }}" tabindex="-1"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
+                    <div id="attendanceModalContainer">
+                        @foreach ($attendances as $attendance)
+                            <div class="modal fade" id="attendanceModal{{ $attendance->id }}" tabindex="-1"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
 
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Attendance Details ({{ $attendance->date }})</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Attendance Details ({{ $attendance->date }})</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
 
-                                        <div class="modal-body">
-                                            <table class="table table-sm">
-                                                <tr>
-                                                    <th>Date</th>
-                                                    <td>{{ $attendance->date }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Time In</th>
-                                                    <td>{{ $attendance->time_in }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Status In</th>
-                                                    <td>{{ $attendance->status_time_in }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Time Out</th>
-                                                    <td>{{ $attendance->time_out }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Status Out</th>
-                                                    <td>{{ $attendance->status_time_out }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Status</th>
-                                                    <td>{{ $attendance->status }}</td>
-                                                </tr>
+                                            <div class="modal-body">
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <td>{{ $attendance->date }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Time In</th>
+                                                        <td>{{ $attendance->time_in }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Status In</th>
+                                                        <td>{{ $attendance->status_time_in }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Time Out</th>
+                                                        <td>{{ $attendance->time_out }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Status Out</th>
+                                                        <td>{{ $attendance->status_time_out }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Status</th>
+                                                        <td>{{ $attendance->status }}</td>
+                                                    </tr>
 
-                                                <tr>
-                                                    <th>Late Reason</th>
-                                                    <td>
-                                                        @if ($attendance->status_time_in === 'Late')
-                                                            <textarea name="late_reason" class="form-control" rows="1">{{ $attendance->late_reason }}</textarea>
-                                                        @else
-                                                            <span class="text-muted fst-italic">Not Applicable</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
+                                                    <tr>
+                                                        <th>Late Reason</th>
+                                                        <td>
+                                                            @if ($attendance->status_time_in === 'Late')
+                                                                <textarea name="late_reason" class="form-control" rows="1">{{ $attendance->late_reason }}</textarea>
+                                                            @else
+                                                                <span class="text-muted fst-italic">Not Applicable</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
 
-                                                <tr>
-                                                    <th>Early Leave Reason</th>
-                                                    <td>
-                                                        @if ($attendance->status_time_out === 'Early Leave')
-                                                            <textarea name="early_leave_reason" class="form-control" rows="1">{{ $attendance->early_leave_reason }}</textarea>
-                                                        @else
-                                                            <span class="text-muted fst-italic">Not Applicable</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
+                                                    <tr>
+                                                        <th>Early Leave Reason</th>
+                                                        <td>
+                                                            @if ($attendance->status_time_out === 'Early Leave')
+                                                                <textarea name="early_leave_reason" class="form-control" rows="1">{{ $attendance->early_leave_reason }}</textarea>
+                                                            @else
+                                                                <span class="text-muted fst-italic">Not Applicable</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
 
-                                        <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary">Save</button>
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                        </div>
-                                    </form>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                     <div class="container">
                         <div class="d-flex justify-content-center mt-3">
                             {{ $attendances->links() }}
@@ -373,131 +375,176 @@
         setInterval(updateDateTime, 1000);
 
         // reusable punch function
-        function sendPunch(url, mapId, punchType) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
+function sendPunch(url, mapId, punchType) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
 
-                    fetch(url, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify({
-                                latitude: lat,
-                                longitude: lng
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            // AUTO-UPDATE TODAY'S ATTENDANCE CARD
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: lng
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // --------------------------
+                // Update Punch In/Out Buttons
+                // --------------------------
+                const container = document.getElementById('punchContainer');
+                if (data.action === 'punchIn') {
+                    container.innerHTML = `
+                        <button class="btn btn-punch" id="punchOutBtn">
+                            <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
+                        </button>
+                    `;
+                }
+                if (data.action === 'punchOut') {
+                    container.innerHTML = `
+                        <span class="text-success mt-3">
+                            <i class="bi bi-check-circle-fill me-1"></i> You have punched out for today.
+                        </span>
+                    `;
+                }
 
-                            // must change date/time and buttons first before alert to function
-                            // button punch-in/punch-out auto swap
-                            if (data.action === 'punchIn') {
-                                const container = document.getElementById('punchContainer');
-                                container.innerHTML = `
-                                <button class="btn btn-punch" id="punchOutBtn">
-                                    <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
-                                </button>
-                            `;
-                            }
+                // --------------------------
+                // Update Today’s Attendance Card
+                // --------------------------
+                if (data.action === 'punchIn') {
+                    document.getElementById('timeInDisplay').textContent = data.time.split(" ")[1];
+                }
+                if (data.action === 'punchOut') {
+                    document.getElementById('timeOutDisplay').textContent = data.time.split(" ")[1];
+                }
 
-                            if (data.action === 'punchOut') {
-                                const container = document.getElementById('punchContainer');
-                                container.innerHTML = `
-                                <span class="text-success mt-3">
-                                    <i class="bi bi-check-circle-fill me-1"></i> You have punched out for today.
-                                </span>
-                            `;
-                            }
+                // --------------------------
+                // Update Attendance History
+                // --------------------------
+                const historyTable = document.getElementById('attendanceHistoryTable');
 
-                            // text time-in/time-out auto update 
-                            if (data.action === 'punchIn') {
-                                document.getElementById('timeInDisplay').textContent = new Date()
-                                    .toLocaleTimeString();
-                            }
+                if (data.action === 'punchIn') {
+                    const modalId = "attendanceModal_" + data.id;
 
-                            if (data.action === 'punchOut') {
-                                document.getElementById('timeOutDisplay').textContent = new Date()
-                                    .toLocaleTimeString();
-                            }
+                    // New row
+                    const newRow = `
+                        <tr class="text-start">
+                            <td class="py-3 px-3 border-b border-gray-100">${data.time.split(" ")[0]}</td> 
+                            <td class="py-3 px-3 border-b border-gray-100">${data.time.split(" ")[1]}</td>
+                            <td class="py-3 px-3 border-b border-gray-100">
+                                ${data.status_time_in === 'On Time'
+                                    ? '<span class="badge bg-success">On Time</span>'
+                                    : '<span class="badge bg-danger">Late</span>'}
+                            </td>
+                            <td class="py-3 px-3 border-b border-gray-100">—</td>
+                            <td class="py-3 px-3 border-b border-gray-100">—</td>
+                            <td class="py-3 px-3 border-b border-gray-100">${data.status}</td>
+                            <td class="py-3 px-3 border-b border-gray-100">
+                                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                    data-bs-target="#${modalId}" title="View Details">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                    historyTable.insertAdjacentHTML("afterbegin", newRow);
 
-                            // AUTO-UPDATE ATTENDANCE HISTORY CARD
-                            const historyTable = document.getElementById('attendanceHistoryTable');
-                            if (data.action === 'punchIn') {
-                                const newRow = `
-                                <tr>
-                                    <td>${new Date().toLocaleDateString()}</td>
-                                    <td>${new Date().toLocaleTimeString()}</td>
-                                    <td>
-                                        ${data.status_time_in === 'On Time'
-                                            ? '<span class="badge bg-success">On Time</span>'
-                                            : '<span class="badge bg-danger">Late</span>'}
-                                    </td>
-                                    <td>—</td>
-                                    <td>—</td>
-                                    <td>${data.status}</td>
-                                    <td><span class="text-muted fst-italic">Not Applicable</span></td>
-                                </tr>
-                            `;
-                                historyTable.insertAdjacentHTML("afterbegin", newRow);
-                            }
+                    // Modal HTML
+                    const modalHTML = `
+                        <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <form method="POST" action="/attendance/${data.id}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="_method" value="PUT">
 
-                            if (data.action === 'punchOut') {
-                                // Find the first row (today’s record) and update Time Out + Status
-                                const firstRow = historyTable.querySelector("tr");
-                                if (firstRow) {
-                                    const cells = firstRow.querySelectorAll("td");
-                                    cells[3].textContent = new Date().toLocaleTimeString(); // Time Out
-                                    cells[4].innerHTML = data.status_time_out === 'On Time' ?
-                                        '<span class="badge bg-success">On Time</span>' :
-                                        '<span class="badge bg-danger">Early Leave</span>';
-                                }
-                            }
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Attendance Details (${data.time.split(" ")[0]})</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
 
-                            if (data.action === 'punchOut') {
-                                // Find the first row (today’s record) and update Time Out + Status
-                                const firstRow = historyTable.querySelector("tr");
-                                if (firstRow) {
-                                    const cells = firstRow.querySelectorAll("td");
-                                    cells[3].textContent = new Date().toLocaleTimeString(); // Time Out
-                                    cells[4].innerHTML = data.status_time_out === 'On Time' ?
-                                        '<span class="badge bg-success">On Time</span>' :
-                                        '<span class="badge bg-danger">Early Leave</span>';
-                                }
-                            }
+                                        <div class="modal-body">
+                                            <table class="table table-sm">
+                                                <tr><th>Date</th><td>${data.time.split(" ")[0]}</td></tr>
+                                                <tr><th>Time In</th><td>${data.time.split(" ")[1]}</td></tr>
+                                                <tr><th>Status Time In</th><td>${data.status_time_in}</td></tr>
+                                                <tr><th>Time Out</th><td>-</td></tr>
+                                                <tr><th>Status Time Out</th><td>-</td></tr>
+                                                <tr><th>Status</th><td>${data.status}</td></tr>
+                                                <tr><th>Late Reason</th>
+                                                    <td>
+                                                        ${data.status_time_in === 'Late'
+                                                            ? `<textarea name="late_reason" class="form-control" rows="1"></textarea>`
+                                                            : `<span class="text-muted fst-italic">Not Applicable</span>`}
+                                                    </td>
+                                                </tr>
+                                                <tr><th>Early Leave Reason</th>
+                                                    <td><span class="text-muted fst-italic">Not Applicable</span></td>
+                                                </tr>
+                                            </table>
+                                        </div>
 
-                            // UPDATE SUCCESS POPUP
-                            alert(
-                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
-                            );
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('attendanceModalContainer').insertAdjacentHTML("afterbegin", modalHTML);
+                }
 
-                            if (mapId) {
-                                var map = L.map(mapId).setView([lat, lng], 16);
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    maxZoom: 19,
-                                }).addTo(map);
+                // --------------------------
+                // Punch Out → Update existing modal
+                // --------------------------
+                if (data.action === 'punchOut') {
+                    // Find first row (today)
+                    const firstRow = historyTable.querySelector("tr");
+                    if (firstRow) {
+                        const cells = firstRow.querySelectorAll("td");
+                        cells[3].textContent = data.time.split(" ")[1]; // Time Out
+                        cells[4].innerHTML = data.status_time_out === 'On Time'
+                            ? '<span class="badge bg-success">On Time</span>'
+                            : '<span class="badge bg-danger">Early Leave</span>';
+                    }
 
-                                L.marker([lat, lng]).addTo(map)
-                                    .bindPopup(
-                                        `${punchType} Location<br>Status: ${data.status ?? data.status_time_in}`
-                                    )
-                                    .openPopup();
-                            }
+                    // Update modal Early Leave Reason
+                    const modal = document.querySelector("#attendanceModal_" + data.id);
+                    if (modal) {
+                        const rows = modal.querySelectorAll("tr");
+                        const earlyLeaveRow = rows[7].querySelector("td"); // 8th row = Early Leave Reason
+                        if (data.status_time_out === 'Early Leave') {
+                            earlyLeaveRow.innerHTML = `<textarea name="early_leave_reason" class="form-control" rows="1"></textarea>`;
+                        } else {
+                            earlyLeaveRow.innerHTML = `<span class="text-muted fst-italic">Not Applicable</span>`;
+                        }
 
+                        // Update Time Out + Status in modal
+                        rows[3].querySelector("td").textContent = data.time.split(" ")[1]; // Time Out
+                        rows[4].querySelector("td").textContent = data.status_time_out;
+                    }
+                }
 
-                        })
-                        .catch(err => console.error(err));
-                });
-            } else {
-                alert("Geolocation is not supported by your browser.");
-            }
-        }
+                // --------------------------
+                // Success Alert
+                // --------------------------
+                alert(`You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`);
+            })
+            .catch(err => console.error(err));
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
 
-        // Bind Punch In if exists
+        // bind punch in if exists
         document.addEventListener('click', function(e) {
             if (e.target && e.target.id === 'punchInBtn') {
                 sendPunch("{{ route('attendance.punchIn') }}", "map", "punched in");
@@ -505,6 +552,6 @@
             if (e.target && e.target.id === 'punchOutBtn') {
                 sendPunch("{{ route('attendance.punchOut') }}", "mapOut", "punched out");
             }
-        })
+        });
     </script>
 @endsection

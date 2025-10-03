@@ -82,6 +82,7 @@ class AttendanceController extends Controller
         ]);
 
         return response()->json([
+            'id'   => $attendance->id,
             'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
             'status_time_in' => $statusTimeIn,
             'status'  => $status,
@@ -161,6 +162,7 @@ class AttendanceController extends Controller
         ]);
 
         return response()->json([
+            'id'   => $attendance->id,
             'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
             'status_time_out' => $statusTimeOut,
             //to differentiate punch in and punch out:
