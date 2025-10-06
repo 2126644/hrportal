@@ -55,7 +55,8 @@ class EventController extends Controller
             return [
                 'title'         => $event->event_name,
                 'start'         => Carbon::parse($event->event_date)->toDateString(),
-                'color'          => '#71b0f8ff',
+                'color'         => '#71b0f8ff',
+                'url'           => route('event.show', $event->id),
             ];
         });
 

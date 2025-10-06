@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>@yield('title', 'Al-Hidayah Group HR Portal')</title>
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('assets/img/ahglogonobg.png') }}">
 

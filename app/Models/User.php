@@ -65,6 +65,19 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function booted()
+    {
+        static::updated(function ($user) {
+            if ($user->employee) {
+                $user->employee->update([
+                    'full_name' => $user->name,
+                    'email' => $user->email,
+                ]);
+            }
+        });
+    }
+
+
     public function role()
     {
         return $this->belongsTo(Role::class);

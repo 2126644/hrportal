@@ -258,7 +258,7 @@
                 <div class="row">
                     <!-- Calendar Column -->
                     <div class="col-12 col-md-10 mb-4 calendar-col">
-                            <div id="eventCalendar"></div>
+                        <div id="eventCalendar"></div>
                     </div>
 
                     <!-- Upcoming Events Column -->
@@ -349,6 +349,16 @@
                         right: ''
                     },
                     events: @json($calendarEvents),
+
+                    // when user clicks an event
+                    eventClick: function(info) {
+                        info.jsEvent.preventDefault(); // stop default behavior
+
+                        if (info.event.url) {
+                            window.location.href = info.event.url; // go to event.show page
+                        }
+                    },
+
                     eventDidMount: function(info) {
                         // Tooltip on hover (using Bootstrap tooltip)
                         var tooltip = new bootstrap.Tooltip(info.el, {
