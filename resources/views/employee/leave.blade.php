@@ -264,16 +264,48 @@
 
             <!-- Leave Report tab -->
             <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
-                <h4 class="card-title mb-4">Leave Report – {{ now()->year }}</h4>
+                <h4 class="card-title mb-4">Leave Report</h4>
 
-                <div class="row mb-3">
-                    <div class="col-12 d-flex justify-content-end">
-                        <a href="{{ route('leave.export', ['from' => request('from'), 'to' => request('to')]) }}"
-                            class="btn btn-success">
+                <form method="GET" action="{{ route('employee.leave') }}" class="mb-3">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="year" class="form-label">Year</label>
+                            <select id="year" name="year" class="form-select" onchange="this.form.submit()">
+                                @for ($y = now()->year; $y >= now()->year - 5; $y--)
+                                    <option value="{{ $y }}" {{ $y == $selectedYear ? 'selected' : '' }}>
+                                        {{ $y }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="full_name" class="form-label">Employee</label>
+                            <select id="full_name" name="full_name" class="form-select"
+                                {{ auth()->user()->role == 'employee' ? 'disabled' : '' }} onchange="this.form.submit()">
+                                @foreach ($employees as $emp)
+                                    <option value="{{ $emp->full_name }}"
+                                        {{ $emp->full_name == $selectedEmployeeName ? 'selected' : '' }}>
+                                        {{ $emp->full_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel"></i> Filter
+                            </button>
+                        </div>
+
+                    <div class="col-md-2 text-end">
+                        <a href="{{ route('leave.export', ['year' => $selectedYear, 'full_name' => $selectedEmployeeName]) }}"
+                            class="btn btn-success w-100">
                             <i class="bi bi-file-earmark-excel"></i> Export to Excel
                         </a>
                     </div>
                 </div>
+            </form>
 
                 <table class="table table-bordered text-center align-middle">
                     <thead class="table-light">

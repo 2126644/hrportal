@@ -315,7 +315,7 @@
                                                         </td>
                                                     </tr>
 
-                                                    <tr>
+                                                    <tr class="early-leave-row">
                                                         <th>Early Leave Reason</th>
                                                         <td>
                                                             @if ($attendance->status_time_out === 'Early Leave')
@@ -429,7 +429,7 @@ function sendPunch(url, mapId, punchType) {
                 const historyTable = document.getElementById('attendanceHistoryTable');
 
                 if (data.action === 'punchIn') {
-                    const modalId = "attendanceModal_" + data.id;
+                    const modalId = "attendanceModal" + data.id;
 
                     // New row
                     const newRow = `
@@ -516,10 +516,10 @@ function sendPunch(url, mapId, punchType) {
                     }
 
                     // Update modal Early Leave Reason
-                    const modal = document.querySelector("#attendanceModal_" + data.id);
+                    const modal = document.querySelector("#attendanceModal" + data.id);
                     if (modal) {
                         const rows = modal.querySelectorAll("tr");
-                        const earlyLeaveRow = rows[7].querySelector("td"); // 8th row = Early Leave Reason
+                        const earlyLeaveRow = modal.querySelector(".early-leave-row td"); // finds the right element directly by class name
                         if (data.status_time_out === 'Early Leave') {
                             earlyLeaveRow.innerHTML = `<textarea name="early_leave_reason" class="form-control" rows="1"></textarea>`;
                         } else {
@@ -536,6 +536,7 @@ function sendPunch(url, mapId, punchType) {
                 // Success Alert
                 // --------------------------
                 alert(`You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`);
+                location.reload();
             })
             .catch(err => console.error(err));
         });

@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/leave/apply', [LeaveController::class, 'create'])->name('leave.create');
     Route::get('/leave/report', [LeaveController::class, 'export'])->name('leave.export');
 
+
     Route::get('/tasks', [TaskController::class, 'index'])->name('employee.task');
     Route::post('/task', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/create', [TaskController::class, 'create'])->name('task.create');

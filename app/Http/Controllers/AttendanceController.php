@@ -83,7 +83,7 @@ class AttendanceController extends Controller
 
         return response()->json([
             'id'   => $attendance->id,
-            'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
+            'time' => $attendance->date . ' ' . $attendance->time_in,  //show both date and time
             'status_time_in' => $statusTimeIn,
             'status'  => $status,
             //to differentiate punch in and punch out:
@@ -163,7 +163,7 @@ class AttendanceController extends Controller
 
         return response()->json([
             'id'   => $attendance->id,
-            'time' => $attendance->created_at->toDateTimeString(),  //show both date and time
+            'time' => $attendance->date . ' ' . $attendance->time_out,
             'status_time_out' => $statusTimeOut,
             //to differentiate punch in and punch out:
             'success' => true,

@@ -20,6 +20,7 @@ class LeaveController extends Controller
     public function index()
     {
         $employee = Auth::user()->employee;
+        $user = Auth::user();
 
         // FOR CALENDAR TAB
         $allApprovedLeaves = Leave::with('employee')->where('status', 'approved')->get();
@@ -49,15 +50,37 @@ class LeaveController extends Controller
 
         // FOR LEAVE REPORT TAB
 
+        $selectedYear = request('year', now()->year);   // get year from URL (?year=2025) or default to current year
+        $selectedEmployeeName = null;
+
+        if ($user->role === 'admin') {  // Only admins get multiple employee options
+            $selectedEmployeeName = request('full_name');
+            $employees = \App\Models\Employee::with('user')->orderBy('full_name')->get();
+        } else {    // Not admin → only one option
+            $selectedEmployeeName = $employee->full_name;   // Employee cannot switch to other names
+            $employees = collect([$employee]); // Still pass 1-item collection so <select> doesn’t break
+        }
+
         // -------------------------
         // Build reportData: days taken per leave_type per month
         // Use SUM(days) so we count days, not number of records
         // -------------------------
-        $leaveReport = DB::table('leaves')
-            ->selectRaw('leave_type, MONTH(start_date) AS month, SUM(days) AS total')
-            ->where('employee_id', $employee->employee_id)
-            ->whereYear('start_date', now()->year)
-            ->groupBy('leave_type', 'month')
+
+        // Base query
+        $reportQuery = DB::table('leaves')
+            ->join('employees', 'leaves.employee_id', '=', 'employees.employee_id')     
+            // combine leaves with employees to filter or display based on employee details (e.g. full name)
+            ->selectRaw('leaves.leave_type, MONTH(leaves.start_date) AS month, SUM(leaves.days) AS total')
+            ->whereYear('leaves.start_date', $selectedYear);
+            // Filter by whatever year the user selected instead of always now()->year
+
+        // only add the name condition if the user (admin) picked one
+        if ($selectedEmployeeName) {
+            $reportQuery->where('employees.full_name', $selectedEmployeeName);
+        }
+
+        $leaveReport = $reportQuery
+            ->groupBy('leaves.leave_type', 'month')     // grouping by leave type and month
             ->get();
 
         // pivot the results into [leave_type => [1=>count, 2=>count, ...]]
@@ -65,6 +88,8 @@ class LeaveController extends Controller
         foreach ($leaveReport as $row) {
             $reportData[$row->leave_type][(int)$row->month] = (float)$row->total;
         }
+
+
 
         // -------------------------
         // Leave types (entitlements master)
@@ -115,6 +140,9 @@ class LeaveController extends Controller
             'leaveTypes',
             'employeeLeaves',
             'finalEntitlements',
+            'selectedYear',
+            'selectedEmployeeName',
+            'employees'
         ));
     }
 

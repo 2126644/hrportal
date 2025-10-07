@@ -443,9 +443,25 @@
                         <i class="bi bi-house-door-fill"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a class="nav-link" href="{{ route('admin.courses') }}">
-                        <i class="bi bi-book-half"></i>
-                        <span>Courses</span>
+                    <a class="nav-link" href="{{ route('employee.attendance') }}">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Attendance</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.leave') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Leave</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.task') }}">
+                        <i class="bi bi-ui-checks"></i>
+                        <span>Task</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('employee.event') }}">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Event</span>
+                    </a>
+                    <a class="nav-link" href="{{ route('profile.show') }}">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Profile</span>
                     </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
