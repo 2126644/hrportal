@@ -1,149 +1,7 @@
 @extends('layouts.master')
 
 @section('content')
-    <style>
-        body {
-            background-color: #f4f8fb;
-        }
-
-        .datetime-punch {
-            display: flex;
-            /* put children side-by-side */
-            align-items: center;
-            /* vertically center items */
-            gap: 1rem;
-            /* spacing between blocks */
-        }
-
-        #currentDateTime {
-            margin-right: auto;
-            /* push buttons to the right */
-        }
-
-        .datetime-punch .date,
-        .datetime-punch .time {
-            display: flex;
-            align-items: center;
-            font-size: 1.5rem;
-        }
-
-        .datetime-punch i {
-            margin-right: .5rem;
-        }
-
-
-        .btn-punch {
-            background-color: #ffc107;
-            border: none;
-            color: #212529;
-            font-weight: 600;
-            padding: 0.5rem 1.5rem;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .btn-punch:hover {
-            background-color: #e0a800;
-            color: #212529;
-        }
-
-        .events-calendar {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .events {
-            flex: 1;
-            min-width: 280px;
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgb(0 0 0 / 0.1);
-        }
-
-        .events h5 {
-            margin-bottom: 1rem;
-            font-weight: 700;
-            color: #0d6efd;
-        }
-
-        .event-item {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .event-item:last-child {
-            border-bottom: none;
-        }
-
-        .event-date-time {
-            font-weight: 600;
-            color: #212529;
-        }
-
-        .event-title {
-            color: #495057;
-        }
-
-        .card {
-            background: #ffffff;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            margin-bottom: 1.5rem;
-        }
-
-        .card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-body h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .card-body h6 {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .btn-info {
-            background-color: #5dade2;
-            border-color: #5dade2;
-            border-radius: 12px;
-            padding: 10px 20px;
-            font-weight: 500;
-        }
-
-        .btn-info:hover {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-
-        .card-title {
-            font-weight: 600;
-            color: #2980b9;
-        }
-
-        .card-header p {
-            color: #7f8c8d;
-            margin-top: 5px;
-            font-size: 0.95rem;
-        }
-
-        .db-icon img {
-            width: 50px;
-            opacity: 0.7;
-        }
-
-        .db-widgets {
-            padding: 10px;
-        }
-    </style>
+    
 
     <div class="content container-fluid">
 
@@ -163,7 +21,7 @@
         </div>
 
         <div class="dashboard-header mb-4">
-            <div class="datetime-punch">
+            <div class="dashboard-datetime">
                 <div id="currentDateTime">
                     <div class="date mb-1">
                         <i class="bi bi-calendar3"></i>
@@ -174,10 +32,10 @@
                         <span id="currentTime"></span>
                     </div>
                 </div>
-                <button class="btn-punch" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
+                <button class="btn-new" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
                     Punch In
                 </button>
-                <button class="btn-punch" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
+                <button class="btn-new" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
                     Punch Out
                 </button>
             </div>

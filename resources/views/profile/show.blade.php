@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid">
         <!-- Top Two Cards - Equal Height -->
         <div class="row mb-4">
             <!-- Left Card - Profile Picture and Basic Info -->
@@ -39,17 +39,17 @@
                         </div>
 
                         <!-- Full Name -->
-                        <h4 class="employee-name mb-2">{{ $employee->full_name ?? 'Employee Name' }}</h4>
+                        <h4 class="employee-name">{{ $employee->full_name ?? 'Employee Name' }}</h4>
 
                         <!-- Position -->
-                        <p class="employee-position text-muted mb-3">{{ $employee->position ?? 'Staff' }}</p>
+                        <p class="employee-position text-muted">{{ $employee->position ?? 'Staff' }}</p>
 
                         <!-- Divider Line -->
                         <hr class="my-4">
 
                         <!-- Employee ID and Date Joined -->
-                        <div class="employee-details mb-4">
-                            <div class="detail-row d-flex justify-content-between align-items-center mb-3">
+                        <div class="employee-details">
+                            <div class="detail-row d-flex justify-content-between align-items-center">
                                 <span class="detail-label text-muted">Employee ID:</span>
                                 <span
                                     class="detail-value fw-semibold {{ empty($employee->employee_id) ? 'text-muted' : '' }}">
@@ -68,7 +68,7 @@
 
                         <!-- Edit Profile Button -->
                         <button class="btn-edit-profile w-100" onclick="window.location='{{ route('profile.edit') }}'">
-                            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                            <i class="bi bi-pencil-square me-2"></i>Profile Setting
                         </button>
                     </div>
                 </div>
@@ -84,55 +84,55 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Full Name</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">
+                                    <span class="input-group-text border-0">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input type="text" class="form-control bg-light"
-                                        value="{{ $employee->full_name ?? 'John Doe' }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $employee->full_name ?? 'Employee Name' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Email Address</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">
+                                    <span class="input-group-text border-0">
                                         <i class="bi bi-envelope"></i>
                                     </span>
-                                    <input type="text" class="form-control bg-light"
-                                        value="{{ $employee->email ?? 'john.doe@example.com' }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $employee->email ?? 'Please add your email' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Phone Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">
+                                    <span class="input-group-text border-0">
                                         <i class="bi bi-telephone"></i>
                                     </span>
-                                    <input type="text" class="form-control bg-light"
-                                        value="{{ $employee->phone_number ?? '+1 (555) 123-4567' }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $employee->phone_number ?? 'Please add your phone number' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Department</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">
+                                    <span class="input-group-text border-0">
                                         <i class="bi bi-building"></i>
                                     </span>
-                                    <input type="text" class="form-control bg-light"
-                                        value="{{ $employee->department ?? 'IT Department' }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $employee->department ?? 'Please select your department' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label small fw-semibold">Address</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">
+                                    <span class="input-group-text border-0">
                                         <i class="bi bi-geo-alt"></i>
                                     </span>
-                                    <input type="text" class="form-control bg-light"
-                                        value="{{ $employee->address ?? '123 Main St, City, State 12345' }}" readonly>
+                                    <input type="text" class="form-control"
+                                        value="{{ $employee->address ?? 'Please add your address' }}" readonly>
                                 </div>
                             </div>
                         </form>
@@ -241,6 +241,7 @@
                                     </div>
                                 </div>
                             </div>
+                            {{-- add edit button later --}}
                         </div>
                     </div>
 
@@ -256,234 +257,6 @@
             </div>
         </div>
     </div>
-
-    <style>
-        /* Profile Page Specific Styles */
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid var(--primary-color);
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: #6c757d;
-            margin: 0 auto;
-        }
-
-        .employee-name {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .employee-position {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .detail-row {
-            padding: 0.5rem 0;
-        }
-
-        .detail-label {
-            font-size: 0.9rem;
-        }
-
-        .detail-value {
-            font-size: 0.95rem;
-        }
-
-        .btn-edit-profile {
-            background-color: var(--primary-color);
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .btn-edit-profile:hover {
-            background-color: #0056b3;
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-        }
-
-        .info-icon-small {
-            font-size: 1.25rem;
-            margin-right: 1rem;
-            width: 24px;
-            text-align: center;
-            margin-top: 0.25rem;
-            flex-shrink: 0;
-        }
-
-        .info-content-horizontal {
-            flex: 1;
-        }
-
-        .info-value-box {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #495057;
-            width: 100%;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-        }
-
-        .empty-value {
-            color: #6c757d !important;
-            font-style: italic;
-        }
-
-        .detail-item {
-            padding: 1rem 1.25rem;
-            border-radius: 8px;
-            background: #f8f9fa;
-            transition: all 0.3s ease;
-            border: 1px solid #e9ecef;
-        }
-
-        .detail-item:hover {
-            background: #e9ecef;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        .card {
-            border: none;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
-        }
-
-        .nav-tabs .nav-link {
-            border: none;
-            color: #6c757d;
-            font-weight: 500;
-            padding: 1rem 1.5rem;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .nav-tabs .nav-link.active {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-        }
-
-        .nav-tabs .nav-link:hover {
-            border: none;
-            color: var(--primary-color);
-        }
-
-        /* Page Header Styling - Remove border */
-        .page-sub-header {
-            padding-bottom: 0;
-            margin-bottom: 2rem;
-            border-bottom: none !important;
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #2980b9;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Dark mode adjustments */
-        [data-bs-theme="dark"] .detail-item {
-            background: #2a2a2a;
-            color: #e0e0e0;
-            border-color: #444;
-        }
-
-        [data-bs-theme="dark"] .detail-item:hover {
-            background: #333;
-        }
-
-        [data-bs-theme="dark"] .info-value-box {
-            background: #1a1a1a;
-            border-color: #444;
-            color: #e0e0e0;
-        }
-
-        [data-bs-theme="dark"] .text-muted {
-            color: #adb5bd !important;
-        }
-
-        [data-bs-theme="dark"] .employee-name {
-            color: #f8f9fa;
-        }
-
-
-        /* Ensure equal height for top cards */
-        .h-100 {
-            height: 100% !important;
-        }
-
-        .card-body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-group-text i {
-                color: #6c757d;
-            }
-
-            .form-control[readonly] {
-                background-color: #f8f9fa;
-                border: 1px solid #dee2e6;
-                border-radius: 6px;
-                box-shadow: none;
-            }
-
-            .input-group-text {
-                border: 1px solid #dee2e6;
-                border-right: none;
-                border-radius: 6px 0 0 6px;
-            }
-
-            .form-label {
-                color: #2c3e50;
-            }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .profile-avatar {
-                width: 100px;
-                height: 100px;
-                font-size: 2rem;
-            }
-
-            .employee-name {
-                font-size: 1.3rem;
-            }
-
-            .info-icon-small {
-                font-size: 1.1rem;
-                margin-right: 0.75rem;
-            }
-
-            .btn-edit-profile {
-                padding: 0.6rem 1.25rem;
-                font-size: 0.9rem;
-            }
-        }
-    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
