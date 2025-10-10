@@ -44,7 +44,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/css/hrportal.css') }}">
 
-    </head>
+</head>
 
 <body>
     <!-- Top Navigation (minimal) -->
@@ -72,8 +72,18 @@
                 @endauth
             </div>
 
-            <div class="top-nav-items">
+            <div class="top-nav-items d-flex align-items-center">
                 @auth
+                    <!-- Punch In / Out Link -->
+                    <a href="#" id="punchLink" class="punch-link me-3"
+                        data-punch-in-url="{{ route('attendance.punchIn') }}"
+                        data-punch-out-url="{{ route('attendance.punchOut') }}"
+                        data-punched="{{ isset($isPunchedIn) && $isPunchedIn ? 'true' : 'false' }}">
+                        <i id="punchIcon"
+                            class="bi {{ isset($isPunchedIn) && $isPunchedIn ? 'bi-person-x' : 'bi-person-check' }}"></i>
+                        <span id="punchText">{{ isset($isPunchedIn) && $isPunchedIn ? 'Punch Out' : 'Punch In' }}</span>
+                    </a>
+
                     <a class="logout-link" href="{{ route('logout') }}"
                         onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         <i class="bi bi-box-arrow-right"></i> Logout
@@ -164,7 +174,7 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="container-fluid">
+        <div class="container-fluid py-3">
             @yield('content')
         </div>
     </div>
@@ -201,33 +211,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
 
     <script>
-        const body = document.body;
-        const toggleBtn = document.getElementById('sidebarToggle');
-        const closeBtn = document.getElementById('sidebarClose');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        function toggleSidebar() {
-            body.classList.toggle('sidebar-collapsed');
-            body.classList.toggle('show-overlay');
-        }
-
-        toggleBtn.addEventListener('click', toggleSidebar);
-        closeBtn.addEventListener('click', toggleSidebar);
-        overlay.addEventListener('click', toggleSidebar);
-    </script>
-
-    <script>
-        // Sidebar Toggle Script
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebarClose = document.getElementById('sidebarClose');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            function showSidebar() {
-                sidebar.classList.add('show');
-                sidebarOverlay.classList.add('show');
-                document.body.style.overflow = 'hidden';
+            function toggleSidebar() {
+                const isShowing = sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+                document.body.style.overflow = isShowing ? 'hidden' : '';
             }
 
             function hideSidebar() {
@@ -236,13 +229,14 @@
                 document.body.style.overflow = '';
             }
 
-            sidebarToggle.addEventListener('click', showSidebar);
+            // Event listeners
+            sidebarToggle.addEventListener('click', toggleSidebar);
             sidebarClose.addEventListener('click', hideSidebar);
             sidebarOverlay.addEventListener('click', hideSidebar);
 
             // Close sidebar on escape key
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
+                if (e.key === 'Escape' && sidebar.classList.contains('show')) {
                     hideSidebar();
                 }
             });
@@ -256,35 +250,66 @@
                     link.classList.add('active');
                 }
             });
-        });
 
-        // Theme Toggle Script
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const themeToggle = document.getElementById('themeToggle');
-            const htmlTag = document.documentElement;
-            const storedTheme = localStorage.getItem('theme');
-
-            // Set initial theme
-            if (storedTheme) {
-                htmlTag.setAttribute('data-bs-theme', storedTheme);
-                updateThemeIcon(storedTheme);
-            }
-
-            function updateThemeIcon(theme) {
-                themeToggle.innerHTML = theme === 'dark' ?
-                    '<i class="bi bi-sun-fill"></i>' :
-                    '<i class="bi bi-moon-stars-fill"></i>';
-            }
-
-            // Toggle theme on button click
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = htmlTag.getAttribute('data-bs-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-                htmlTag.setAttribute('data-bs-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateThemeIcon(newTheme);
+            // Auto-hide sidebar on mobile when clicking nav links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 769) {
+                        hideSidebar();
+                    }
+                });
             });
+        });
+        
+        // Reusable punch function
+        function sendPunch(url, punchType) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    fetch(url, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                latitude: lat,
+                                longitude: lng
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            alert(
+                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
+                            );
+
+                            // Toggle link label and icon after punch
+                            const link = document.getElementById('punchLink');
+                            if (data.action === 'punchIn') {
+                                link.innerHTML = '<i class="bi bi-person-x"></i> Punch Out';
+                            } else if (data.action === 'punchOut') {
+                                link.innerHTML = '<i class="bi bi-person-check"></i> Punch In';
+                            }
+                        })
+                        .catch(err => console.error(err));
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // Bind punch link
+        document.getElementById('punchLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const isPunchedIn = {{ $isPunchedIn ? 'true' : 'false' }};
+            if (isPunchedIn) {
+                sendPunch("{{ route('attendance.punchOut') }}", null, "punched out");
+            } else {
+                sendPunch("{{ route('attendance.punchIn') }}", null, "punched in");
+            }
         });
     </script>
     <!-- FullCalendar JS -->

@@ -1,8 +1,6 @@
 @extends('layouts.master')
 
 @section('content')
-    
-
     <div class="content container-fluid">
 
         <div class="page-header">
@@ -20,24 +18,10 @@
             </div>
         </div>
 
-        <div class="dashboard-header mb-4">
-            <div class="dashboard-datetime">
-                <div id="currentDateTime">
-                    <div class="date mb-1">
-                        <i class="bi bi-calendar3"></i>
-                        <span id="currentDate"></span>
-                    </div>
-                    <div class="time">
-                        <i class="bi bi-clock"></i>
-                        <span id="currentTime"></span>
-                    </div>
-                </div>
-                <button class="btn-new" id="punchInBtn" @if ($todayAttendance && $todayAttendance->time_in) disabled @endif>
-                    Punch In
-                </button>
-                <button class="btn-new" id="punchOutBtn" @if (!$todayAttendance || $todayAttendance->time_out) disabled @endif>
-                    Punch Out
-                </button>
+        <div class="dashboard-header">
+            <div class="datetime-punch">
+                <div class="datetime-time" id="currentTime">12:00 PM</div>
+                <div class="datetime-date" id="currentDate">Thursday, Oct 9, 2025</div>
             </div>
         </div>
 
@@ -122,66 +106,5 @@
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
-        // Reusable punch function
-        function sendPunch(url, mapId, punchType) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-
-                    fetch(url, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify({
-                                latitude: lat,
-                                longitude: lng
-                            })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            alert(
-                                `You ${punchType} at: ${data.time}, Status: ${data.status ?? data.status_time_in}`
-                            );
-
-                            if (mapId) {
-                                var map = L.map(mapId).setView([lat, lng], 16);
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    maxZoom: 19,
-                                }).addTo(map);
-
-                                L.marker([lat, lng]).addTo(map)
-                                    .bindPopup(
-                                        `${punchType} Location<br>Status: ${data.status ?? data.status_time_in}`
-                                    )
-                                    .openPopup();
-                            }
-
-                            // Disable/enable buttons accordingly
-                            if (data.action === 'punchIn') {
-                                document.getElementById('punchInBtn').disabled = true;
-                                document.getElementById('punchOutBtn').disabled = false;
-                            }
-                            if (data.action === 'punchOut') {
-                                document.getElementById('punchOutBtn').disabled = true;
-                            }
-                        })
-                        .catch(err => console.error(err));
-                });
-            } else {
-                alert("Geolocation is not supported by your browser.");
-            }
-        }
-
-        // Bind buttons
-        document.getElementById('punchInBtn').addEventListener('click', function() {
-            sendPunch("{{ route('attendance.punchIn') }}", "map", "punched in");
-        });
-
-        document.getElementById('punchOutBtn').addEventListener('click', function() {
-            sendPunch("{{ route('attendance.punchOut') }}", "mapOut", "punched out");
-        });
     </script>
 @endsection
