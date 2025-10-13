@@ -186,11 +186,13 @@ body {
 .sidebar .nav-link:hover::before,
 .sidebar .nav-link.active::before {
     transform: scaleY(1);
+    background-color: var(--primary-color);
 }
 
 .sidebar .nav-link.active {
     background-color: rgba(0, 123, 255, 0.1);
     color: var(--primary-color) !important;
+    font-weight: 600;
 }
 
 .sidebar-overlay {
@@ -255,6 +257,7 @@ body {
 
 .card:hover {
     box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
 }
 
 .card-title {
@@ -380,75 +383,269 @@ body {
 }
 
 /* =============================
-   LEAVE&TASK PAGE
+   LEAVE PAGE
 ============================= */
 
-.card-body b {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #3498db;
+.tab-content {
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 0.375rem 0.375rem;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
-.card-body g {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #40d15d;
+.filter-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    height: 120px;
 }
 
-.card-body y {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #edd641;
+.filter-card.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
 }
 
-.card-body h6 {
-    color: #7f8c8d;
-    font-size: 0.9rem;
+.filter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.card-body h3 {
+.filter-card .card-body {
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.filter-card .card-title {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.filter-card .stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+.filter-card i {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+    margin-top: 0.25rem;
+}
+
+/* Specific card colors */
+.filter-card[data-status="all"] i { color: var(--primary-color); }
+.filter-card[data-status="approved"] i { color: var(--success-color); }
+.filter-card[data-status="pending"] i { color: var(--warning-color); }
+.filter-card[data-status="rejected"] i { color: var(--danger-color); }
+
+#leaveCalendar {
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.stat-number {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #2c3e50;
+    display: block;
+    margin-top: 0.5rem;
 }
+
+.stat-number.total { color: #3498db; }
+.stat-number.approved { color: #28a745; }
+.stat-number.pending { color: #ffc107; }
+.stat-number.rejected { color: #dc3545; }
 
 /* =============================
    ATTENDANCE PAGE
 ============================= */
 
-.datetime-punch {
-    display: flex;
-    flex-direction: column;
-    /* stack time on top of date */
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    /* center text */
-    gap: 0.5rem;
-    margin: 1rem 0 2rem 0; /* Better vertical spacing */
+.table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.datetime-time {
-    font-size: 2rem;
-    /* larger font for time */
+.table th,
+.table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.badge.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--warning-color) !important;
+    color: #212529 !important;
+}
+
+.datetime-punch {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.datetime-punch .datetime-time {
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--primary-color);
 }
 
-.datetime-date {
-    font-size: 1rem;
-    /* smaller font for date */
-    font-weight: 500;
+.datetime-punch .datetime-date {
+    font-size: 0.9rem;
     color: #6c757d;
+    font-weight: 500;
 }
 
-.db-icon img {
-    width: 50px;
-    opacity: 0.7;
+#punchContainer {
+    margin-top: 1.5rem;
 }
 
-.db-widgets {
-    padding: 10px;
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.25rem;
+}
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.pagination .page-link {
+    border: 1px solid #dee2e6;
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* =============================
+   TASK PAGE
+============================= */
+
+/* Fix task filter cards - use consistent design */
+.filter-card[data-status="to-do"] i { color: var(--danger-color); }
+.filter-card[data-status="in-progress"] i { color: var(--warning-color); }
+.filter-card[data-status="in-review"] i { color: var(--primary-color); }
+.filter-card[data-status="completed"] i { color: var(--success-color); }
+
+/* Task item styling */
+.task-item {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left-color: var(--primary-color);
+}
+
+/* Task status border colors */
+.task-item[data-status="to-do"] {
+    border-left-color: var(--danger-color);
+}
+
+.task-item[data-status="in-progress"] {
+    border-left-color: var(--warning-color);
+}
+
+.task-item[data-status="in-review"] {
+    border-left-color: var(--primary-color);
+}
+
+.task-item[data-status="completed"] {
+    border-left-color: var(--success-color);
+}
+
+/* Fix badge colors for tasks */
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+    color: white !important;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Task item content spacing */
+.task-item .card-body {
+    padding: 1.25rem;
+}
+
+.task-item h5 {
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+}
+
+.task-item .text-muted {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Responsive task items */
+@media (max-width: 768px) {
+    .task-item .card-body {
+        padding: 1rem;
+    }
+    
+    .task-item .d-flex {
+        flex-direction: column;
+    }
+    
+    .task-item .text-end {
+        text-align: left !important;
+        margin-top: 1rem;
+    }
 }
 
 /* =============================
@@ -701,6 +898,7 @@ body {
     font-weight: 500;
     padding: 1rem 1.5rem;
     border-radius: 8px 8px 0 0;
+    transition: all 0.2s ease;
 }
 
 .nav-tabs .nav-link.active {
@@ -828,6 +1026,46 @@ body.sidebar-collapsed .main-content {
     .btn-edit-profile {
         padding: 0.6rem 1.25rem;
         font-size: 0.9rem;
+    }
+
+    .table {
+        font-size: 0.875rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem;
+    }
+    
+    .datetime-punch.d-flex {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+
+    .tab-content {
+        padding: 1rem;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .filter-card {
+        height: 100px;
+    }
+    
+    .filter-card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .filter-card .stat-number {
+        font-size: 1.25rem;
+    }
+    
+    .filter-card i {
+        font-size: 1.5rem;
     }
 }
 

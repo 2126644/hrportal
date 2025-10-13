@@ -61,15 +61,6 @@
             margin-top: 5px;
             font-size: 0.95rem;
         }
-
-        .db-icon img {
-            width: 50px;
-            opacity: 0.7;
-        }
-
-        .db-widgets {
-            padding: 10px;
-        }
     </style>
 
     <div class="content container-fluid">

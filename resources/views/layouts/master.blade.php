@@ -113,54 +113,54 @@
             @auth
                 <!-- Admin Navigation (Role ID: 2) -->
                 @if (Auth::user()->role_id == '2')
-                    <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                    <a class="nav-link {{ request()->is('admin-dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
                         <i class="bi bi-house-door-fill"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.attendance') }}">
+                    <a class="nav-link {{ request()->is('attendance*') ? 'active' : '' }}" href="{{ route('employee.attendance') }}">
                         <i class="bi bi-clock-history"></i>
                         <span>Attendance</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.leave') }}">
+                    <a class="nav-link {{ request()->is('leave*') ? 'active' : '' }}" href="{{ route('employee.leave') }}">
                         <i class="bi bi-calendar3"></i>
                         <span>Leave</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.task') }}">
+                    <a class="nav-link {{ request()->is('tasks*') ? 'active' : '' }}" href="{{ route('employee.task') }}">
                         <i class="bi bi-ui-checks"></i>
                         <span>Task</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.event') }}">
+                    <a class="nav-link {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('employee.event') }}">
                         <i class="bi bi-megaphone"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link" href="{{ route('profile.show') }}">
+                    <a class="nav-link {{ request()->is('update-profile*') ? 'active' : '' }}" href="{{ route('profile.show') }}">
                         <i class="bi bi-person-circle"></i>
                         <span>Profile</span>
                     </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
                 @elseif (Auth::user()->role_id == '3')
-                    <a class="nav-link" href="{{ route('employee.dashboard') }}">
+                    <a class="nav-link {{ request()->is('employee-dashboard') ? 'active' : '' }}" href="{{ route('employee.dashboard') }}">
                         <i class="bi bi-house-door-fill"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.attendance') }}">
+                    <a class="nav-link {{ request()->is('attendance*') ? 'active' : '' }}" href="{{ route('employee.attendance') }}">
                         <i class="bi bi-clock-history"></i>
                         <span>Attendance</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.leave') }}">
+                    <a class="nav-link {{ request()->is('leave*') ? 'active' : '' }}" href="{{ route('employee.leave') }}">
                         <i class="bi bi-calendar3"></i>
                         <span>Leave</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.task') }}">
+                    <a class="nav-link {{ request()->is('tasks*') ? 'active' : '' }}" href="{{ route('employee.task') }}">
                         <i class="bi bi-ui-checks"></i>
                         <span>Task</span>
                     </a>
-                    <a class="nav-link" href="{{ route('employee.event') }}">
+                    <a class="nav-link {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('employee.event') }}">
                         <i class="bi bi-megaphone"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link" href="{{ route('profile.show') }}">
+                    <a class="nav-link {{ request()->is('update-profile*') ? 'active' : '' }}" href="{{ route('profile.show') }}">
                         <i class="bi bi-person-circle"></i>
                         <span>Profile</span>
                     </a>
@@ -216,6 +216,7 @@
             const sidebarClose = document.getElementById('sidebarClose');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
 
             function toggleSidebar() {
                 const isShowing = sidebar.classList.toggle('show');
@@ -241,16 +242,6 @@
                 }
             });
 
-            // Highlight active nav link
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.sidebar .nav-link');
-
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-
             // Auto-hide sidebar on mobile when clicking nav links
             navLinks.forEach(link => {
                 link.addEventListener('click', function() {
@@ -260,7 +251,7 @@
                 });
             });
         });
-        
+
         // Reusable punch function
         function sendPunch(url, punchType) {
             if (navigator.geolocation) {
