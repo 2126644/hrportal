@@ -1,7 +1,6 @@
 @extends('layouts.master')
 
 @section('content')
-
     <div class="content container-fluid">
         <div class="page-header">
             @if (session('success'))
@@ -47,32 +46,35 @@
         </ul>
 
         <!-- Tabs content -->
-        <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="leaveTabsContent"
+        <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="eventTabsContent"
             style="min-height: 500px;">
 
             <!-- Upcoming Events tab -->
             <div class="tab-pane fade show active" id="upcoming-event" role="tabpanel" aria-labelledby="upcoming-event-tab">
                 <div class="row">
                     <!-- Calendar Column -->
-                    <div class="col-12 col-md-10 mb-4 calendar-col">
+                    <div class="col-12 col-md-8 col-lg-9 mb-4 calendar-col">
                         <div id="eventCalendar"></div>
                     </div>
 
                     <!-- Upcoming Events Column -->
-                    <div class="col-12 col-md-2 mb-4">
+                    <div class="col-12 col-md-4 col-lg-3">
                         <div class="card">
                             <div class="card-body">
                                 <h3 class="card-title">Upcoming Events</h3>
                                 @forelse ($upcomingEvents as $event)
-                                    <div class="event-item">
-                                        <div class="event-date-time">
+                                    <div class="event-item p-2 rounded hover-bg">
+                                        <div class="event-date-time small text-primary fw-semibold">
                                             {{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} -
-                                            {{ $event->event_time }}</div>
-                                        <div class="event-title">{{ $event->event_name }}</div>
+                                            {{ $event->event_time }}
+                                        </div>
+                                        <div class="event-title small">{{ $event->event_name }}</div>
                                     </div>
                                 @empty
-                                    <div class="alert alert-warning">
-                                        No upcoming events.
+                                    <div class="text-center text-muted py-5">
+                                        <i class="bi bi-calendar-x display-4 mb-3"></i>
+                                        <h5>No upcoming events</h5>
+                                        <p class="mb-0">Check back later for new events</p>
                                     </div>
                                 @endforelse
                             </div>
@@ -83,8 +85,6 @@
 
             <!-- Past Events tab -->
             <div class="tab-pane fade" id="past-event" role="tabpanel" aria-labelledby="past-event-tab">
-                {{-- Insert your leave report content here --}}
-
                 <div class="events-grid">
                     @forelse($events as $event)
                         @php
@@ -125,49 +125,53 @@
                             </div>
                         </div>
                     @empty
-                        <p class="text-center text-muted fs-5">No upcoming events at the moment.</p>
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+                            <h5 class="text-muted">No past events found</h5>
+                            <p class="text-muted">There are no past events to display.</p>
+                        </div>
                     @endforelse
                 </div>
-
             </div>
-
         </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var calendarEl = document.getElementById('eventCalendar');
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('eventCalendar');
 
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    height: 500,
-                    themeSystem: 'bootstrap5',
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: ''
-                    },
-                    events: @json($calendarEvents),
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                height: 500,
+                themeSystem: 'bootstrap5',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: ''
+                },
+                events: @json($calendarEvents),
 
-                    // when user clicks an event
-                    eventClick: function(info) {
-                        info.jsEvent.preventDefault(); // stop default behavior
+                // when user clicks an event
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault(); // stop default behavior
 
-                        if (info.event.url) {
-                            window.location.href = info.event.url; // go to event.show page
-                        }
-                    },
-
-                    eventDidMount: function(info) {
-                        // Tooltip on hover (using Bootstrap tooltip)
-                        var tooltip = new bootstrap.Tooltip(info.el, {
-                            title: info.event.title,
-                            placement: 'top',
-                            trigger: 'hover',
-                            container: 'body'
-                        });
+                    if (info.event.url) {
+                        window.location.href = info.event.url; // go to event.show page
                     }
-                });
+                },
 
-                calendar.render();
+                eventDidMount: function(info) {
+                    // Tooltip on hover (using Bootstrap tooltip)
+                    var tooltip = new bootstrap.Tooltip(info.el, {
+                        title: info.event.title,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }
             });
-        </script>
-    @endsection
+
+            calendar.render();
+        });
+    </script>
+@endsection

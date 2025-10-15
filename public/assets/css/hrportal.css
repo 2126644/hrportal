@@ -20,11 +20,25 @@
     font-family: "Poppins", sans-serif !important;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: #f4f6f7;
     line-height: 1.6;
     font-family: "Poppins", sans-serif !important;
     padding-top: 70px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+footer {
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    margin-top: auto;
 }
 
 /* =============================
@@ -238,7 +252,8 @@ body {
     white-space: nowrap;
 }
 
-.btn-new:hover, .btn-punch:hover {
+.btn-new:hover,
+.btn-punch:hover {
     background-color: #e0a800;
     color: #212529;
 }
@@ -382,6 +397,24 @@ body {
     border-radius: 6px;
 }
 
+@media (max-width: 768px) {
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .calendar-col {
+        padding-right: 0;
+        margin-bottom: 1rem;
+    }
+
+    .event-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
 /* =============================
    LEAVE PAGE
 ============================= */
@@ -448,10 +481,18 @@ body {
 }
 
 /* Specific card colors */
-.filter-card[data-status="all"] i { color: var(--primary-color); }
-.filter-card[data-status="approved"] i { color: var(--success-color); }
-.filter-card[data-status="pending"] i { color: var(--warning-color); }
-.filter-card[data-status="rejected"] i { color: var(--danger-color); }
+.filter-card[data-status="all"] i {
+    color: var(--primary-color);
+}
+.filter-card[data-status="approved"] i {
+    color: var(--success-color);
+}
+.filter-card[data-status="pending"] i {
+    color: var(--warning-color);
+}
+.filter-card[data-status="rejected"] i {
+    color: var(--danger-color);
+}
 
 #leaveCalendar {
     border-radius: 0.375rem;
@@ -465,10 +506,18 @@ body {
     margin-top: 0.5rem;
 }
 
-.stat-number.total { color: #3498db; }
-.stat-number.approved { color: #28a745; }
-.stat-number.pending { color: #ffc107; }
-.stat-number.rejected { color: #dc3545; }
+.stat-number.total {
+    color: #3498db;
+}
+.stat-number.approved {
+    color: #28a745;
+}
+.stat-number.pending {
+    color: #ffc107;
+}
+.stat-number.rejected {
+    color: #dc3545;
+}
 
 /* =============================
    ATTENDANCE PAGE
@@ -573,10 +622,50 @@ body {
 ============================= */
 
 /* Fix task filter cards - use consistent design */
-.filter-card[data-status="to-do"] i { color: var(--danger-color); }
-.filter-card[data-status="in-progress"] i { color: var(--warning-color); }
-.filter-card[data-status="in-review"] i { color: var(--primary-color); }
-.filter-card[data-status="completed"] i { color: var(--success-color); }
+.filter-card[data-status="total"] i {
+    color: var(--primary-color);
+}
+.filter-card[data-status="to-do"] i {
+    color: var(--danger-color);
+}
+.filter-card[data-status="in-progress"] i {
+    color: var(--warning-color);
+}
+.filter-card[data-status="in-review"] i {
+    color: var(--warning-color);
+}
+.filter-card[data-status="to-review"] i {
+    color: var(--danger-color);
+}
+.filter-card[data-status="completed"] i {
+    color: var(--success-color);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.stat-number.total {
+    color: #3498db;
+}
+.stat-number.to-do {
+    color: #dc3545;
+}
+.stat-number.in-progress {
+    color: #ffc107;
+}
+.stat-number.in-review {
+    color: #ffc107;
+}
+.stat-number.to-review {
+    color: #dc3545;
+}
+.stat-number.completed {
+    color: #28a745;
+}
 
 /* Task item styling */
 .task-item {
@@ -637,11 +726,11 @@ body {
     .task-item .card-body {
         padding: 1rem;
     }
-    
+
     .task-item .d-flex {
         flex-direction: column;
     }
-    
+
     .task-item .text-end {
         text-align: left !important;
         margin-top: 1rem;
@@ -651,6 +740,10 @@ body {
 /* =============================
    EVENT PAGE
 ============================= */
+
+.calendar-col {
+    padding-right: 1rem;
+}
 
 .events-section {
     padding: 0 1.5rem 2rem;
@@ -718,7 +811,7 @@ body {
 }
 
 .event-card-body h3:hover {
-    color: #2980b9;
+    color: var(--primary-color);
     text-decoration: underline;
 }
 
@@ -749,7 +842,7 @@ body {
 
 .badge-rsvp {
     background-color: #40d15d;
-    color: white;
+    color: var(--secondary-color);
     font-size: 0.75rem;
     font-weight: 700;
     padding: 3px 10px;
@@ -763,7 +856,7 @@ body {
     font-weight: 600;
     padding: 4px 10px;
     border-radius: 12px;
-    color: white;
+    color: var(--primary-color);
     user-select: none;
     margin-left: auto;
 }
@@ -771,34 +864,79 @@ body {
 .status-upcoming {
     background-color: #3498db;
 }
-
 .status-past {
     background-color: #95a5a6;
 }
 
-#eventCalendar,
-.calendar-wrapper {
-    width: 100% !important;
-    max-width: 100% !important;
+#eventCalendar {
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.event-meta {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.event-meta span {
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+/* Fix button styling */
+.event-card-body .btn-primary {
+    background: var(--primary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.event-card-body .btn-primary:hover {
+    background: var(--secondary-color);
+    transform: translateY(-1px);
+    color: white;
+}
+
+/* Improve status badges */
+.event-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+/* Empty state styling */
+.text-center.py-5 {
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 2rem 0;
+}
+
+.text-center.py-5 i {
+    opacity: 0.5;
+}
+
+.text-center.py-5 h5 {
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.text-center.py-5 p {
+    color: #6c757d;
+    font-size: 0.95rem;
 }
 
 /* =============================
    PROFILE PAGE
 ============================= */
-
-.profile-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid var(--primary-color);
-    background: #f8f9fa;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: #6c757d;
-    margin: 0 auto;
-}
 
 .employee-name {
     font-size: 1.5rem;
@@ -821,68 +959,6 @@ body {
 
 .detail-value {
     font-size: 0.95rem;
-}
-
-.btn-edit-profile {
-    background-color: var(--primary-color);
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-}
-
-.btn-edit-profile:hover {
-    background-color: #0056b3;
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.info-icon-small {
-    font-size: 1.25rem;
-    margin-right: 1rem;
-    width: 24px;
-    text-align: center;
-    margin-top: 0.25rem;
-    flex-shrink: 0;
-}
-
-.info-content-horizontal {
-    flex: 1;
-}
-
-.info-value-box {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #495057;
-    width: 100%;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-}
-
-.empty-value {
-    color: #6c757d !important;
-    font-style: italic;
-}
-
-.detail-item {
-    padding: 1rem 1.25rem;
-    border-radius: 8px;
-    background: #f8f9fa;
-    transition: all 0.3s ease;
-    border: 1px solid #e9ecef;
-}
-
-.detail-item:hover {
-    background: #e9ecef;
 }
 
 .section-title {
@@ -917,32 +993,69 @@ body {
     height: 100% !important;
 }
 
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid var(--primary-color);
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #6c757d;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.contact-display {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+    min-height: 2.5rem;
+}
+
+.contact-display:last-child {
+    border-bottom: none;
+}
+
+.detail-item {
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+    height: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.detail-item:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+}
+
 .card-body {
     flex: 1; /* Fill available space */
     display: flex;
     flex-direction: column;
 }
 
-.input-group-text i {
-    color: #6c757d;
+/* Empty field styling */
+.empty-field {
+    color: #6c757d !important;
+    font-style: italic;
 }
 
-.form-control[readonly] {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    box-shadow: none;
+/* Tab content animations */
+.tab-pane {
+    animation: fadeIn 0.3s ease-in;
 }
 
-.input-group-text {
-    border: 1px solid #dee2e6;
-    border-right: none;
-    border-radius: 6px 0 0 6px;
-}
-
-.form-label {
-    color: #2c3e50;
-}
 
 /* =============================
    LAYOUT ADJUSTMENTS
@@ -954,6 +1067,7 @@ body {
     /* reserve space when sidebar is open */
     padding: 0 2rem;
     margin-top: 1rem;
+    flex: 1 0 auto;
 }
 
 body.sidebar-collapsed .main-content {
@@ -1018,11 +1132,6 @@ body.sidebar-collapsed .main-content {
         font-size: 1.3rem;
     }
 
-    .info-icon-small {
-        font-size: 1.1rem;
-        margin-right: 0.75rem;
-    }
-
     .btn-edit-profile {
         padding: 0.6rem 1.25rem;
         font-size: 0.9rem;
@@ -1031,12 +1140,12 @@ body.sidebar-collapsed .main-content {
     .table {
         font-size: 0.875rem;
     }
-    
+
     .table th,
     .table td {
         padding: 0.5rem;
     }
-    
+
     .datetime-punch.d-flex {
         flex-direction: column;
         gap: 0.5rem;
@@ -1046,7 +1155,7 @@ body.sidebar-collapsed .main-content {
     .tab-content {
         padding: 1rem;
     }
-    
+
     .nav-tabs .nav-link {
         padding: 0.75rem 1rem;
         font-size: 0.9rem;
@@ -1055,15 +1164,15 @@ body.sidebar-collapsed .main-content {
     .filter-card {
         height: 100px;
     }
-    
+
     .filter-card .card-body {
         padding: 0.75rem;
     }
-    
+
     .filter-card .stat-number {
         font-size: 1.25rem;
     }
-    
+
     .filter-card i {
         font-size: 1.5rem;
     }

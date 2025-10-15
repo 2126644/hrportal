@@ -33,8 +33,17 @@
                     <div class="card-body text-center p-4">
                         <!-- Profile Picture -->
                         <div class="profile-pic mb-4">
-                            <div class="profile-avatar">
-                                <i class="bi bi-person-fill"></i>
+                            <div class="profile-avatar position-relative mx-auto">
+                                @if ($employee->profile_pic)
+                                    <img src="{{ asset('storage/' . $employee->profile_pic) }}"
+                                        alt="{{ $employee->full_name }}" class="rounded-circle img-fluid"
+                                        style="width: 120px; height: 120px; object-fit: cover;">
+                                @else
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto"
+                                        style="width: 120px; height: 120px; border: 2px dashed #dee2e6;">
+                                        <i class="bi bi-person-fill text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -45,29 +54,27 @@
                         <p class="employee-position text-muted">{{ $employee->position ?? 'Staff' }}</p>
 
                         <!-- Divider Line -->
-                        <hr class="my-4">
+                        <hr class="my-3">
 
                         <!-- Employee ID and Date Joined -->
-                        <div class="employee-details">
-                            <div class="detail-row d-flex justify-content-between align-items-center">
+                        <div class="employee-details small">
+                            <div class="detail-row d-flex justify-content-between align-items-center mb-2">
                                 <span class="detail-label text-muted">Employee ID:</span>
-                                <span
-                                    class="detail-value fw-semibold {{ empty($employee->employee_id) ? 'text-muted' : '' }}">
+                                <span class="detail-value fw-semibold">
                                     {{ $employee->employee_id ?? 'EMP001' }}
                                 </span>
                             </div>
 
                             <div class="detail-row d-flex justify-content-between align-items-center">
                                 <span class="detail-label text-muted">Date Joined:</span>
-                                <span
-                                    class="detail-value fw-semibold {{ empty($employee->date_joined) ? 'text-muted' : '' }}">
+                                <span class="detail-value fw-semibold">
                                     {{ $employee->date_joined ? \Carbon\Carbon::parse($employee->date_joined)->format('M j, Y') : '-' }}
                                 </span>
                             </div>
                         </div>
 
                         <!-- Edit Profile Button -->
-                        <button class="btn-edit-profile w-100" onclick="window.location='{{ route('profile.edit') }}'">
+                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.edit') }}'">
                             <i class="bi bi-pencil-square me-2"></i>Profile Setting
                         </button>
                     </div>
@@ -82,181 +89,189 @@
 
                         <form class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Full Name</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0">
-                                        <i class="bi bi-person"></i>
+                                <label class="form-label small fw-semibold text-muted">Full Name</label>
+                                <div class="contact-display d-flex align-items-center">
+                                    <i class="bi bi-person text-muted me-2"></i>
+                                    <span
+                                        class="{{ empty($employee->full_name) ? 'text-muted fst-italic' : 'fw-semibold' }}">
+                                        {{ $employee->full_name ?? 'Not provided' }}
                                     </span>
-                                    <input type="text" class="form-control"
-                                        value="{{ $employee->full_name ?? 'Employee Name' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Email Address</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0">
-                                        <i class="bi bi-envelope"></i>
+                                <label class="form-label small fw-semibold text-muted">Email Address</label>
+                                <div class="contact-display d-flex align-items-center">
+                                    <i class="bi bi-envelope text-muted me-2"></i>
+                                    <span class="{{ empty($employee->email) ? 'text-muted fst-italic' : '' }}">
+                                        {{ $employee->email ?? 'Not provided' }}
                                     </span>
-                                    <input type="text" class="form-control"
-                                        value="{{ $employee->email ?? 'Please add your email' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Phone Number</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0">
-                                        <i class="bi bi-telephone"></i>
+                                <label class="form-label small fw-semibold text-muted">Phone Number</label>
+                                <div class="contact-display d-flex align-items-center">
+                                    <i class="bi bi-telephone text-muted me-2"></i>
+                                    <span class="{{ empty($employee->phone_number) ? 'text-muted fst-italic' : '' }}">
+                                        {{ $employee->phone_number ?? 'Not provided' }}
                                     </span>
-                                    <input type="text" class="form-control"
-                                        value="{{ $employee->phone_number ?? 'Please add your phone number' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Department</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0">
-                                        <i class="bi bi-building"></i>
+                                <label class="form-label small fw-semibold text-muted">Department</label>
+                                <div class="contact-display d-flex align-items-center">
+                                    <i class="bi bi-building text-muted me-2"></i>
+                                    <span class="{{ empty($employee->department) ? 'text-muted fst-italic' : '' }}">
+                                        {{ $employee->department ?? 'Not assigned' }}
                                     </span>
-                                    <input type="text" class="form-control"
-                                        value="{{ $employee->department ?? 'Please select your department' }}" readonly>
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label small fw-semibold">Address</label>
-                                <div class="input-group">
-                                    <span class="input-group-text border-0">
-                                        <i class="bi bi-geo-alt"></i>
+                                <label class="form-label small fw-semibold text-muted">Address</label>
+                                <div class="contact-display d-flex align-items-start">
+                                    <i class="bi bi-geo-alt text-muted me-2 mt-1"></i>
+                                    <span class="{{ empty($employee->address) ? 'text-muted fst-italic' : '' }}">
+                                        {{ $employee->address ?? 'Not provided' }}
                                     </span>
-                                    <input type="text" class="form-control"
-                                        value="{{ $employee->address ?? 'Please add your address' }}" readonly>
                                 </div>
                             </div>
+
                         </form>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- Tabs Section -->
-        <div class="card">
-            <div class="card-header bg-transparent border-bottom-0">
-                <ul class="nav nav-tabs card-header-tabs" id="profileTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
-                            type="button" role="tab" aria-controls="details" aria-selected="true">
-                            <i class="bi bi-person-lines-fill me-2"></i>Details
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment"
-                            type="button" role="tab" aria-controls="employment" aria-selected="false">
-                            <i class="bi bi-briefcase me-2"></i>Employment
-                        </button>
-                    </li>
-                </ul>
-            </div>
+        <div class="container-fluid mt-4">
+            <!-- Tabs navigation -->
+            <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
+                        type="button" role="tab" aria-controls="details" aria-selected="true">
+                        <i class="bi bi-person-lines-fill me-2"></i>Details
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment"
+                        type="button" role="tab" aria-controls="employment" aria-selected="false">
+                        <i class="bi bi-briefcase me-2"></i>Employment
+                    </button>
+                </li>
+            </ul>
 
-            <div class="card-body">
-                <div class="tab-content" id="profileTabsContent">
-                    <!-- Details Tab - Row by Row Layout -->
-                    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-                        <div class="details-section">
-                            <!-- Personal Information Row -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h5 class="section-title mb-3 text-primary">
-                                        <i class="bi bi-person-vcard me-2"></i>Personal Information
-                                    </h5>
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <div class="detail-item">
-                                                <div class="detail-label text-muted small">Gender</div>
-                                                <div
-                                                    class="detail-value fw-semibold {{ empty($employee->gender) ? 'text-muted' : '' }}">
-                                                    {{ $employee->gender ?? '-' }}
-                                                </div>
-                                            </div>
+            <!-- Tabs content -->
+            <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="profileTabsContent"
+                style="min-height: 500px;">
+                <!-- Details tab -->
+                <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+
+                    <!-- Personal Information Row -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="section-title mb-3 text-primary">
+                                <i class="bi bi-person-vcard me-2"></i>Personal Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Gender</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->gender) ? 'text-muted' : '' }}">
+                                            {{ $employee->gender ?? '-' }}
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="detail-item">
-                                                <div class="detail-label text-muted small">Birthday</div>
-                                                <div
-                                                    class="detail-value fw-semibold {{ empty($employee->birthday) ? 'text-muted' : '' }}">
-                                                    {{ $employee->birthday ? \Carbon\Carbon::parse($employee->birthday)->format('F j, Y') : '-' }}
-                                                </div>
-                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Birthday</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->birthday) ? 'text-muted' : '' }}">
+                                            {{ $employee->birthday ? \Carbon\Carbon::parse($employee->birthday)->format('F j, Y') : '-' }}
                                         </div>
-                                        <div class="col-md-4">
-                                            <div class="detail-item">
-                                                <div class="detail-label text-muted small">Marital Status</div>
-                                                <div
-                                                    class="detail-value fw-semibold {{ empty($employee->marital_status) ? 'text-muted' : '' }}">
-                                                    {{ $employee->marital_status ?? '-' }}
-                                                </div>
-                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Marital Status</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->marital_status) ? 'text-muted' : '' }}">
+                                            {{ $employee->marital_status ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Additional Information Row -->
-                            <div class="row">
-                                <div class="col-12">
-                                    <h5 class="section-title mb-3 text-primary">
-                                        <i class="bi bi-info-circle me-2"></i>Additional Information
-                                    </h5>
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <div class="detail-item">
-                                                <div class="detail-label text-muted small">Nationality</div>
-                                                <div
-                                                    class="detail-value fw-semibold {{ empty($employee->nationality) ? 'text-muted' : '' }}">
-                                                    {{ $employee->nationality ?? '-' }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="detail-item">
-                                                <div class="detail-label text-muted small">Emergency Contact</div>
-                                                <div
-                                                    class="detail-value fw-semibold {{ empty($employee->emergency_contact) ? 'text-muted' : '' }}">
-                                                    {{ $employee->emergency_contact ?? '-' }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="detail-item">
-                                                <div class="detail-label text-muted small">IC Number</div>
-                                                <div
-                                                    class="detail-value fw-semibold {{ empty($employee->ic_number) ? 'text-muted' : '' }}">
-                                                    {{ $employee->ic_number ?? '-' }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {{-- add edit button later --}}
                         </div>
                     </div>
 
-                    <!-- Employment Tab -->
-                    <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
-                        <div class="text-center py-5">
-                            <i class="bi bi-briefcase display-1 text-muted mb-3"></i>
-                            <h4 class="text-muted">Employment Information</h4>
-                            <p class="text-muted">Employment details will be displayed here</p>
+                    <!-- Additional Information Row -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="section-title mb-3 text-primary">
+                                <i class="bi bi-info-circle me-2"></i>Additional Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Nationality</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->nationality) ? 'text-muted' : '' }}">
+                                            {{ $employee->nationality ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Emergency Contact</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->emergency_contact) ? 'text-muted' : '' }}">
+                                            {{ $employee->emergency_contact ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">IC Number</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->ic_number) ? 'text-muted' : '' }}">
+                                            {{ $employee->ic_number ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Employment Tab -->
+                <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-info border-0">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-info-circle me-3 fs-4"></i>
+                                    <div>
+                                        <h5 class="alert-heading mb-2">Employment Module</h5>
+                                        <p class="mb-0">Employment information system is currently in development.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-4">
+                        <i class="bi bi-tools display-4 text-muted mb-3"></i>
+                        <h5 class="text-muted mb-2">Employment Details Coming Soon</h5>
+                        <p class="text-muted">Salary information, employment history, and contract details will be
+                            available here.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -270,15 +285,6 @@
                     tabTrigger.show()
                 })
             })
-
-            // Edit profile button functionality
-            const editProfileBtn = document.querySelector('.btn-edit-profile');
-            if (editProfileBtn) {
-                editProfileBtn.addEventListener('click', function() {
-                    // The onclick handler already handles the navigation
-                    console.log('Edit profile clicked');
-                });
-            }
         });
     </script>
 @endsection

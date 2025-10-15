@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="content container-fluid">
-
         <div class="page-header">
             @if (session('success'))
                 <div class="alert alert-success">
@@ -45,18 +44,18 @@
                 <div class="card-body">
                     <i class="bi bi-circle"></i>
                     <div class="card-title">To-Do</div>
-                    <span class="stat-number">{{ $toDoTasks }}</span>
+                    <span class="stat-number to-do">{{ $toDoTasks }}</span>
                 </div>
             </div>
         </div>
 
         <!-- In-Progress Tasks -->
-        <div class="col-12 col-md-3 mb-4">
+        <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="in-progress">
                 <div class="card-body">
                     <i class="bi bi-arrow-repeat"></i>
                     <div class="card-title">In Progress</div>
-                    <span class="stat-number">{{ $inProgressTasks }}</span>
+                    <span class="stat-number in-progress">{{ $inProgressTasks }}</span>
                 </div>
             </div>
         </div>
@@ -65,20 +64,31 @@
         <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="in-review">
                 <div class="card-body">
-                    <i class="bi bi-eye"></i>
+                    <i class="bi bi-eye-fill"></i>
                     <div class="card-title">In Review</div>
-                    <span class="stat-number">{{ $inReviewTasks }}</span>
+                    <span class="stat-number in-review">{{ $inReviewTasks }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- To-Review Tasks -->
+        <div class="col-12 col-md-2 mb-4">
+            <div class="card filter-card" data-status="to-review">
+                <div class="card-body">
+                    <i class="bi bi-bell-fill"></i>
+                    <div class="card-title">To-Review</div>
+                    <span class="stat-number to-review">{{ $completedTasks }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Completed Tasks -->
-        <div class="col-12 col-md-3 mb-4">
+        <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="completed">
                 <div class="card-body">
-                    <i class="bi bi-check-circle"></i>
+                    <i class="bi bi-check-circle-fill"></i>
                     <div class="card-title">Completed</div>
-                    <span class="stat-number">{{ $completedTasks }}</span>
+                    <span class="stat-number completed">{{ $completedTasks }}</span>
                 </div>
             </div>
         </div>
@@ -86,10 +96,11 @@
     </div>
 
     <div class="row">
-        <div class="col-12 col-md-12">
+        <div class="col-12">
             <div class="card" id="tasksCard">
                 <div class="card-body">
                     <h4 class="card-title mb-3 ">Tasks</h4>
+
                     @forelse ($tasks as $task)
                         <div class="card task-item mb-3" data-status="{{ $task->status }}" data-bs-toggle="modal"
                             data-bs-target="#taskModal{{ $task->id }}" style="cursor:pointer;">
@@ -158,9 +169,9 @@
                             </div>
                         </div>
                         @empty
-                            <div class="text-center py-4">
-                                <i class="bi bi-inbox display-4 text-muted"></i>
-                                <p class="text-muted mt-2">No tasks found.</p>
+                            <div class="text-center py-4 text-muted no-tasks-static">
+                                <i class="bi bi-inbox display-6 mb-2"></i>
+                                <p class="mb-0">No tasks found</p>
                             </div>
                         @endforelse
                     </div>
@@ -267,15 +278,72 @@
                     document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
                     this.classList.add('active');
 
-                    let status = this.dataset.status; // all, to-do, in-progress, in-review, completed
-                    document.querySelectorAll('.task-item').forEach(item => {
+                    let status = this.dataset.status;
+                    let visibleCount = 0;
+
+                    // Hide all existing static messages first
+                    document.querySelectorAll('#tasksCard .task-item, #tasksCard .no-tasks-static').forEach(
+                        item => {
+                            if (item.classList.contains('no-tasks-static')) {
+                                item.style.display = 'none';
+                            }
+                        });
+
+                    // Show/hide task items based on filter
+                    document.querySelectorAll('#tasksCard .task-item').forEach(item => {
                         if (status === 'all' || item.dataset.status === status) {
                             item.style.display = '';
+                            visibleCount++;
                         } else {
                             item.style.display = 'none';
                         }
                     });
+
+                    // Handle the no tasks message
+                    const existingStaticMsg = document.querySelector('#tasksCard .no-tasks-static');
+                    let noTasksMessage = document.getElementById('noTasksMessage');
+
+                    // Remove existing dynamic message if it exists
+                    if (noTasksMessage) {
+                        noTasksMessage.remove();
+                    }
+
+                    // If no tasks are visible, show appropriate message
+                    if (visibleCount === 0) {
+                        // If there's already a static message (from Blade), show it and update text
+                        if (existingStaticMsg) {
+                            existingStaticMsg.style.display = '';
+                            existingStaticMsg.querySelector('p').textContent =
+                                `No ${getTaskStatusText(status).toLowerCase()} tasks found`;
+                        } else {
+                            // Create new dynamic message
+                            noTasksMessage = document.createElement('div');
+                            noTasksMessage.id = 'noTasksMessage';
+                            noTasksMessage.className = 'text-center py-4 text-muted no-tasks-dynamic';
+                            noTasksMessage.innerHTML = `
+                    <i class="bi bi-inbox display-6 mb-2"></i>
+                    <p class="mb-0">No ${getTaskStatusText(status).toLowerCase()} tasks found</p>
+                `;
+                            document.querySelector('#tasksCard .card-body').appendChild(noTasksMessage);
+                        }
+                    } else {
+                        // Hide static message if tasks are visible
+                        if (existingStaticMsg) {
+                            existingStaticMsg.style.display = 'none';
+                        }
+                    }
                 });
             });
+
+            function getTaskStatusText(status) {
+                const statusMap = {
+                    'all': 'all',
+                    'to-do': 'to-do',
+                    'in-progress': 'in progress',
+                    'in-review': 'in review',
+                    'completed': 'completed'
+                };
+                return statusMap[status] || status;
+            }
         </script>
     @endsection
