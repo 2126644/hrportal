@@ -129,7 +129,7 @@ class LeaveController extends Controller
         }
 
 
-        return view('employee.leave', compact(
+        return view('employee.employee-leave', compact(
             'totalRequests',
             'approvedLeaves',
             'pendingLeaves',

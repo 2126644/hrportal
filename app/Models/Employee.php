@@ -18,9 +18,6 @@ class Employee extends Model
         'employee_id',
         'user_id',
         'full_name',
-        'department',
-        'position',
-        'date_joined',
         'email',
         'phone_number',
         'address',
@@ -34,7 +31,6 @@ class Employee extends Model
     ];
 
     protected $casts = [
-        'date_joined' => 'date',
         'birthday' => 'date',
     ];
 
@@ -57,5 +53,9 @@ class Employee extends Model
     {
         return $this->hasMany(Task::class, 'assigned_to');
     }
-}
 
+    public function employment()
+    {
+        return $this->hasOne(Employment::class);
+    }
+}

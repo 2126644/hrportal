@@ -27,7 +27,7 @@ class TaskController extends Controller
         $query = Task::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
         $tasks = $query->get();
        
-        return view('employee.task', compact(
+        return view('employee.employee-task', compact(
             'totalTasks',
             'toDoTasks',
             'inProgressTasks',

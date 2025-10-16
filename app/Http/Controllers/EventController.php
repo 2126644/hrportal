@@ -70,7 +70,7 @@ class EventController extends Controller
 
         $viewMode = $request->get('view', 'grid');
 
-        return view('employee.event', [
+        return view('employee.employee-event', [
         'events' => $events, // Eloquent collection for cards/list
         'calendarEvents' => $calendarEvents, // Array for FullCalendar
         'stats' => $stats,

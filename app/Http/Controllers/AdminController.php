@@ -6,118 +6,153 @@ use App\Models\Employee;
 use App\Models\Event;
 use App\Models\Attendance;
 use App\Models\Task;
+use App\Models\Leave;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    public function showDashboardForLoggedInAdmin()
+    public function dashboard()
     {
-        $employee = Auth::user()->employee;
-        if (! $employee) {
-            abort(404);
-        }
+        // Total Employees
+        $totalEmployees = Employee::count();
 
-        if (!$employee) {
-            return redirect()->route('logout')->withErrors(['error' => 'Employee profile not found!']);
-        }
+        // Present Today (employees who punched in today)
+        $presentToday = Attendance::whereDate('date', Carbon::today())
+            ->distinct('employee_id')
+            ->count('employee_id');
 
-        // Fetch upcoming events (adjust your table column names)
-        $upcomingEvents = Event::where('event_date', '>=', now())
-            ->orderBy('event_date', 'asc')
+        // Pending Leave Requests
+        $pendingLeaves = Leave::where('status', 'pending')->count();
+
+        // Active Tasks (tasks that are not completed)
+        $activeTasks = Task::whereIn('status', ['to-do', 'in-progress', 'in-review'])->count();
+
+        // Today's attendance breakdown
+        $absentToday = $totalEmployees - $presentToday;
+
+        // Get all employees for the detailed table
+        $allEmployees = Employee::select('employee_id', 'full_name', 'department', 'position')->get();
+
+        // Get today's attendance with employee details
+        $todayAttendance = Attendance::with('employee')
+            ->whereDate('date', Carbon::today())
+            ->get()
+            ->map(function ($attendance) {
+                return [
+                    'employee_id' => $attendance->employee_id,
+                    'time_in' => $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('g:i A') : null,
+                    'time_out' => $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('g:i A') : null,
+                    'status_time_in' => $attendance->status_time_in,
+                    'employee_name' => $attendance->employee->full_name ?? 'Unknown'
+                ];
+            });
+
+        // Recent Activities (last 10 activities across different models)
+        $recentActivities = $this->getRecentActivities();
+
+        return view('admin.admin-dashboard', compact(
+            'totalEmployees',
+            'presentToday',
+            'pendingLeaves',
+            'activeTasks',
+            'absentToday',
+            'recentActivities',
+            'allEmployees',
+            'todayAttendance'
+        ));
+    }
+
+    private function getRecentActivities()
+    {
+        $activities = [];
+
+        // Recent attendance punches (last 5)
+        $recentPunches = Attendance::with('employee')
+            ->whereDate('date', Carbon::today())
+            ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        // Attendance Summary Card
-        $attendanceRecords = Attendance::where('employee_id', $employee->employee_id)->get();
+        foreach ($recentPunches as $punch) {
+            $activities[] = [
+                'icon' => $punch->time_in ? 'person-check' : 'person-x',
+                'title' => $punch->employee->full_name ?? 'Employee',
+                'description' => $punch->time_in ? 'Punched in' : 'Punched out',
+                'time' => $punch->created_at->diffForHumans()
+            ];
+        }
 
-        $daysPresent = optional($attendanceRecords->whereIn('status', ['on-site','off-site']))->count();
-        $daysAbsent  = $attendanceRecords->where('status', 'leave')->count();
-        $lastPunchIn = optional($attendanceRecords->whereIn('status', ['on-site','off-site'])->last())->created_at;
+        // Recent leave requests (last 3)
+        $recentLeaves = Leave::with('employee')
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
 
-        $attendance = [
-            'days_present' => $daysPresent,
-            'days_absent' => $daysAbsent,
-            'last_punch_in' => $lastPunchIn ? $lastPunchIn->format('d M Y h:i A') : '-',
-        ];
+        foreach ($recentLeaves as $leave) {
+            $activities[] = [
+                'icon' => 'calendar-plus',
+                'title' => $leave->employee->full_name ?? 'Employee',
+                'description' => 'Applied for ' . $leave->leave_type . ' leave',
+                'time' => $leave->created_at->diffForHumans()
+            ];
+        }
 
-        $todayAttendance = Attendance::where('employee_id', $employee->employee_id)->whereDate('date', Carbon::today())->first();
+        // Sort all activities by time and take latest 8
+        usort($activities, function ($a, $b) {
+            return strtotime($b['time']) - strtotime($a['time']);
+        });
 
-        // Task Summary Card
-        $taskRecords = Task::where('employee_id', $employee->employee_id)->get();
-
-        $pendingTask = optional($taskRecords->whereIn('status', ['to-do','in-progress', 'in-review']))->count();
-        $completedTask  = $taskRecords->where('status', 'completed')->count();
-        $overdueTask = $taskRecords->where('status', '!=', 'completed')->where('due_date', '<', now())->count();
-
-        $task = [
-            'pending_task' => $pendingTask,
-            'completed_task' => $completedTask,
-            'overdue_task' => $overdueTask
-        ];
-
-        $tasksByStatus = Task::where('employee_id', $employee->employee_id)
-            ->get()
-            ->groupBy('status');
-
-        return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance', 'attendance', 'task', 'tasksByStatus'));
-
+        return array_slice($activities, 0, 8);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function showDashboardForLoggedInAdmin()
     {
-        //
+        return $this->dashboard();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function employee()
     {
-        //
+        $employees = Employee::orderBy('created_at', 'desc')->paginate(10);
+        $totalEmployees = Employee::count();
+        $activeToday = Attendance::whereDate('date', Carbon::today())->distinct('employee_id')->count();
+        $onLeave = Leave::whereDate('start_date', '<=', Carbon::today())
+            ->whereDate('end_date', '>=', Carbon::today())
+            ->where('status', 'approved')
+            ->count();
+        $newThisMonth = Employee::whereMonth('date_joined', Carbon::now()->month)->count();
+
+        return view('admin.admin-employee', compact(
+            'employees',
+            'totalEmployees',
+            'activeToday',
+            'onLeave',
+            'newThisMonth'
+        ));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function attendance()
     {
-        //
+        $attendances = Attendance::with('employee')->orderBy('date', 'desc')->paginate(10);
+        return view('admin.attendance', compact('attendances'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function leave()
     {
-        //
+        $leaves = Leave::with('employee')->orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.leave', compact('leaves'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function tasks()
     {
-        //
+        $tasks = Task::with('assignedTo')->orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.tasks', compact('tasks'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function events()
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $events = Event::orderBy('event_date', 'desc')->paginate(10);
+        return view('admin.events', compact('events'));
     }
 }

@@ -51,7 +51,7 @@
                         <h4 class="employee-name">{{ $employee->full_name ?? 'Employee Name' }}</h4>
 
                         <!-- Position -->
-                        <p class="employee-position text-muted">{{ $employee->position ?? 'Staff' }}</p>
+                        <p class="employee-position text-muted">{{ $employment->position ?? 'Staff' }}</p>
 
                         <!-- Divider Line -->
                         <hr class="my-3">
@@ -68,7 +68,7 @@
                             <div class="detail-row d-flex justify-content-between align-items-center">
                                 <span class="detail-label text-muted">Date Joined:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $employee->date_joined ? \Carbon\Carbon::parse($employee->date_joined)->format('M j, Y') : '-' }}
+                                    {{ $employment->date_joined ? \Carbon\Carbon::parse($employment->date_joined)->format('M j, Y') : '-' }}
                                 </span>
                             </div>
                         </div>
@@ -123,8 +123,8 @@
                                 <label class="form-label small fw-semibold text-muted">Department</label>
                                 <div class="contact-display d-flex align-items-center">
                                     <i class="bi bi-building text-muted me-2"></i>
-                                    <span class="{{ empty($employee->department) ? 'text-muted fst-italic' : '' }}">
-                                        {{ $employee->department ?? 'Not assigned' }}
+                                    <span class="{{ empty($employment->department) ? 'text-muted fst-italic' : '' }}">
+                                        {{ $employment->department ?? 'Not assigned' }}
                                     </span>
                                 </div>
                             </div>
@@ -271,7 +271,6 @@
             </div>
         </div>
     </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

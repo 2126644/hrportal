@@ -29,21 +29,21 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrapFive();
 
         View::composer('*', function ($view) {
-        $isPunchedIn = false;
+            $isPunchedIn = false;
 
-        $user = Auth::user();
-        if ($user && $user->employee) {
-            $attendance = Attendance::where('employee_id', $user->employee->employee_id)
-                ->whereDate('date', Carbon::today())
-                ->orderBy('id', 'desc')
-                ->first();
+            $user = Auth::user();
+            if ($user && $user->employee) {
+                $attendance = Attendance::where('employee_id', $user->employee->employee_id)
+                    ->whereDate('date', Carbon::today())
+                    ->orderBy('id', 'desc')
+                    ->first();
 
-            if ($attendance && $attendance->time_in && !$attendance->time_out) {
-                $isPunchedIn = true;
+                if ($attendance && $attendance->time_in && !$attendance->time_out) {
+                    $isPunchedIn = true;
+                }
             }
-        }
 
-        $view->with('isPunchedIn', $isPunchedIn);
-    });
+            $view->with('isPunchedIn', $isPunchedIn);
+        });
     }
 }

@@ -4,11 +4,6 @@
     <div class="content container-fluid">
 
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
@@ -105,6 +100,5 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
-
     </script>
 @endsection

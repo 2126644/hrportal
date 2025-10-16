@@ -18,6 +18,12 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/holidays', function () {
+    $icsUrl = "https://calendar.google.com/calendar/ical/en.malaysia%23holiday%40group.v.calendar.google.com/public/basic.ics";
+    $icsData = Http::get($icsUrl)->body();
+    return response($icsData)->header('Content-Type', 'text/calendar');
+});
+
 Route::get('/dashboard', function () {
     if (Auth::check()) {
         // If the user is already logged in
@@ -40,10 +46,9 @@ Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name
 // Handle submitted code
 Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
 
-//Route for DATABASE
+//Route for employee
 Route::middleware(['auth'])->group(function () {
     Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
-    Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
 
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
@@ -55,14 +60,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/leave', [LeaveController::class, 'index'])->name('employee.leave');
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
     Route::get('/leave/apply', [LeaveController::class, 'create'])->name('leave.create');
+    // Route::get('/leave/{id}', [LeaveController::class, 'show'])->name('leave.show');
+    // Route::get('/leave/{leave}/edit', [LeaveController::class, 'edit'])->name('leave.edit');
+    // Route::put('/leave/{leave}', [LeaveController::class, 'update'])->name('leave.update');
+    // Route::delete('/leave/{id}', [LeaveController::class, 'destroy'])->name('leave.destroy');
     Route::get('/leave/report', [LeaveController::class, 'export'])->name('leave.export');
-
 
     Route::get('/tasks', [TaskController::class, 'index'])->name('employee.task');
     Route::post('/task', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/create', [TaskController::class, 'create'])->name('task.create');
+    // Route::get('/task/{id}', [TaskController::class, 'show'])->name('task.show');
     // Route::get('/task/{task}/edit', [TaskController::class, 'edit'])->name('task.edit');
     Route::put('/task/{task}', [TaskController::class, 'update'])->name('task.update');
+    // Route::delete('/task/{id}', [TaskController::class, 'destroy'])->name('task.destroy');
 
     Route::get('/event', [EventController::class, 'index'])->name('employee.event');
     Route::post('/event', [EventController::class, 'store'])->name('event.store');
@@ -73,35 +83,19 @@ Route::middleware(['auth'])->group(function () {
     // Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
 });
 
-Route::get('/holidays', function () {
-    $icsUrl = "https://calendar.google.com/calendar/ical/en.malaysia%23holiday%40group.v.calendar.google.com/public/basic.ics";
-    $icsData = Http::get($icsUrl)->body();
-    return response($icsData)->header('Content-Type', 'text/calendar');
-});
-
-// Routes for old website
-
-// Route::get('admin-courses', [AdminController::class, 'showCoursesList'])->name('admin.courses');
-
-
-//Student update profile to student database
+//Route for admin
 Route::middleware(['auth'])->group(function () {
-    Route::get('/update-profile', [EmployeeController::class, 'show'])->name('profile.show');
-    Route::get('/update-profile/edit', [EmployeeController::class, 'edit'])->name('profile.edit');
+    Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
+
+    Route::get('/admin/employee', [AdminController::class, 'employee'])->name('admin.employee');
+
+    Route::get('/admin/attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
+    
+    Route::get('/admin/leave', [LeaveController::class, 'index'])->name('admin.leave');
+
+    Route::get('/admin/tasks', [TaskController::class, 'index'])->name('admin.task');
+
+    Route::get('/admin/event', [EventController::class, 'index'])->name('admin.event');
+
+    // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });
-
-// Route::get('/admin/course/edit/{course_code}', [CourseController::class, 'editCourse'])->name('admin.course.edit');
-// Route::post('/admin/course/update/{course_code}', [CourseController::class, 'updateCourse'])->name('admin.course.update');
-// Route::delete('admin-course/{course_code}', [CourseController::class, 'deleteCourse'])->name('admin.course.delete');
-
-// // Show the “New Course” form
-// Route::get('addcourse', [CourseController::class, 'addCourse'])
-//      ->middleware('auth')
-//      ->name('admin.course.add');
-
-// // Handle the form POST and store the course
-// Route::post('addcourse', [CourseController::class, 'storeCourse'])
-//      ->middleware('auth')
-//      ->name('admin.course.store');
-
-//      Route::delete('/admin/courses/bulk-delete', [CourseController::class, 'bulkDelete'])->name('admin.courses.bulkDelete');

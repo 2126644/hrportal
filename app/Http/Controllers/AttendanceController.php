@@ -33,7 +33,7 @@ class AttendanceController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        return view('employee.attendance', compact(
+        return view('employee.employee-attendance', compact(
             'attendances',
             'todayAttendance'
         ));

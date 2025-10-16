@@ -280,8 +280,6 @@ footer {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 0.5rem;
 }
 
 .card-header p {
@@ -1085,6 +1083,104 @@ body.sidebar-collapsed .main-content {
 .main-content .container-fluid {
     padding-left: 1rem;
     padding-right: 1rem;
+}
+
+/* admin */
+
+/* Admin Dashboard Styles */
+.stat-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.stat-card:nth-child(1) { border-left-color: #007bff; }
+.stat-card:nth-child(2) { border-left-color: #28a745; }
+.stat-card:nth-child(3) { border-left-color: #ffc107; }
+.stat-card:nth-child(4) { border-left-color: #17a2b8; }
+
+.activity-timeline {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.system-status .status-item {
+    padding: 0.5rem 0;
+}
+
+.system-status .status-item:last-child {
+    border-bottom: none;
+}
+
+/* attendance overview */
+
+.attendance-stat-card {
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.attendance-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.present-card:hover { border-left: 4px solid #28a745; }
+.absent-card:hover { border-left: 4px solid #dc3545; }
+.late-card:hover { border-left: 4px solid #ffc107; }
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+}
+
+/* Fix layout issues */
+.d-grid.gap-2 {
+    gap: 0.5rem !important;
+}
+
+.system-status .status-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.system-status .status-item:last-child {
+    border-bottom: none;
+}
+
+.card-header .card-title {
+    margin-bottom: 0;
 }
 
 /* =============================

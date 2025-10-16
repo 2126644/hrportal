@@ -15,9 +15,6 @@ return new class extends Migration
             $table->string('employee_id')->primary();    // staff number, matric, etc. custom PK
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('full_name');
-            $table->string('department')->nullable();
-            $table->string('position')->nullable();
-            $table->date('date_joined')->nullable();
             $table->string('email')->unique();
             $table->string('phone_number')->nullable()->unique();
             $table->string('address')->nullable();
