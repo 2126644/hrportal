@@ -11,6 +11,8 @@ use App\Models\User;
  */
 class EmployeeFactory extends Factory
 {
+    protected $model = Employee::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,22 +21,19 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
-            'employee_id'      => strtoupper(fake()->bothify('EMP###')),
-            'user_id'          => User::factory(), // or existing user id
-            'full_name'        => fake()->name(),
-            'department'       => fake()->randomElement(['HR', 'IT', 'Finance', 'Marketing', 'Development']),
-            'position'         => fake()->jobTitle(),
-            'date_joined'      => fake()->date(),
-            'email'            => fake()->unique()->safeEmail(),
-            'phone_number'     => fake()->unique()->phoneNumber(),
-            'address'          => fake()->address(),
-            'ic_number'        => fake()->unique()->numerify('############'),
-            'marital_status'   => fake()->randomElement(['Single', 'Married']),
-            'gender'           => fake()->randomElement(['Male', 'Female']),
-            'birthday'         => fake()->date(),
-            'nationality'      => fake()->country(),
+            'employee_id'       => strtoupper(fake()->bothify('EMP###')),
+            'user_id'           => User::factory(), // or existing user id
+            'full_name'         => fake()->name(),
+            'email'             => fake()->unique()->safeEmail(),
+            'phone_number'      => fake()->unique()->phoneNumber(),
+            'address'           => fake()->address(),
+            'ic_number'         => fake()->unique()->numerify('############'),
+            'marital_status'    => fake()->randomElement(['Single', 'Married']),
+            'gender'            => fake()->randomElement(['Male', 'Female']),
+            'birthday'          => fake()->dateTimeBetween('-50 years', '-20 years'),
+            'nationality'       => fake()->country(),
             'emergency_contact' => fake()->phoneNumber(),
-            'profile_pic'      => null,
+            'profile_pic'       => null,
         ];
     }
 }

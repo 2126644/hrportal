@@ -38,14 +38,14 @@ class AttendanceFactory extends Factory
 
         return [
             // Randomly decide if the employee is present, absent, or on leave
-            'employee_id'       => Employee::inRandomOrder()->value('employee_id'),
-            'date'              => $timeIn->toDateString(),
-            'time_in'           => $timeIn->toTimeString(),
-            'time_out'          => $timeOut?->toTimeString(),
-            'location'          => $this->faker->latitude(3.0, 3.3) . ',' . $this->faker->longitude(101.6, 101.8),
-            'status'            => $status,
-            'status_time_in'    => $statusTimeIn,
-            'status_time_out'   => $statusTimeOut,
+            'employee_id'        => Employee::inRandomOrder()->value('employee_id'),
+            'date'               => $timeIn->toDateString(),
+            'time_in'            => $timeIn->toTimeString(),
+            'time_out'           => $timeOut?->toTimeString(),
+            'location'           => $this->faker->latitude(3.0, 3.3) . ',' . $this->faker->longitude(101.6, 101.8),
+            'status'             => $status,
+            'status_time_in'     => $statusTimeIn,
+            'status_time_out'    => $statusTimeOut,
             'late_reason'        => fake()->optional()->sentence(),
             'early_leave_reason' => fake()->optional()->sentence(),
         ];

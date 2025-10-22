@@ -81,6 +81,10 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('/event/{id}/edit', [EventController::class, 'edit'])->name('event.edit');
     // Route::put('/event/{id}', [EventController::class, 'update'])->name('event.update');
     // Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
+
+    Route::get('/profile/show', [EmployeeController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [EmployeeController::class, 'edit'])->name('profile.edit');
+
 });
 
 //Route for admin
@@ -90,7 +94,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/employee', [AdminController::class, 'employee'])->name('admin.employee');
 
     Route::get('/admin/attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
-    
+
     Route::get('/admin/leave', [LeaveController::class, 'index'])->name('admin.leave');
 
     Route::get('/admin/tasks', [TaskController::class, 'index'])->name('admin.task');

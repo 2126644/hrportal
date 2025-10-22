@@ -8,8 +8,11 @@ use App\Models\Attendance;
 use App\Models\Task;
 use App\Models\Leave;
 use Carbon\Carbon;
+use App\Models\Employment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\LeaveEntitlement;
 
 class AdminController extends Controller
 {
@@ -33,7 +36,16 @@ class AdminController extends Controller
         $absentToday = $totalEmployees - $presentToday;
 
         // Get all employees for the detailed table
-        $allEmployees = Employee::select('employee_id', 'full_name', 'department', 'position')->get();
+        $allEmployees = Employee::with('employment')
+            ->get()
+            ->map(function ($employee) {
+                return [
+                    'employee_id' => $employee->employee_id,
+                    'full_name' => $employee->full_name,
+                    'department' => $employee->employment->department ?? '-',
+                    'position' => $employee->employment->position ?? '-',
+                ];
+            });
 
         // Get today's attendance with employee details
         $todayAttendance = Attendance::with('employee')
@@ -112,16 +124,56 @@ class AdminController extends Controller
         return $this->dashboard();
     }
 
-    public function employee()
+    public function employee(Request $request)
     {
-        $employees = Employee::orderBy('created_at', 'desc')->paginate(10);
+        $query = Employee::with('employment');
+
+        // Search by name or employee_id
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('employee_id', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by department
+        if ($request->filled('department')) {
+            $query->whereHas('employment', function ($q) use ($request) {
+                $q->where('department', $request->department);
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('employment_status')) {
+            $query->whereHas('employment', function ($q) use ($request) {
+                $q->where('employment_status', $request->status);
+            });
+        }
+
+        // Filter by branch
+        if ($request->filled('company_branch')) {
+            $query->whereHas('employment', function ($q) use ($request) {
+                $q->where('company_branch', $request->company_branch);
+            });
+        }
+
+        if ($request->filled('date_joined')) {
+            $query->whereDate('employment', function ($q) use ($request) {
+                $q->where('date_joined', '>=', $request->date_joined);
+            });
+        }
+
+        // Sort and paginate
+        $employees = $query->orderBy('created_at', 'desc')->paginate(10);
+
         $totalEmployees = Employee::count();
         $activeToday = Attendance::whereDate('date', Carbon::today())->distinct('employee_id')->count();
         $onLeave = Leave::whereDate('start_date', '<=', Carbon::today())
             ->whereDate('end_date', '>=', Carbon::today())
             ->where('status', 'approved')
             ->count();
-        $newThisMonth = Employee::whereMonth('date_joined', Carbon::now()->month)->count();
+        $newThisMonth = Employment::whereMonth('date_joined', Carbon::now()->month)->count();
 
         return view('admin.admin-employee', compact(
             'employees',
@@ -136,12 +188,6 @@ class AdminController extends Controller
     {
         $attendances = Attendance::with('employee')->orderBy('date', 'desc')->paginate(10);
         return view('admin.attendance', compact('attendances'));
-    }
-
-    public function leave()
-    {
-        $leaves = Leave::with('employee')->orderBy('created_at', 'desc')->paginate(10);
-        return view('admin.leave', compact('leaves'));
     }
 
     public function tasks()

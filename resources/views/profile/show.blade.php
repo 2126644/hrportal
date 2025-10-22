@@ -68,7 +68,7 @@
                             <div class="detail-row d-flex justify-content-between align-items-center">
                                 <span class="detail-label text-muted">Date Joined:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $employment->date_joined ? \Carbon\Carbon::parse($employment->date_joined)->format('M j, Y') : '-' }}
+                                    {{ $employment->date_joined ?? '-' }}
                                 </span>
                             </div>
                         </div>
@@ -85,7 +85,7 @@
             <div class="col-lg-8 mb-4">
                 <div class="card h-100">
                     <div class="card-body p-4">
-                        <h4 class="card-title mb-4 text-primary">Personal Information</h4>
+                        <h4 class="card-title mb-4 text-primary">Contact Information</h4>
 
                         <form class="row g-3">
                             <div class="col-md-6">
@@ -122,7 +122,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold text-muted">Department</label>
                                 <div class="contact-display d-flex align-items-center">
-                                    <i class="bi bi-building text-muted me-2"></i>
+                                    <i class="bi bi-buildings text-muted me-2"></i>
                                     <span class="{{ empty($employment->department) ? 'text-muted fst-italic' : '' }}">
                                         {{ $employment->department ?? 'Not assigned' }}
                                     </span>
@@ -247,7 +247,147 @@
 
                 <!-- Employment Tab -->
                 <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
+
+                    <!-- Employment Information Row -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="section-title mb-3 text-primary">
+                                <i class="bi bi-person-vcard me-2"></i>Employment Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Employment Type</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->employment_type) ? 'text-muted' : '' }}">
+                                            {{ $employee->employment_type ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Employment Status</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->employment_status) ? 'text-muted' : '' }}">
+                                            {{ $employee->employment_status ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Company Branch</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->company_branch) ? 'text-muted' : '' }}">
+                                            {{ $employee->company_branch ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Report To</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->report_to) ? 'text-muted' : '' }}">
+                                            {{ $employee->report_to ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Department</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->department) ? 'text-muted' : '' }}">
+                                            {{ $employee->department ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Position</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->position) ? 'text-muted' : '' }}">
+                                            {{ $employee->position ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information Row -->
                     <div class="row">
+                        <div class="col-12">
+                            <h5 class="section-title mb-3 text-primary">
+                                <i class="bi bi-info-circle me-2"></i>Dates Information
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Date Joined</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->date_joined) ? 'text-muted' : '' }}">
+                                            {{ $employee->date_joined ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Probation Start</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->probation_start) ? 'text-muted' : '' }}">
+                                            {{ $employee->probation_start ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Probation End</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->probation_end) ? 'text-muted' : '' }}">
+                                            {{ $employee->probation_end ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Suspended Start</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->suspended_start) ? 'text-muted' : '' }}">
+                                            {{ $employee->suspended_start ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Suspended End</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->suspended_end) ? 'text-muted' : '' }}">
+                                            {{ $employee->suspended_end ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Resigned Date</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->resigned_date) ? 'text-muted' : '' }}">
+                                            {{ $employee->resigned_date ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Termination Date</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->termination_date) ? 'text-muted' : '' }}">
+                                            {{ $employee->termination_date ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- <div class="row">
                         <div class="col-12">
                             <div class="alert alert-info border-0">
                                 <div class="d-flex align-items-center">
@@ -266,7 +406,7 @@
                         <h5 class="text-muted mb-2">Employment Details Coming Soon</h5>
                         <p class="text-muted">Salary information, employment history, and contract details will be
                             available here.</p>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>

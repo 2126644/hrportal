@@ -147,41 +147,44 @@
                         <i class="bi bi-megaphone"></i>
                         <span>Events</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('profile.show') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('profile.show*') ? 'active' : '' }}"
                         href="{{ route('profile.show') }}">
                         <i class="bi bi-person-circle"></i>
                         <span>Profile</span>
                     </a>
 
-                <!-- Employee Navigation (Role ID: 3) -->
-            @elseif (Auth::user()->role_id == '3')
-                <a class="nav-link {{ request()->is('employee-dashboard') ? 'active' : '' }}"
-                    href="{{ route('employee.dashboard') }}">
-                    <i class="bi bi-house-door-fill"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a class="nav-link {{ request()->is('attendance*') ? 'active' : '' }}"
-                    href="{{ route('employee.attendance') }}">
-                    <i class="bi bi-clock-history"></i>
-                    <span>Attendance</span>
-                </a>
-                <a class="nav-link {{ request()->is('leave*') ? 'active' : '' }}" href="{{ route('employee.leave') }}">
-                    <i class="bi bi-calendar3"></i>
-                    <span>Leave</span>
-                </a>
-                <a class="nav-link {{ request()->is('tasks*') ? 'active' : '' }}" href="{{ route('employee.task') }}">
-                    <i class="bi bi-ui-checks"></i>
-                    <span>Task</span>
-                </a>
-                <a class="nav-link {{ request()->is('event*') ? 'active' : '' }}" href="{{ route('employee.event') }}">
-                    <i class="bi bi-megaphone"></i>
-                    <span>Event</span>
-                </a>
-                <a class="nav-link {{ request()->is('update-profile*') ? 'active' : '' }}"
-                    href="{{ route('profile.show') }}">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Profile</span>
-                </a>
+                    <!-- Employee Navigation (Role ID: 3) -->
+                @elseif (Auth::user()->role_id == '3')
+                    <a class="nav-link {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}"
+                        href="{{ route('employee.dashboard') }}">
+                        <i class="bi bi-house-door-fill"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('employee.attendance*') ? 'active' : '' }}"
+                        href="{{ route('employee.attendance') }}">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Attendance</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('employee.leave*') ? 'active' : '' }}"
+                        href="{{ route('employee.leave') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Leave</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('employee.task*') ? 'active' : '' }}"
+                        href="{{ route('employee.task') }}">
+                        <i class="bi bi-ui-checks"></i>
+                        <span>Task</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('employee.event*') ? 'active' : '' }}"
+                        href="{{ route('employee.event') }}">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Event</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('profile.show*') ? 'active' : '' }}"
+                        href="{{ route('profile.show') }}">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Profile</span>
+                    </a>
                 @endif
             @endauth
         </div>
@@ -214,11 +217,11 @@
 <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
 <script src="{{ asset('assets/js/feather.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/slimscroll/jquery.slimscroll.min.js') }}"></script>
-<script src="assets/plugins/simple-calendar/jquery.simple-calendar.js"></script>
+<script src="/assets/plugins/simple-calendar/jquery.simple-calendar.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.4.0/ical.min.js"></script>
 
-<script src="assets/js/calander.js"></script>
+<script src="/assets/js/calander.js"></script>
 
 <!-- Admin list course -->
 <script src="{{ asset('assets/plugins/datatables/datatables.min.js') }}"></script>

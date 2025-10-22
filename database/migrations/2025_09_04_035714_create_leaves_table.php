@@ -28,7 +28,7 @@ return new class extends Migration
             $table->text('reject_reason')->nullable();
             $table->string('action')->nullable();
 
-            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  // when the parent record is deleted, the child is deleted.
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  // when the parent record is deleted, the child is deleted
             
             $table->timestamps();
         });

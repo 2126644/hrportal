@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Exports\LeavesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LeaveEntitlement;
+use App\Models\Employee;
 
 class LeaveController extends Controller
 {
@@ -17,10 +18,10 @@ class LeaveController extends Controller
      * Display a listing of the resource.
      */
     // Show leave summary for logged-in employee
-    public function index()
+    public function index(Request $request)
     {
-        $employee = Auth::user()->employee;
         $user = Auth::user();
+        $employee = $user->employee; // null for admin if no employee record
 
         // FOR CALENDAR TAB
         $allApprovedLeaves = Leave::with('employee')->where('status', 'approved')->get();
@@ -35,28 +36,59 @@ class LeaveController extends Controller
 
         // FOR LEAVE APPLICATION TAB
         // Total approved days used
-        $usedDays = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->sum('days');
 
-        $pendingLeaves  = Leave::where('employee_id', $employee->employee_id)->where('status', 'pending')->count();
-        $approvedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'approved')->count();
-        $rejectedLeaves = Leave::where('employee_id', $employee->employee_id)->where('status', 'rejected')->count();
-        $totalRequests  = Leave::where('employee_id', $employee->employee_id)->count();
-        // count(), sum(), first() end the query; cannot chain orderBy() or get() after them
+        $query = Leave::with('employee')->orderBy('created_at', 'desc');
 
-        // All leave records for the table
-        $leaves = Leave::where('employee_id', $employee->employee_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Only apply filters if the inputs exist
+        if ($user->role_id === 2) {
+            if ($request->filled('employee')) {
+                $query->whereHas('employee', function ($q) use ($request) {
+                    $q->where('full_name', 'like', '%' . $request->employee . '%')
+                        ->orWhere('employee_id', 'like', '%' . $request->employee . '%');
+                });
+            }
+        } else {
+            $query->where('employee_id', $employee->employee_id);
+        }
+
+        if ($request->filled('leave_type')) {
+            $query->where('leave_type', $request->leave_type);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('start_date', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('end_date', '<=', $request->end_date);
+        }
+
+        if ($request->filled('applied_date')) {
+            $query->whereDate('applied_date', $request->applied_date);
+        }
+
+        // Finally fetch results
+        $leaves = $query->get();
+
+        $totalRequests  = $leaves->count();
+        $approvedLeaves = $leaves->where('status', 'approved')->count();
+        $pendingLeaves  = $leaves->where('status', 'pending')->count();
+        $rejectedLeaves = $leaves->where('status', 'rejected')->count();
+        $usedDays       = $leaves->where('status', 'approved')->sum('days');
 
         // FOR LEAVE REPORT TAB
 
         $selectedYear = request('year', now()->year);   // get year from URL (?year=2025) or default to current year
         $selectedEmployeeName = null;
 
-        if ($user->role === 'admin') {  // Only admins get multiple employee options
+        if ($user->role_id === 2) {  // Only admins get multiple employee options
             $selectedEmployeeName = request('full_name');
-            $employees = \App\Models\Employee::with('user')->orderBy('full_name')->get();
-        } else {    // Not admin → only one option
+            $employees = $employees = Employee::orderBy('full_name')->get();
+        } else {
             $selectedEmployeeName = $employee->full_name;   // Employee cannot switch to other names
             $employees = collect([$employee]); // Still pass 1-item collection so <select> doesn’t break
         }
@@ -68,14 +100,16 @@ class LeaveController extends Controller
 
         // Base query
         $reportQuery = DB::table('leaves')
-            ->join('employees', 'leaves.employee_id', '=', 'employees.employee_id')     
+            ->join('employees', 'leaves.employee_id', '=', 'employees.employee_id')
             // combine leaves with employees to filter or display based on employee details (e.g. full name)
             ->selectRaw('leaves.leave_type, MONTH(leaves.start_date) AS month, SUM(leaves.days) AS total')
             ->whereYear('leaves.start_date', $selectedYear);
-            // Filter by whatever year the user selected instead of always now()->year
+        // Filter by whatever year the user selected instead of always now()->year
 
         // only add the name condition if the user (admin) picked one
-        if ($selectedEmployeeName) {
+        if ($user->role_id === 3) {
+            $reportQuery->where('employees.employee_id', $employee->employee_id);
+        } elseif ($selectedEmployeeName && $selectedEmployeeName !== 'all') {
             $reportQuery->where('employees.full_name', $selectedEmployeeName);
         }
 
@@ -88,8 +122,6 @@ class LeaveController extends Controller
         foreach ($leaveReport as $row) {
             $reportData[$row->leave_type][(int)$row->month] = (float)$row->total;
         }
-
-
 
         // -------------------------
         // Leave types (entitlements master)
@@ -128,8 +160,9 @@ class LeaveController extends Controller
             }
         }
 
+        $view = $user->role_id == 2 ? 'admin.admin-leave' : 'employee.employee-leave';
 
-        return view('employee.employee-leave', compact(
+        return view($view, compact(
             'totalRequests',
             'approvedLeaves',
             'pendingLeaves',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Event;
 use App\Models\Attendance;
 use App\Models\Task;
@@ -32,9 +33,9 @@ class EmployeeController extends Controller
         // Attendance Summary Card
         $attendanceRecords = Attendance::where('employee_id', $employee->employee_id)->get();
 
-        $daysPresent = optional($attendanceRecords->whereIn('status', ['on-site','off-site']))->count();
+        $daysPresent = optional($attendanceRecords->whereIn('status', ['on-site', 'off-site']))->count();
         $daysAbsent  = $attendanceRecords->where('status', 'leave')->count();
-        $lastPunchIn = optional($attendanceRecords->whereIn('status', ['on-site','off-site'])->last())->created_at;
+        $lastPunchIn = optional($attendanceRecords->whereIn('status', ['on-site', 'off-site'])->last())->created_at;
 
         $attendance = [
             'days_present' => $daysPresent,
@@ -47,7 +48,7 @@ class EmployeeController extends Controller
         // Task Summary Card
         $taskRecords = Task::where('employee_id', $employee->employee_id)->get();
 
-        $pendingTask = optional($taskRecords->whereIn('status', ['to-do','in-progress', 'in-review']))->count();
+        $pendingTask = optional($taskRecords->whereIn('status', ['to-do', 'in-progress', 'in-review']))->count();
         $completedTask  = $taskRecords->where('status', 'completed')->count();
         $overdueTask = $taskRecords->where('status', '!=', 'completed')->where('due_date', '<', now())->count();
 
@@ -62,7 +63,6 @@ class EmployeeController extends Controller
             ->groupBy('status');
 
         return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance', 'attendance', 'task', 'tasksByStatus'));
-
     }
 
     /**
@@ -97,7 +97,13 @@ class EmployeeController extends Controller
     {
         $employee = Auth::user()->employee;
 
-        return view('profile.show', compact('employee'));
+        if (!$employee) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Employee profile not found.');
+        }
+        $employment = $employee->employment;
+
+        return view('profile.show', compact('employee', 'employment'));
     }
 
     /**

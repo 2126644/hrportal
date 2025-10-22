@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('employments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
+            $table->string('employee_id');  // add foreign key column
             $table->string('employment_type'); // full_time, part_time, intern, etc.
             $table->string('employment_status'); // active, probation, suspended, resigned, terminated
-            $table->enum('company_branch', ['main', 'branch_1', 'branch_2', 'branch_3'])->default('main');
-            $table->foreignId('report_to')->nullable()->constrained('employees')->onDelete('set null');
+            $table->enum('company_branch', ['AHG', 'D-8CEFC'])->default('AHG');
+            $table->string('report_to')->nullable();
             $table->string('department')->nullable();
             $table->string('position')->nullable();
             $table->date('date_joined')->nullable();
@@ -27,6 +27,10 @@ return new class extends Migration
             $table->date('suspended_end')->nullable();
             $table->date('resigned_date')->nullable();
             $table->date('termination_date')->nullable();
+
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  
+            $table->foreign('report_to')->references('employee_id')->on('employees')->nullOnDelete();
+
             $table->timestamps();
 
             // Indexes for better performance

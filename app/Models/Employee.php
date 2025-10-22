@@ -41,21 +41,21 @@ class Employee extends Model
 
     public function attendances()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(Attendance::class, 'employee_id', 'employee_id');
     }
 
     public function leaves()
     {
-        return $this->hasMany(Leave::class);
+        return $this->hasMany(Leave::class, 'employee_id', 'employee_id');
     }
 
     public function tasks()
     {
-        return $this->hasMany(Task::class, 'assigned_to');
+        return $this->hasMany(Task::class, 'assigned_to', 'employee_id');
     }
 
     public function employment()
     {
-        return $this->hasOne(Employment::class);
+        return $this->hasOne(Employment::class, 'employee_id', 'employee_id');
     }
 }

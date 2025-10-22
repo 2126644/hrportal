@@ -28,14 +28,14 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('secret'),
-            'two_factor_secret' => null,
+            'name'                      => fake()->name(),
+            'email'                     => fake()->unique()->safeEmail(),
+            'email_verified_at'         => now(),
+            'password'                  => static::$password ??= Hash::make('secret'),
+            'two_factor_secret'         => null,
             'two_factor_recovery_codes' => null,
-            'remember_token' => Str::random(10),
-            'role_id'           => Role::inRandomOrder()->first()->id ?? 3, // fallback to Employee
+            'remember_token'            => Str::random(10),
+            'role_id'                   => Role::inRandomOrder()->first()->id ?? 3, // fallback to Employee
         ];
     }
 
