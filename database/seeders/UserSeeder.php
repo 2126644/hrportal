@@ -14,11 +14,13 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 10 random users with employee profiles in one go
+        // Create 30 random users with employee profiles in one go
         // Make sure in UserFactory already defines ->has(Employee::factory())
         User::factory()
             ->has(Employee::factory()) // // relies on hasOne relationship in User model
-            ->count(10)
-            ->create();
+            ->count(30)
+            ->create([
+                'role_id' => 3, // Employee
+            ]);
     }
 }

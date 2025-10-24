@@ -27,16 +27,13 @@ return new class extends Migration
             $table->date('suspended_end')->nullable();
             $table->date('resigned_date')->nullable();
             $table->date('termination_date')->nullable();
+            $table->time('work_start_time')->nullable();
+            $table->time('work_end_time')->nullable();
 
             $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  
             $table->foreign('report_to')->references('employee_id')->on('employees')->nullOnDelete();
 
             $table->timestamps();
-
-            // Indexes for better performance
-            $table->index(['employment_status']);
-            $table->index(['company_branch']);
-            $table->index(['probation_end']);
         });
     }
 

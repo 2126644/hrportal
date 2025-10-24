@@ -24,16 +24,21 @@ class Employment extends Model
         'suspended_start',
         'suspended_end',
         'resigned_date',
-        'termination_date'
+        'termination_date',
+        'work_start_time',
+        'work_end_time',
     ];
 
     protected $casts = [
+        'date_joined' => 'date',
         'probation_start' => 'date',
         'probation_end' => 'date',
         'suspended_start' => 'date',
         'suspended_end' => 'date',
         'resigned_date' => 'date',
         'termination_date' => 'date',
+        'work_start_time' => 'datetime:H:i',
+        'work_end_time' => 'datetime:H:i'
     ];
 
     public function employee()

@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Employee;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Create the admin user
-        $admin = User::firstOrCreate(
+        User::firstOrCreate(
             ['email' => 'tehaiium@gmail.com'], // email of admin
             [
                 'name'     => 'System Administrator',
@@ -24,16 +24,5 @@ class AdminSeeder extends Seeder
                 'role_id'  => 2, 
             ]
         );
-
-        // Optional: give this admin a linked employee profile
-        if (! $admin->employee) {
-            Employee::create([
-                'user_id'    => $admin->id,
-                'full_name'  => 'System Administrator',
-                'position'   => 'Administrator',
-                'department' => 'Management',
-                // add any other required employee fields
-            ]);
-        }
     }
 }

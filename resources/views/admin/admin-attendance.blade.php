@@ -2,7 +2,6 @@
 
 @section('content')
     <div class="content container-fluid">
-
         <div class="page-header">
             @if (session('success'))
                 <div class="alert alert-success">
@@ -24,66 +23,96 @@
         </div>
     </div>
 
-    <div class="row">
-        <!-- Total Requests -->
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    {{-- makes content flexible row-pushes text left, icon right --}}
-
-                    <div class="card-title">Today's Attendance</div>
-
-                    <div class="datetime-punch mt-2">
-                        <div class="d-flex align-items-center justify-content-center mb-2">
-                            <i class="bi bi-clock-history text-secondary me-2"></i>
-                            <div class="datetime-time fw-bold" id="currentTime"></div>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center">
-                            <div class="datetime-date" id="currentDate"></div>
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.attendance') }}">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label">Search Employees</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Name or ID...">
                         </div>
                     </div>
-
-                    <div class="mt-3">
-                        <h5>
-                            <i class="bi bi-box-arrow-in-right me-2"></i>
-                            Time In:
-                            <span class="text-primary" id="timeInDisplay">
-                                {{ $todayAttendance?->time_in ?? '—' }}
-                            </span>
-                        </h5>
-                        <h5>
-                            <i class="bi bi-box-arrow-right me-2"></i>
-                            Time Out:
-                            <span class="text-primary" id="timeOutDisplay">
-                                {{ $todayAttendance?->time_out ?? '—' }}
-                            </span>
-                        </h5>
-
+                    <div class="col-md-2">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="date" value="{{ request('date') }}" class="form-control">
                     </div>
-
-                    <div id="punchContainer">
-                        @if (!$todayAttendance)
-                            <button class="btn btn-punch" id="punchInBtn">
-                                <i class="bi bi-hand-index-thumb me-1"></i> Punch In
-                            </button>
-                        @elseif ($todayAttendance && !$todayAttendance->time_out)
-                            <button class="btn btn-punch" id="punchOutBtn">
-                                <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
-                            </button>
-                        @else
-                            <span class="text-success mt-3">
-                                <i class="bi bi-check-circle-fill me-1"></i>You have punched out for today.
-                            </span>
-                        @endif
+                    <div class="col-md-2">
+                        <label class="form-label">Status Time In</label>
+                        <select name="status_time_in" class="form-select">
+                            <option value="">All Statuses</option>
+                            @php
+                                $statuses = \App\Models\Attendance::select('status_time_in')
+                                    ->distinct()
+                                    ->pluck('status_time_in')
+                                    ->filter();
+                            @endphp
+                            @foreach ($statuses as $status)
+                                <option value="{{ $status }}"
+                                    {{ request('status_time_in') == $status ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-
+                    <div class="col-md-2">
+                        <label class="form-label">Status Time Out</label>
+                        <select name="status_time_out" class="form-select">
+                            <option value="">All Statuses</option>
+                            @php
+                                $statuses = \App\Models\Attendance::select('status_time_out')
+                                    ->distinct()
+                                    ->pluck('status_time_out')
+                                    ->filter();
+                            @endphp
+                            @foreach ($statuses as $status)
+                                <option value="{{ $status }}"
+                                    {{ request('status_time_out') == $status ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">All Statuses</option>
+                            @php
+                                $statuses = \App\Models\Attendance::select('status')
+                                    ->distinct()
+                                    ->pluck('status')
+                                    ->filter();
+                            @endphp
+                            @foreach ($statuses as $status)
+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                    {{ $status }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <a href="{{ route('admin.attendance') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
                 </div>
-
-            </div>
+            </form>
         </div>
+    </div>
 
+    <div class="row">
         <!-- Attendance History -->
-        <div class="col-12 col-md-8 mb-4">
+        <div class="col-12 col-md-12 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -99,6 +128,7 @@
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>Employee</th>
                                     <th>Date</th>
                                     <th>Time-In</th>
                                     <th>Status Time-In</th>
@@ -111,6 +141,7 @@
                             <tbody id="attendanceHistoryTable">
                                 @foreach ($attendances as $attendance)
                                     <tr>
+                                        <td>{{ $attendance->employee->full_name }}</td>
                                         <td>{{ $attendance->date }}</td>
 
                                         <td>{{ $attendance->time_in }}</td>

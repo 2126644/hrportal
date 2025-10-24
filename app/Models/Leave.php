@@ -12,7 +12,6 @@ class Leave extends Model
 
     protected $fillable = [
         'employee_id',
-        'name',
         'applied_date',
         'leave_type',
         'leave_length',
@@ -24,7 +23,6 @@ class Leave extends Model
         'approved_by',
         'status', // pending, approved, rejected
         'reject_reason',
-        'action',
     ];
 
     public function employee()

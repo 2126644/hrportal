@@ -226,7 +226,6 @@ class LeaveController extends Controller
 
         $leave = new Leave();
         $leave->employee_id  = $employee->employee_id;
-        $leave->name         = $employee->full_name; // assuming Employee has 'name'
         $leave->applied_date = Carbon::now()->toDateString();
         $leave->leave_type   = $request->leave_type;
         $leave->reason       = $request->reason;

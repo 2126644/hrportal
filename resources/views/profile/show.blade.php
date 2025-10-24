@@ -309,11 +309,29 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Work Start</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->work_start_time) ? 'text-muted' : '' }}">
+                                            {{ $employee->work_start_time ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Work End</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->work_end_time) ? 'text-muted' : '' }}">
+                                            {{ $employee->work_end_time ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Additional Information Row -->
+                    <!-- Dates Information Row -->
                     <div class="row">
                         <div class="col-12">
                             <h5 class="section-title mb-3 text-primary">

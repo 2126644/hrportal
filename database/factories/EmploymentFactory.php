@@ -39,6 +39,8 @@ class EmploymentFactory extends Factory
             'suspended_end' => $employmentStatus === 'suspended' ? fake()->dateTimeBetween('now', '+1 month') : null,
             'resigned_date' => $employmentStatus === 'resigned' ? fake()->dateTimeBetween('-6 months', 'now') : null,
             'termination_date' => $employmentStatus === 'terminated' ? fake()->dateTimeBetween('-6 months', 'now') : null,
+            'work_start_time' => fake()->time('H:i'),
+            'work_end_time' => fake()->time('H:i'),
         ];
     }
 }

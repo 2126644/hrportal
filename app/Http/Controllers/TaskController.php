@@ -13,21 +13,54 @@ class TaskController extends Controller
      * Display a listing of the resource.
      */
     // Show task summary for logged-in employee
-    public function index()
+    public function index(Request $request)
     {
-        $employee = Auth::user()->employee;
+        $user = Auth::user();
+        $employee = $user->employee;
 
-        $totalTasks         = Task::where('employee_id', $employee->employee_id)->count();
-        $toDoTasks          = Task::where('employee_id', $employee->employee_id)->where('status', 'to-do')->count();
-        $inProgressTasks    = Task::where('employee_id', $employee->employee_id)->where('status', 'in-progress')->count();
-        $inReviewTasks      = Task::where('employee_id', $employee->employee_id)->where('status', 'in-review')->count();
-        $completedTasks     = Task::where('employee_id', $employee->employee_id)->where('status', 'completed')->count();
+        $query = Task::with('employee')->orderBy('created_at', 'desc');
 
-        // Get all requests to show in a table
-        $query = Task::where('employee_id', $employee->employee_id)->orderBy('created_at', 'desc');
+        // Only apply filters if the inputs exist
+        if ($user->role_id === 2) {
+            if ($request->filled('employee')) {
+                $query->whereHas('employee', function ($q) use ($request) {
+                    $q->where('full_name', 'like', '%' . $request->employee . '%')
+                        ->orWhere('employee_id', 'like', '%' . $request->employee . '%');
+                });
+            }
+        } else {
+            $query->where('employee_id', $employee->employee_id);
+        }
+
+         if ($request->filled('title')) {
+            $query->where('title', 'like', '%' . $request->title . '%');
+        }
+        
+        if ($request->filled('due_date')) {
+            $query->where('due_date', $request->due_date);
+        }
+
+        if ($request->filled('assigned_to')) {
+            $query->where('assigned_to', 'like', '%' . $request->assigned_to . '%');
+        }
+
+        if ($request->filled('assigned_by')) {
+            $query->where('assigned_by', 'like', '%' . $request->assigned_by . '%');
+        }
+
+        // Finally fetch results
         $tasks = $query->get();
-       
-        return view('employee.employee-task', compact(
+
+        $totalTasks         = $tasks->count();
+        $toDoTasks          = $tasks->where('status', 'to-do')->count();
+        $inProgressTasks    = $tasks->where('status', 'in-progress')->count();
+        $inReviewTasks      = $tasks->where('status', 'in-review')->count();
+        $toReviewTasks      = $tasks->where('status', 'to-review')->count();
+        $completedTasks     = $tasks->where('status', 'completed')->count();
+
+        $view = $user->role_id == 2 ? 'admin.admin-task' : 'employee.employee-task';
+
+        return view($view, compact(
             'totalTasks',
             'toDoTasks',
             'inProgressTasks',
@@ -35,7 +68,6 @@ class TaskController extends Controller
             'completedTasks',
             'tasks'
         ));
-
     }
 
     /**

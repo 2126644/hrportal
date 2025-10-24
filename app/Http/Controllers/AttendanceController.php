@@ -17,26 +17,78 @@ class AttendanceController extends Controller
      * Display a listing of the resource.
      */
     // Show attendance summary for logged-in employee
-    public function index()
+    public function index(Request $request)
     {
-        $employee = Auth::user()->employee;
+        $user = Auth::user();
+
+        // 🔹 Admin: view all attendance
+        if ($user->role_id == 2) {
+            $query = Attendance::with('employee')->orderBy('created_at', 'desc');
+
+            // Apply filters dynamically
+            if ($request->filled('employee')) {
+                $query->whereHas('employee', function ($q) use ($request) {
+                    $q->where('full_name', 'like', '%' . $request->employee . '%')
+                        ->orWhere('employee_id', 'like', '%' . $request->employee . '%');
+                });
+            }
+
+            if ($request->filled('date')) {
+                $query->whereDate('date', $request->date);
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('status_time_in')) {
+                $query->where('status_time_in', $request->status_time_in);
+            }
+
+            if ($request->filled('status_time_out')) {
+                $query->where('status_time_out', $request->status_time_out);
+            }
+
+            // Finally fetch results
+            $attendances = $query->paginate(10);
+
+            return view('admin.admin-attendance', compact('attendances'));
+        }
+
+        // 🔹 Employee: view own attendance
+        $employee = $user->employee;
 
         // Get all requests to show in a table
-        $attendances = Attendance::where('employee_id', $employee->employee_id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(7);
+        $query = Attendance::where('employee_id', $employee->employee_id)
+            ->orderBy('created_at', 'desc');
 
-        // 🔹 Latest record (also filter by today)
+        // Apply optional filters for employee view
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('status_time_in')) {
+            $query->where('status_time_in', $request->status_time_in);
+        }
+
+        if ($request->filled('status_time_out')) {
+            $query->where('status_time_out', $request->status_time_out);
+        }
+
+        $attendances = $query->paginate(7);
+
+        // Latest record (also filter by today)
         $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
             ->whereDate('date', Carbon::today())
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->first();
 
-        return view('employee.employee-attendance', compact(
-            'attendances',
-            'todayAttendance'
-        ));
+        return view('employee.employee-attendance', compact('attendances', 'todayAttendance'));
     }
 
     // Punch in (mark attendance)
@@ -63,11 +115,16 @@ class AttendanceController extends Controller
 
         $now = Carbon::now();
 
-        // Punch In (before 8:30am) → ✅ On Time
-        // Punch In (8:30am) → ✅ Normal
-        // Punch In (after 8:30am) → ❌ Late
+        // Punch In (before shift 8:30/9am) → ✅ On Time
+        // Punch In (8:30/9am) → ✅ Normal
+        // Punch In (after 8:30/9am) → ❌ Late
 
-        $workStart = Carbon::createFromTime(8, 30, 0); // 08:30 AM
+        $employment = $employee->employment;
+
+        // fallback if no employment record or times set
+        $workStart = $employment && $employment->work_start_time
+            ? Carbon::parse($employment->work_start_time)
+            : Carbon::createFromTime(8, 30, 0);
 
         // Check if late
         $statusTimeIn = $now->greaterThan($workStart) ? 'Late' : 'On Time';
@@ -149,8 +206,12 @@ class AttendanceController extends Controller
         // Punch Out (5:30pm) → ✅ Normal
         // Punch Out (after 5:30pm) → ⭐ Overtime
 
-        // Official work end time (5:30pm)
-        $workEnd = Carbon::createFromTime(17, 30, 0);
+        $employment = $employee->employment;
+
+        // fallback if no employment record or times set
+        $workEnd = $employment && $employment->work_end_time
+            ? Carbon::parse($employment->work_end_time)
+            : Carbon::createFromTime(17, 30, 0);
 
         // Check if early leave
         $statusTimeOut = $now->lt($workEnd) ? 'Early Leave' : 'On Time';

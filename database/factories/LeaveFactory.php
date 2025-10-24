@@ -21,7 +21,6 @@ class LeaveFactory extends Factory
     {
         return [
             'employee_id'   => Employee::inRandomOrder()->first()->employee_id,
-            'name'          => fake()->name(),
             'applied_date'  => fake()->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
             'leave_type'    => fake()->randomElement(['annual_leave', 'medical_leave', 'emergency_leave', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid_leave', 'marriage']),
             'leave_length'  => fake()->randomElement(['full_day', 'AM', 'PM']),
@@ -33,7 +32,6 @@ class LeaveFactory extends Factory
             'approved_by'   => fake()->boolean(60) ? User::inRandomOrder()->first()?->id : null,
             'status'        => fake()->randomElement(['pending', 'approved', 'rejected']),
             'reject_reason' => fake()->optional()->sentence(),
-            'action'        => fake()->optional()->word(),
         ];
     }
 }

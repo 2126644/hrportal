@@ -23,7 +23,7 @@
         <!-- Filters and Search -->
         <div class="card mb-4">
             <div class="card-body">
-                <form method="GET" action="{{ route('admin.employee') }}" class="row g-3 align-items-end">
+                <form method="GET" action="{{ route('admin.employee') }}">
                     <div class="row g-3">
                         <div class="col-md-2">
                             <label class="form-label">Search Employees</label>

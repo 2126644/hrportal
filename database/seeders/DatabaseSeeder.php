@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
 
         // safely create the dependent tables: tasks, leaves, attendance, events
         $this->call([
+            AdminSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class,
             EmploymentSeeder::class,

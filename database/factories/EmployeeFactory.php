@@ -21,7 +21,7 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
-            'employee_id'       => strtoupper(fake()->bothify('EMP###')),
+            'employee_id'       => strtoupper(fake()->unique()->bothify('EMP###')),
             'user_id'           => User::factory(), // or existing user id
             'full_name'         => fake()->name(),
             'email'             => fake()->unique()->safeEmail(),
