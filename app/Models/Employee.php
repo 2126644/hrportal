@@ -26,8 +26,7 @@ class Employee extends Model
         'gender',
         'birthday',
         'nationality',
-        'emergency_contact',
-        'profile_pic',
+        'emergency_contact'
     ];
 
     protected $casts = [

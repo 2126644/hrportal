@@ -38,4 +38,8 @@ class Event extends Model
         return $this->belongsTo(Employee::class, 'created_by');
     }
 
+    public function registrations()
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
 }

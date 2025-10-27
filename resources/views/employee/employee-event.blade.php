@@ -34,13 +34,13 @@
                 <button class="nav-link active" id="upcoming-event-tab" data-bs-toggle="tab"
                     data-bs-target="#upcoming-event" type="button" role="tab" aria-controls="upcoming-event"
                     aria-selected="true">
-                    Upcoming Events
+                    Calendar
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="past-event-tab" data-bs-toggle="tab" data-bs-target="#past-event"
                     type="button" role="tab" aria-controls="past-event" aria-selected="false">
-                    Past Events
+                    Events
                 </button>
             </li>
         </ul>
@@ -53,32 +53,8 @@
             <div class="tab-pane fade show active" id="upcoming-event" role="tabpanel" aria-labelledby="upcoming-event-tab">
                 <div class="row">
                     <!-- Calendar Column -->
-                    <div class="col-12 col-md-8 col-lg-9 mb-4 calendar-col">
+                    <div class="col-12 mb-4 calendar-col">
                         <div id="eventCalendar"></div>
-                    </div>
-
-                    <!-- Upcoming Events Column -->
-                    <div class="col-12 col-md-4 col-lg-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h3 class="card-title">Upcoming Events</h3>
-                                @forelse ($upcomingEvents as $event)
-                                    <div class="event-item p-2 rounded hover-bg">
-                                        <div class="event-date-time small text-primary fw-semibold">
-                                            {{ \Carbon\Carbon::parse($event->event_date)->format('M d, Y') }} -
-                                            {{ $event->event_time }}
-                                        </div>
-                                        <div class="event-title small">{{ $event->event_name }}</div>
-                                    </div>
-                                @empty
-                                    <div class="text-center text-muted py-5">
-                                        <i class="bi bi-calendar-x display-4 mb-3"></i>
-                                        <h5>No upcoming events</h5>
-                                        <p class="mb-0">Check back later for new events</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

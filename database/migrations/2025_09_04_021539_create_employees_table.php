@@ -24,7 +24,6 @@ return new class extends Migration
             $table->date('birthday')->nullable();
             $table->string('nationality')->nullable();
             $table->string('emergency_contact')->nullable();
-            $table->string('profile_pic')->nullable();
             $table->timestamps();
         });
     }

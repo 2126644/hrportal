@@ -32,8 +32,7 @@ class EmployeeFactory extends Factory
             'gender'            => fake()->randomElement(['Male', 'Female']),
             'birthday'          => fake()->dateTimeBetween('-50 years', '-20 years'),
             'nationality'       => fake()->country(),
-            'emergency_contact' => fake()->phoneNumber(),
-            'profile_pic'       => null,
+            'emergency_contact' => fake()->phoneNumber()
         ];
     }
 }

@@ -88,8 +88,8 @@ class User extends Authenticatable
         return $this->hasOne(Employee::class);
     }
 
-    public function admin()
+    public function eventRegistrations()
     {
-        return $this->hasOne(Admin::class);
+        return $this->hasMany(EventRegistration::class);
     }
 }
