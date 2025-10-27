@@ -74,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/task/{task}', [TaskController::class, 'update'])->name('task.update');
     // Route::delete('/task/{id}', [TaskController::class, 'destroy'])->name('task.destroy');
 
-    Route::get('/event', [EventController::class, 'employeeIndex'])->name('employee.event');
+    Route::get('/event', [EventController::class, 'index'])->name('employee.event');
     Route::post('/event', [EventController::class, 'store'])->name('event.store');
     Route::get('/event/create', [EventController::class, 'create'])->name('event.create');
     Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
@@ -99,7 +99,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/tasks', [TaskController::class, 'index'])->name('admin.task');
 
-    Route::get('/admin/event', [EventController::class, 'adminIndex'])->name('admin.event');
+    Route::get('/admin/event', [EventController::class, 'index'])->name('admin.event');
 
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

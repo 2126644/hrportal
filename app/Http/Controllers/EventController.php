@@ -14,41 +14,31 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Event::query();
+        $user = Auth::user();
+        $employee = $user->employee;
+        $query = Event::query()->orderBy('event_date', 'asc');
 
-        // Apply filters
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('event_name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('tags', 'like', "%{$search}%");
+            $query->where(function ($q) use ($request) {
+                $q->where('event_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('tags', 'like', '%' . $request->search . '%');
             });
         }
 
-        if ($request->filled('category') && $request->category !== 'all') {
+        if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
 
-        if ($request->filled('event_status') && $request->event_status !== 'all') {
+        if ($request->filled('event_status')) {
             $query->where('event_status', $request->event_status);
         }
 
-        if ($request->filled('price_filter')) {
-            if ($request->price_filter === 'free') {
-                $query->where('price', 0);
-            } elseif ($request->price_filter === 'paid') {
-                $query->where('price', '>', 0);
-            }
+        if ($request->filled('event_date')) {
+            $query->whereDate('event_date', '=', $request->event_date);
         }
 
-        // Fetch upcoming events (beside calendar)
-        $upcomingEvents = Event::where('event_date', '>=', now())
-            ->orderBy('event_date', 'asc')
-            ->take(5)
-            ->get();
-
-        $events = $query->orderBy('event_date', 'asc')->get();
+        // Finally fetch results
+        $events = $query->get();
 
         // FOR CALENDAR
         $calendarEvents = $events->map(function ($event) {
@@ -60,23 +50,12 @@ class EventController extends Controller
             ];
         });
 
-        // Calculate stats
-        $stats = [
-            'total_events' => Event::count(),
-            'upcoming_events' => Event::where('event_status', 'upcoming')->count(),
-            'total_attendees' => Event::sum('attendees'),
-            'average_attendance' => Event::count() > 0 ? round(Event::sum('attendees') / Event::count()) : 0
-        ];
+        $categories = ['meeting', 'conference', 'workshop', 'networking', 'webinar', 'social', 'other']; 
+        $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
 
-        $viewMode = $request->get('view', 'grid');
+        $view = $user->role_id == 2 ? 'admin.admin-event' : 'employee.employee-event';
 
-        return view('employee.employee-event', [
-        'events' => $events, // Eloquent collection for cards/list
-        'calendarEvents' => $calendarEvents, // Array for FullCalendar
-        'stats' => $stats,
-        'viewMode' => $viewMode,
-        'upcomingEvents' => $upcomingEvents,
-        ]);
+        return view($view, compact('events', 'calendarEvents', 'categories', 'eventStatuses'));
 
     }
 
@@ -111,7 +90,7 @@ class EventController extends Controller
             'organizer'         => 'required|string|max:100',
             'tags'              => 'nullable|array',    // expecting an array from form
             'rsvp_required'     => 'nullable|boolean',
-            
+
         ]);
 
         // ✅ 2. Handle image upload if provided

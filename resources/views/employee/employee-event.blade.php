@@ -60,8 +60,64 @@
             </div>
 
             <!-- Past Events tab -->
-            <div class="tab-pane fade" id="past-event" role="tabpanel" aria-labelledby="past-event-tab">
-                <div class="events-grid">
+            <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+                <form method="GET" action="{{ route('employee.event') }}">
+                    <input type="hidden" name="tab" id="activeTabInput" value="event">
+                    <div class="row g-3 align-items-end">
+                        @if (auth()->user()->role_id === 2)
+                            <div class="col-md-2">
+                                <label class="form-label">Search Events</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        class="form-control" placeholder="Name or tags...">
+                                </div>
+                            </div>
+                        @endif
+                        <div class="col-md-2">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="event_date" value="{{ request('event_date') }}"
+                                class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-control">
+                                <option value="">All Categories</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category }}"
+                                        {{ request('category') == $category ? 'selected' : '' }}>
+                                        {{ ucwords(str_replace('_', ' ', $category)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Status</label>
+                            <select name="event_status" class="form-control">
+                                <option value="">All Status</option>
+                                @foreach ($eventStatuses as $status)
+                                    <option value="{{ $status }}"
+                                        {{ request('event_status') == $status ? 'selected' : '' }}>
+                                        {{ ucwords(str_replace('_', ' ', $status)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel me-2"></i>Filter
+                            </button>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <a href="{{ route('employee.event') }}" class="btn btn-secondary w-100">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                <div class="events-grid mt-4">
                     @forelse($events as $event)
                         @php
                             $eventDate = \Carbon\Carbon::parse($event->event_date);
@@ -111,7 +167,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('eventCalendar');
