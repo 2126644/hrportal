@@ -813,23 +813,6 @@ footer {
     text-decoration: underline;
 }
 
-.event-meta {
-    font-size: 0.9rem;
-    color: #7f8c8d;
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1rem;
-    align-items: center;
-}
-
-.event-meta span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    user-select: none;
-}
-
 .event-description {
     color: #555;
     font-size: 1rem;

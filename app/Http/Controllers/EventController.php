@@ -129,7 +129,7 @@ class EventController extends Controller
     public function show(string $id)
     {
         $event = Event::findOrFail($id);
-        return view('employee.ref', compact('event'));
+        return view('employee.employee-eventshow', compact('event'));
     }
 
     /**

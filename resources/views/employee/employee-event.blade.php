@@ -31,15 +31,14 @@
         <!-- Tabs navigation -->
         <ul class="nav nav-tabs" id="eventTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="upcoming-event-tab" data-bs-toggle="tab"
-                    data-bs-target="#upcoming-event" type="button" role="tab" aria-controls="upcoming-event"
-                    aria-selected="true">
+                <button class="nav-link active" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar"
+                    type="button" role="tab" aria-controls="calendar" aria-selected="true">
                     Calendar
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="past-event-tab" data-bs-toggle="tab" data-bs-target="#past-event"
-                    type="button" role="tab" aria-controls="past-event" aria-selected="false">
+                <button class="nav-link" id="event-tab" data-bs-toggle="tab" data-bs-target="#event" type="button"
+                    role="tab" aria-controls="event" aria-selected="false">
                     Events
                 </button>
             </li>
@@ -49,37 +48,25 @@
         <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="eventTabsContent"
             style="min-height: 500px;">
 
-            <!-- Upcoming Events tab -->
-            <div class="tab-pane fade show active" id="upcoming-event" role="tabpanel" aria-labelledby="upcoming-event-tab">
-                <div class="row">
-                    <!-- Calendar Column -->
-                    <div class="col-12 mb-4 calendar-col">
-                        <div id="eventCalendar"></div>
-                    </div>
-                </div>
+            <!-- Calendar tab -->
+            <div class="tab-pane fade show active" id="calendar" role="tabpanel" aria-labelledby="calendar-tab">
+                <div id="eventCalendar"></div>
             </div>
 
-            <!-- Past Events tab -->
+            <!-- Events tab -->
             <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
+                <!-- Filters and Search -->
                 <form method="GET" action="{{ route('employee.event') }}">
                     <input type="hidden" name="tab" id="activeTabInput" value="event">
                     <div class="row g-3 align-items-end">
-                        @if (auth()->user()->role_id === 2)
-                            <div class="col-md-2">
-                                <label class="form-label">Search Events</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">
-                                        <i class="bi bi-search"></i>
-                                    </span>
-                                    <input type="text" name="search" value="{{ request('search') }}"
-                                        class="form-control" placeholder="Name or tags...">
-                                </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Search Events</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Name or tags...">
                             </div>
-                        @endif
-                        <div class="col-md-2">
-                            <label class="form-label">Date</label>
-                            <input type="date" name="event_date" value="{{ request('event_date') }}"
-                                class="form-control">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Category</label>
@@ -104,6 +91,10 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="event_date" value="{{ request('event_date') }}" class="form-control">
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">

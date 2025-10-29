@@ -69,8 +69,7 @@
                                     <span class="input-group-text">
                                         <i class="bi bi-search"></i>
                                     </span>
-                                    <input type="text" name="search" value="{{ request('search') }}"
-                                        class="form-control" placeholder="Name or ID...">
+                                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Name or ID...">
                                 </div>
                             </div>
                         @endif
@@ -88,18 +87,15 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Start Date</label>
-                            <input type="date" name="start_date" value="{{ request('start_date') }}"
-                                class="form-control">
+                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">End Date</label>
                             <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
                         </div>
-
                         <div class="col-md-2">
                             <label class="form-label">Applied Date</label>
-                            <input type="date" name="applied_date" value="{{ request('applied_date') }}"
-                                class="form-control">
+                            <input type="date" name="applied_date" value="{{ request('applied_date') }}" class="form-control">
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
