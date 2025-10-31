@@ -139,9 +139,9 @@
                                     <span title="Location">📍 {{ $event->event_location }}</span>
 
                                     @if ($event->rsvp_required)
-                                        <span class="badge-rsvp" title="RSVP Required">RSVP</span>
+                                        <span class="event-rsvp" title="RSVP Required">RSVP</span>
                                     @endif
-                                    <span class="event-status {{ $isPast ? 'status-past' : 'status-upcoming' }}">
+                                    <span class="event-status {{ $isPast ? 'event-status-past' : 'event-status-upcoming' }}">
                                         {{ $isPast ? 'Past' : 'Upcoming' }}
                                     </span>
                                 </div>

@@ -228,7 +228,6 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Recent Activities</h5>
-                        <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body">
                         <div class="activity-timeline" style="max-height: 300px; overflow-y: auto;">

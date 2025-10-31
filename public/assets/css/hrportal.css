@@ -20,7 +20,8 @@
     font-family: "Poppins", sans-serif !important;
 }
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
@@ -401,11 +402,6 @@ footer {
         gap: 20px;
     }
 
-    .calendar-col {
-        padding-right: 0;
-        margin-bottom: 1rem;
-    }
-
     .event-meta {
         flex-direction: column;
         align-items: flex-start;
@@ -669,6 +665,7 @@ footer {
 .task-item {
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
+    word-wrap: break-word;
 }
 
 .task-item:hover {
@@ -712,6 +709,7 @@ footer {
 .task-item h5 {
     color: #2c3e50;
     margin-bottom: 0.75rem;
+    word-wrap: break-word;
 }
 
 .task-item .text-muted {
@@ -736,29 +734,17 @@ footer {
 }
 
 /* =============================
-   EVENT PAGE
+   EVENT PAGE - CALENDAR TAB
 ============================= */
 
-.calendar-col {
-    padding-right: 1rem;
+#eventCalendar {
+    border-radius: 0.375rem;
+    overflow: hidden;
 }
 
-.events-section {
-    padding: 0 1.5rem 2rem;
-}
-
-.section-title h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #34495e;
-    margin-bottom: 0.3rem;
-}
-
-.section-title p {
-    color: #7f8c8d;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-}
+/* =============================
+   EVENT PAGE - EVENTS TAB
+============================= */
 
 .events-grid {
     display: grid;
@@ -801,7 +787,7 @@ footer {
 }
 
 .event-card-body h3 {
-    font-size: 1.4rem;
+    font-size: 1.25rem;
     margin-bottom: 0.4rem;
     color: #2c3e50;
     cursor: pointer;
@@ -813,6 +799,25 @@ footer {
     text-decoration: underline;
 }
 
+.event-card-body .btn-primary {
+    background: var(--primary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.event-card-body .btn-primary:hover {
+    background: var(--secondary-color);
+    transform: translateY(-1px);
+    color: white;
+}
+
 .event-description {
     color: #555;
     font-size: 1rem;
@@ -821,7 +826,7 @@ footer {
     line-height: 1.4;
 }
 
-.badge-rsvp {
+.event-rsvp {
     background-color: #40d15d;
     color: var(--secondary-color);
     font-size: 0.75rem;
@@ -842,20 +847,16 @@ footer {
     margin-left: auto;
 }
 
-.status-upcoming {
+.event-status-upcoming {
     background-color: #3498db;
 }
-.status-past {
+
+.event-status-past {
     background-color: #95a5a6;
 }
 
-#eventCalendar {
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
 .event-meta {
-    font-size: 0.85rem;
+    font-size: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -864,33 +865,6 @@ footer {
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.8rem;
-}
-
-/* Fix button styling */
-.event-card-body .btn-primary {
-    background: var(--primary-color);
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    color: white;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-}
-
-.event-card-body .btn-primary:hover {
-    background: var(--secondary-color);
-    transform: translateY(-1px);
-    color: white;
-}
-
-/* Improve status badges */
-.event-status {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
 }
 
 /* Empty state styling */
@@ -913,6 +887,164 @@ footer {
 .text-center.py-5 p {
     color: #6c757d;
     font-size: 0.95rem;
+}
+
+/* =============================
+   EVENT PAGE - SHOW PAGE
+============================= */
+
+.event-header {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.event-image {
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.event-details-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.event-details-card .card-header {
+    background-color: white;
+    border-bottom: 1px solid #eaeaea;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+}
+
+.event-detail-item {
+    display: flex;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.event-detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.event-detail-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(113, 176, 248, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.event-detail-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-detail-label {
+    font-weight: 500;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.event-detail-value {
+    font-weight: 500;
+    color: #212529;
+    word-break: break-word;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.status-upcoming {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.status-ongoing {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.status-completed {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.status-cancelled {
+    background-color:var(--danger-color);
+    color: white;
+}
+
+.tag {
+    display: inline-block;
+    background-color: rgba(113, 176, 248, 0.1);
+    color: var(--primary-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 1.5rem;
+}
+
+.btn-rsvp {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-rsvp:hover {
+    background-color: #5a9ae6;
+    color: white;
+}
+
+.capacity-meter {
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.capacity-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    .event-header {
+        padding: 1.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
 }
 
 /* =============================
@@ -1037,10 +1169,10 @@ footer {
     animation: fadeIn 0.3s ease-in;
 }
 
-
 /* =============================
    LAYOUT ADJUSTMENTS
 ============================= */
+
 
 .main-content {
     transition: margin-left 0.3s ease;
@@ -1048,7 +1180,7 @@ footer {
     /* reserve space when sidebar is open */
     padding: 0 2rem;
     margin-top: 1rem;
-    flex: 1 0 auto;
+    width: 100%;
 }
 
 body.sidebar-collapsed .main-content {
@@ -1078,7 +1210,7 @@ body.sidebar-collapsed .main-content {
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .stat-icon {
@@ -1086,10 +1218,18 @@ body.sidebar-collapsed .main-content {
     opacity: 0.8;
 }
 
-.stat-card:nth-child(1) { border-left-color: #007bff; }
-.stat-card:nth-child(2) { border-left-color: #28a745; }
-.stat-card:nth-child(3) { border-left-color: #ffc107; }
-.stat-card:nth-child(4) { border-left-color: #17a2b8; }
+.stat-card:nth-child(1) {
+    border-left-color: #007bff;
+}
+.stat-card:nth-child(2) {
+    border-left-color: #28a745;
+}
+.stat-card:nth-child(3) {
+    border-left-color: #ffc107;
+}
+.stat-card:nth-child(4) {
+    border-left-color: #17a2b8;
+}
 
 .activity-timeline {
     max-height: 400px;
@@ -1135,12 +1275,18 @@ body.sidebar-collapsed .main-content {
 
 .attendance-stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.present-card:hover { border-left: 4px solid #28a745; }
-.absent-card:hover { border-left: 4px solid #dc3545; }
-.late-card:hover { border-left: 4px solid #ffc107; }
+.present-card:hover {
+    border-left: 4px solid #28a745;
+}
+.absent-card:hover {
+    border-left: 4px solid #dc3545;
+}
+.late-card:hover {
+    border-left: 4px solid #ffc107;
+}
 
 .avatar-sm {
     width: 32px;

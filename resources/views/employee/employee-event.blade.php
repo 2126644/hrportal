@@ -128,14 +128,14 @@
                                 </h3>
 
                                 <div class="event-meta">
-                                    <span title="Date">📅 {{ $eventDate->format('d F Y') }}</span>
-                                    <span title="Time">⏰ {{ $eventTime->format('g:i A') }}</span>
-                                    <span title="Location">📍 {{ $event->event_location }}</span>
+                                    <span title="Date">📅 {{ $eventDate->format('d F Y') }}</span><br>
+                                    <span title="Time">⏰ {{ $eventTime->format('g:i A') }}</span><br>
+                                    <span title="Location">📍 {{ $event->event_location }}</span><br><br>
 
                                     @if ($event->rsvp_required)
-                                        <span class="badge-rsvp" title="RSVP Required">RSVP</span>
+                                        <span class="event-rsvp" title="RSVP Required">RSVP</span>
                                     @endif
-                                    <span class="event-status {{ $isPast ? 'status-past' : 'status-upcoming' }}">
+                                    <span class="event-status {{ $isPast ? 'event-status-past' : 'event-status-upcoming' }}">
                                         {{ $isPast ? 'Past' : 'Upcoming' }}
                                     </span>
                                 </div>
@@ -150,7 +150,7 @@
                     @empty
                         <div class="col-12 text-center py-5">
                             <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
-                            <h5 class="text-muted">No past events found</h5>
+                            <h5 class="text-muted mb-2">No past events found</h5>
                             <p class="text-muted">There are no past events to display.</p>
                         </div>
                     @endforelse
