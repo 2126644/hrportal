@@ -5,18 +5,13 @@
     <div class="content container-fluid">
 
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h3 class="page-title"><br>New Event</h3>
-                                <p class="text-muted">Create a new event or program for the team.</p>
+                                <h3 class="page-title"><br>Edit Event</h3>
+                                <p class="text-muted">Update the event details below.</p>
                             </div>
                         </div>
                     </div>
@@ -31,8 +26,10 @@
                 <div class="card-body justify-content-between">
                     {{-- makes content flexible row-pushes text left, icon right --}}
 
-                    <form action="{{ route('event.store') }}" method="POST" enctype="multipart/form-data" novalidate>
+                    <form action="{{ route('event.update', $event->id) }}" method="POST" enctype="multipart/form-data"
+                        novalidate>
                         @csrf
+                        @method('PUT')
 
                         <div class="mb-3">
                             {{-- mb-3 = margin-bottom 1rem
@@ -40,7 +37,8 @@
                             g-3 = gap 1rem --}}
                             <label for="event_name" class="form-label">Event Name <span class="text-danger">*</span></label>
                             <input type="text" id="event_name" name="event_name" class="form-control"
-                                placeholder="Name of the event" value="{{ old('event_name') }}" required>
+                                placeholder="Name of the event" value="{{ old('event_name', $event->event_name) }}"
+                                required>
                             {{-- Using for="event_name" links the label to the input’s id, so clicking the label focuses the input. --}}
                             @error('event_name')
                                 <div class="text-danger small">{{ $message }}</div>
@@ -52,7 +50,7 @@
                                 <label for="event_date" class="form-label">Event Date <span
                                         class="text-danger">*</span></label>
                                 <input type="date" id="event_date" name="event_date" class="form-control"
-                                    value="{{ old('event_date') }}" required>
+                                    value="{{ old('event_date', $event->event_date->format('Y-m-d')) }}" required>
                                 @error('event_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -62,7 +60,7 @@
                                 <label for="event_time" class="form-label">Event Time <span
                                         class="text-danger">*</span></label>
                                 <input type="time" id="event_time" name="event_time" class="form-control"
-                                    value="{{ old('event_time') }}" required>
+                                    value="{{ old('event_time', $event->event_time->format('H:i')) }}" required>
                                 @error('event_time')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -73,7 +71,8 @@
                             <label for="event_location" class="form-label">Location <span
                                     class="text-danger">*</span></label>
                             <input type="text" id="event_location" name="event_location" class="form-control"
-                                placeholder="Location of the event" value="{{ old('event_location') }}" required>
+                                placeholder="Location of the event"
+                                value="{{ old('event_location', $event->event_location) }}" required>
                             @error('event_location')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -83,7 +82,7 @@
                             <label for="description" class="form-label">Description <span
                                     class="text-danger">*</span></label>
                             <textarea id="description" name="description" class="form-control" rows="4" placeholder="Describe the event"
-                                required>{{ old('description') }}</textarea>
+                                required>{{ old('description', $event->description) }}</textarea>
                             @error('description')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -108,7 +107,8 @@
                                     @endphp
                                     @foreach ($categories as $cat)
                                         <option value="{{ $cat }}"
-                                            {{ old('category') === $cat ? 'selected' : '' }}>{{ ucfirst($cat) }}</option>
+                                            {{ old('category', $event->category) === $cat ? 'selected' : '' }}>
+                                            {{ ucfirst($cat) }}</option>
                                     @endforeach
                                 </select>
                                 @error('category')
@@ -119,7 +119,7 @@
                             <div class="col-md-3">
                                 <label for="capacity" class="form-label">Capacity <span class="text-danger">*</span></label>
                                 <input type="number" id="capacity" name="capacity" class="form-control" min="1"
-                                    placeholder="Max attendees" value="{{ old('capacity') }}" required>
+                                    placeholder="Max attendees" value="{{ old('capacity', $event->capacity) }}" required>
                                 @error('capacity')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -128,7 +128,7 @@
                             <div class="col-md-3">
                                 <label for="price" class="form-label">Price (MYR)</label>
                                 <input type="number" step="0.01" min="0" id="price" name="price"
-                                    class="form-control" placeholder="0.00" value="{{ old('price', '0.00') }}">
+                                    class="form-control" placeholder="0.00" value="{{ old('price', $event->price) }}">
                                 @error('price')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -140,7 +140,8 @@
                                 <label for="organizer" class="form-label">Organizer <span
                                         class="text-danger">*</span></label>
                                 <input type="text" id="organizer" name="organizer" class="form-control"
-                                    placeholder="Organizer name" value="{{ old('organizer') }}" required>
+                                    placeholder="Organizer name" value="{{ old('organizer', $event->organizer) }}"
+                                    required>
                                 @error('organizer')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -155,7 +156,7 @@
                                     @endphp
                                     @foreach ($statuses as $status)
                                         <option value="{{ $status }}"
-                                            {{ old('event_status', 'upcoming') === $status ? 'selected' : '' }}>
+                                            {{ old('event_status', $event->event_status) === $status ? 'selected' : '' }}>
                                             {{ ucfirst($status) }}</option>
                                     @endforeach
                                 </select>
@@ -169,7 +170,8 @@
                             <label for="tags" class="form-label">Tags <small class="text-muted">(comma
                                     separated)</small></label>
                             <input type="text" id="tags" name="tags" class="form-control"
-                                placeholder="e.g. tech, networking, free" value="{{ old('tags') }}">
+                                placeholder="e.g. tech, networking, free"
+                                value="{{ old('tags', is_array($event->tags) ? implode(',', $event->tags) : '') }}">
                             @error('tags')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -177,6 +179,12 @@
 
                         <div class="mb-3">
                             <label for="image" class="form-label">Event Image</label>
+                            @if ($event->image)
+                                <div class="mb-2">
+                                    <img src="{{ asset('storage/' . $event->image) }}" alt="Event Image" width="150"
+                                        class="rounded">
+                                </div>
+                            @endif
                             <input type="file" id="image" name="image" class="form-control"
                                 accept=".pdf,.jpg,.jpeg,.png">
                             <small class="text-muted">JPG, JPEG or PNG (max 2 MB)</small>
@@ -187,22 +195,17 @@
 
                         <div class="form-check form-switch mb-4">
                             <input class="form-check-input" type="checkbox" id="rsvp_required" name="rsvp_required"
-                                value="1" {{ old('rsvp_required') ? 'checked' : '' }}>
+                                value="1" {{ old('rsvp_required', $event->rsvp_required) ? 'checked' : '' }}>
                             <label class="form-check-label" for="rsvp_required">Require RSVP</label>
                         </div>
 
                         <div class="d-flex justify-content-end">
-                            @if ($role_id == 2)
-                                <a href="{{ route('admin.event') }}" class="btn btn-secondary me-2">
-                                    Cancel
-                                </a>
-                            @elseif ($role_id == 3)
-                                <a href="{{ route('employee.event') }}" class="btn btn-secondary me-2">
-                                    Cancel
-                                </a>
-                            @endif
+                            <a href="{{ route('event.show', $event->id) }}" class="btn btn-secondary me-2">
+                                Cancel
+                            </a>
+                            {{-- later add if/else for employee/admin --}}
                             <button type="submit" class="btn btn-primary">
-                                Create Event
+                                Update Event
                             </button>
                         </div>
                     </form>

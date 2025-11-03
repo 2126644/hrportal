@@ -30,7 +30,10 @@ class Event extends Model
 
     // Optional: format date for easy usage in Blade
     protected $casts = [
-        'event_date' => 'date'
+        'event_date' => 'date',
+        'event_time' => 'datetime:H:i',
+        'tags' => 'array',
+        'rsvp_required' => 'boolean',
     ];
 
     public function createdBy()

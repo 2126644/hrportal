@@ -109,11 +109,18 @@ class EmployeeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit()
+    public function settings()
     {
         $employee = Auth::user()->employee;
 
         return view('profile.settings', compact('employee'));
+    }
+
+    public function edit()
+    {
+        $employee = Auth::user()->employee;
+
+        return view('profile.editprofile', compact('employee'));
     }
 
     /**
@@ -121,7 +128,33 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $employee = Auth::user()->employee;
+
+        $validated = $request->validate([
+            'full_name'         => 'required|string|max:255',
+            'email'             => 'required|string',
+            'phone_number'      => 'required|string|max:20',
+            'address'           => 'required|string|max:500',
+            'gender'            => 'required|string|max:10',
+            'birthday'          => 'required|date',
+            'marital_status'    => 'required|string|max:50',
+            'nationality'       => 'required|string|max:50',
+            'emergency_contact' => 'required|string|max:255',
+            'ic_number'         => 'required|string|max:20',
+        ]);
+
+        // if ($request->hasFile('image')) {
+        //     $imagePath = $request->file('image')->store('events', 'public');
+        //     $validated['image'] = $imagePath;
+        // } else {
+        //     $validated['image'] = $employee->image; // keep old image if not replaced
+        // }
+
+        // Update employee
+        $employee->update($validated);
+
+        return redirect()->route('profile.show', $employee->id)->with('success', 'Profile updated successfully!');
+    
     }
 
     /**

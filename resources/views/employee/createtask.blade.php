@@ -1,76 +1,10 @@
 @extends('layouts.master')
 
 @section('content')
-    <style>
-        body {
-            background-color: #f4f8fb;
-        }
-
-        .card {
-            background: #ffffff;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            margin-bottom: 0.5rem;
-        }
-
-        .card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        .card-body b {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #3498db;
-        }
-
-        .card-body g {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #40d15d;
-        }
-
-        .card-body y {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #edd641;
-        }
-
-        .btn-info {
-            background-color: #5dade2;
-            border-color: #5dade2;
-            border-radius: 12px;
-            padding: 10px 20px;
-            font-weight: 500;
-        }
-
-        .btn-info:hover {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-
-        .card-title {
-            font-weight: 600;
-            color: #2980b9;
-            font-size: 1.25rem;
-        }
-
-        .card-header p {
-            color: #7f8c8d;
-            margin-top: 5px;
-            font-size: 0.95rem;
-        }
-    </style>
 
     <div class="content container-fluid">
 
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
@@ -139,7 +73,8 @@
                                 <label for="status" class="form-label">Task Status <span
                                         class="text-danger">*</span></label>
                                 <select id="status"name="status" class="form-select" required>
-                                    <option value="" disabled {{ old('status') ? '' : 'selected' }}>Select Status</option>
+                                    <option value="" disabled {{ old('status') ? '' : 'selected' }}>Select Status
+                                    </option>
                                     <option value="to-do" {{ old('status') === 'to-do' ? 'selected' : '' }}>To-Do</option>
                                     <option value="in-progress" {{ old('status') === 'in-progress' ? 'selected' : '' }}>
                                         In-Progress</option>
@@ -171,7 +106,18 @@
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary px-4">Create Task</button>
+                                @if ($role_id == 2)
+                                    <a href="{{ route('admin.task') }}" class="btn btn-secondary me-2">
+                                        Cancel
+                                    </a>
+                                    @elseif ($role_id == 3)
+                                        <a href="{{ route('employee.task') }}" class="btn btn-secondary me-2">
+                                            Cancel
+                                        </a>
+                                    @endif
+                                    <button type="submit" class="btn btn-primary">
+                                        Create Task
+                                    </button>
                             </div>
                     </form>
                 </div>

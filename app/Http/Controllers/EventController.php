@@ -50,13 +50,12 @@ class EventController extends Controller
             ];
         });
 
-        $categories = ['meeting', 'conference', 'workshop', 'networking', 'webinar', 'social', 'other']; 
+        $categories = ['meeting', 'conference', 'workshop', 'networking', 'webinar', 'social', 'other'];
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
 
         $view = $user->role_id == 2 ? 'admin.admin-event' : 'employee.employee-event';
 
         return view($view, compact('events', 'calendarEvents', 'categories', 'eventStatuses'));
-
     }
 
     /**
@@ -64,7 +63,8 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('employee.newevent');
+        $role_id = Auth::user()->role_id;
+        return view('employee.newevent', compact('role_id'));
     }
 
     /**
@@ -137,7 +137,8 @@ class EventController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        return view('employee.editevent', compact('event'));
     }
 
     /**
@@ -145,7 +146,41 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $event = Event::findOrFail($id);
+
+        // ✅ 1. Validate all important columns that are NOT nullable
+        $validated = $request->validate([
+            'event_name'        => 'required|string|max:100',
+            'description'       => 'required|string',
+            'event_date'        => 'required|date',
+            'event_time'        => 'required|date_format:H:i',
+            'event_location'    => 'required|string|max:255',
+            'category'          => 'required|in:meeting,conference,workshop,networking,webinar,social,other',
+            'capacity'          => 'required|integer|min:1',
+            'attendees'         => 'nullable|integer|min:0',
+            'price'             => 'nullable|numeric|min:0',
+            'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // max 2MB
+            'event_status'      => 'required|in:upcoming,ongoing,completed,cancelled',
+            'organizer'         => 'required|string|max:100',
+            'tags'              => 'nullable|array',    // expecting an array from form
+            'rsvp_required'     => 'nullable|boolean',
+        ]);
+
+        // Handle image upload if there’s a new one
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('events', 'public');
+            $validated['image'] = $imagePath;
+        } else {
+            $validated['image'] = $event->image; // keep old image if not replaced
+        }
+
+        // Checkbox fix (since unchecked means "not sent")
+        $validated['rsvp_required'] = $request->has('rsvp_required');
+
+        // Update event
+        $event->update($validated);
+
+        return redirect()->route('event.show', $event->id)->with('success', 'Event updated successfully!');
     }
 
     /**

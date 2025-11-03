@@ -83,7 +83,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
 
     Route::get('/profile/show', [EmployeeController::class, 'show'])->name('profile.show');
+    Route::get('/profile/settings', [EmployeeController::class, 'settings'])->name('profile.settings');
     Route::get('/profile/edit', [EmployeeController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile/{employee}', [EmployeeController::class, 'update'])->name('profile.update');
 
 });
 

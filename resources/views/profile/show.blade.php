@@ -4,11 +4,6 @@
     <div class="content container-fluid">
 
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
@@ -74,8 +69,11 @@
                         </div>
 
                         <!-- Edit Profile Button -->
-                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.edit') }}'">
-                            <i class="bi bi-pencil-square me-2"></i>Profile Setting
+                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.settings') }}'">
+                            <i class="bi bi-gear-fill me-2"></i>Profile Setting
+                        </button>
+                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.edit', $employee->employee_id) }}'">
+                            <i class="bi bi-pencil-square me-2"></i>Profile Edit
                         </button>
                     </div>
                 </div>

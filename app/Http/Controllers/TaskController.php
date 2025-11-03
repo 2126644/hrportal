@@ -75,7 +75,8 @@ class TaskController extends Controller
      */
     public function create()
     {
-        return view('employee.createtask');
+        $role_id = Auth::user()->role_id;
+        return view('employee.createtask', compact('role_id'));
     }
 
     /**

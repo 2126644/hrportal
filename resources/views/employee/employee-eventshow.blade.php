@@ -11,7 +11,7 @@
                                 <h3 class="page-title"><br>Events</h3>
                                 <p class="text-muted">Manage your events and view your schedule.</p>
                             </div>
-                            <button class="btn-new" onclick="window.location='{{ route('event.create') }}'">
+                            <button class="btn-new" onclick="window.location='{{ route('event.edit', $event->id) }}'">
                                 Edit Event
                             </button>
                         </div>
@@ -210,7 +210,7 @@
                                     <div class="event-detail-label">Tags</div>
                                     <div class="event-detail-value">
                                         @php
-                                            $tags = json_decode($event->tags, true) ?: [];
+                                            $tags = is_array($event->tags) ? $event->tags : json_decode($event->tags, true);
                                         @endphp
                                         @foreach ($tags as $tag)
                                             <span class="tag">{{ $tag }}</span>
@@ -240,63 +240,63 @@
                         <i class="bi bi-map-fill me-2"></i>Location
                     </div>
                     <div class="event-card-body p-0">
-                        <div class="bg-light d-flex align-items-center justify-content-center"
-                            style="height: 200px; border-radius: 0 0 10px 10px;">
-                            <div class="text-center text-muted">
-                                <i class="bi bi-map-fill fa-2x mb-2"></i>
-                                <p>{{ $event->event_location }}</p>
+                        <iframe width="100%" height="250" style="border:0; border-radius: 0 0 10px 10px;"
+                            loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps?q={{ urlencode($event->event_location) }}&output=embed">
+                        </iframe>
+                        <div class="p-2 text-muted small">
+                            <i class="bi bi-geo-alt-fill me-1"></i>{{ $event->event_location }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if ($event->rsvp_required)
+                <div class="col-12 col-md-4 mb-4">
+                    <!-- Attendance Card -->
+                    <div class="card event-details-card mb-4">
+                        <div class="card-header">
+                            <i class="bi bi-bar-chart-fill me-2"></i>Attendance
+                        </div>
+                        <div class="event-card-body">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="event-detail-label">Registered</span>
+                                <span class="event-detail-value">{{ $event->attendees }} / {{ $event->capacity }}</span>
+                            </div>
+                            <div class="capacity-meter">
+                                @php
+                                    $attendancePercentage =
+                                        $event->capacity > 0 ? ($event->attendees / $event->capacity) * 100 : 0;
+                                @endphp
+                                <div class="capacity-fill" style="width: {{ $attendancePercentage }}%"></div>
+                            </div>
+                            <div class="mt-2">
+                                @php
+                                    $spotsLeft = $event->capacity - $event->attendees;
+                                @endphp
+                                <small class="text-muted">{{ $spotsLeft }} spots left</small>
+                            </div>
+
+                            <div class="action-buttons">
+                                @if ($event->event_status === 'upcoming')
+                                    <button class="btn btn-rsvp flex-fill" id="rsvp-button">
+                                        <i class="bi bi-check-circle me-2"></i>Register Now
+                                    </button>
+                                @else
+                                    <button class="btn btn-secondary flex-fill" disabled>
+                                        <i class="bi bi-slash-circle me-2"></i>Registration Closed
+                                    </button>
+                                @endif
+                                <button class="btn btn-outline-secondary" id="share-button">
+                                    <i class="bi bi-share me-2"></i>Share
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
-            <div class="col-12 col-md-4 mb-4">
-                <!-- Attendance Card -->
-                <div class="card event-details-card mb-4">
-                    <div class="card-header">
-                        <i class="bi bi-bar-chart-fill me-2"></i>Attendance
-                    </div>
-                    <div class="event-card-body">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="event-detail-label">Registered</span>
-                            <span class="event-detail-value">{{ $event->attendees }} / {{ $event->capacity }}</span>
-                        </div>
-                        <div class="capacity-meter">
-                            @php
-                                $attendancePercentage =
-                                    $event->capacity > 0 ? ($event->attendees / $event->capacity) * 100 : 0;
-                            @endphp
-                            <div class="capacity-fill" style="width: {{ $attendancePercentage }}%"></div>
-                        </div>
-                        <div class="mt-2">
-                            @php
-                                $spotsLeft = $event->capacity - $event->attendees;
-                            @endphp
-                            <small class="text-muted">{{ $spotsLeft }} spots left</small>
-                        </div>
 
-                        <div class="action-buttons">
-                            @if ($event->rsvp_required && $event->event_status === 'upcoming')
-                                <button class="btn btn-rsvp flex-fill" id="rsvp-button">
-                                    <i class="bi bi-check-circle me-2"></i>RSVP Now
-                                </button>
-                            @elseif(!$event->rsvp_required)
-                                <button class="btn btn-rsvp flex-fill" id="register-button">
-                                    <i class="bi bi-person-plus me-2"></i>Register Now
-                                </button>
-                            @else
-                                <button class="btn btn-secondary flex-fill" disabled>
-                                    <i class="bi bi-slash-circle me-2"></i>Registration Closed
-                                </button>
-                            @endif
-                            <button class="btn btn-outline-secondary" id="share-button">
-                                <i class="bi bi-share me-2"></i>Share
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 @endsection
