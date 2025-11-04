@@ -9,8 +9,8 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h3 class="page-title"><br>Edit Profile</h3>
-                                <p class="text-muted">Update your profile details below.</p>
+                                <h3 class="page-title"><br>Edit Personal Details</h3>
+                                <p class="text-muted">Update your personal details below.</p>
                             </div>
                         </div>
                     </div>
@@ -25,7 +25,7 @@
                 <div class="card-body justify-content-between">
                     {{-- makes content flexible row-pushes text left, icon right --}}
 
-                    <form action="{{ route('profile.update', $employee->employee_id) }}" method="POST"
+                    <form action="{{ route('profile.updatePersonal', $employee->employee_id) }}" method="POST"
                         enctype="multipart/form-data" novalidate>
                         @csrf
                         @method('PUT')

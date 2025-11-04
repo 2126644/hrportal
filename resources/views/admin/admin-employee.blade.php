@@ -262,11 +262,11 @@
                                     <td>
                                         <div class="btn-group">
                                             <button class="btn btn-sm btn-outline-primary"
-                                                onclick="window.location='{{ route('admin.dashboard', $employee->id) }}'">
+                                                onclick="window.location='{{ route('profile.editEmployment', $employee->employee_id) }}'">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-info"
-                                                onclick="window.location='{{ route('admin.dashboard', $employee->id) }}'">
+                                                onclick="window.location='{{ route('profile.show', $employee->employee_id) }}'">
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger">

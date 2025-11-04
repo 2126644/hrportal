@@ -82,10 +82,14 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/event/{id}', [EventController::class, 'update'])->name('event.update');
     Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
 
-    Route::get('/profile/show', [EmployeeController::class, 'show'])->name('profile.show');
+    Route::get('/profile/show/{employee?}', [EmployeeController::class, 'show'])->name('profile.show');
     Route::get('/profile/settings', [EmployeeController::class, 'settings'])->name('profile.settings');
-    Route::get('/profile/edit', [EmployeeController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/{employee}', [EmployeeController::class, 'update'])->name('profile.update');
+
+    Route::get('/profile/edit/personal/{employee}', [EmployeeController::class, 'editPersonal'])->name('profile.editPersonal');
+    Route::put('/profile/update/personal/{employee}', [EmployeeController::class, 'updatePersonal'])->name('profile.updatePersonal');
+
+    Route::get('/profile/edit/employment/{employee}', [EmployeeController::class, 'editEmployment'])->name('profile.editEmployment');
+    Route::put('/profile/update/employment/{employee}', [EmployeeController::class, 'updateEmployment'])->name('profile.updateEmployment');
 
 });
 

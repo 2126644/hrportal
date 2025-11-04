@@ -72,7 +72,7 @@
                         <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.settings') }}'">
                             <i class="bi bi-gear-fill me-2"></i>Profile Setting
                         </button>
-                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.edit', $employee->employee_id) }}'">
+                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
                             <i class="bi bi-pencil-square me-2"></i>Profile Edit
                         </button>
                     </div>

@@ -93,14 +93,23 @@ class EmployeeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function show(Employee $employee = null)
     {
-        $employee = Auth::user()->employee;
-
-        if (!$employee) {
-            return redirect()->route('dashboard')
-                ->with('error', 'Employee profile not found.');
+        // If no employee param provided, use the logged in user's employee
+        if (! $employee) {
+            $employee = Auth::user()->employee;
+            if (! $employee) {
+                abort(404);
+            }
         }
+
+        // Admin can view anyone; regular employee can only view their own profile
+        if (Auth::user()->role_id !== 2) {
+            if ($employee->employee_id != Auth::user()->employee->employee_id) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
+
         $employment = $employee->employment;
 
         return view('profile.show', compact('employee', 'employment'));
@@ -116,9 +125,15 @@ class EmployeeController extends Controller
         return view('profile.settings', compact('employee'));
     }
 
-    public function edit()
+    public function editPersonal(Employee $employee)
     {
-        $employee = Auth::user()->employee;
+        // Admin can view anyone; employee sees themselves
+        if (Auth::user()->role_id !== 2) {
+            // Ensure employee can only edit their own profile
+            if ($employee->employee_id != Auth::user()->employee->employee_id) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
 
         return view('profile.editprofile', compact('employee'));
     }
@@ -126,9 +141,14 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updatePersonal(Request $request, Employee $employee)
     {
-        $employee = Auth::user()->employee;
+        // Admin can update anyone; employee can only update themselves
+        if (Auth::user()->role_id !== 2) {
+            if ($employee->employee_id != Auth::user()->employee->employee_id) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
 
         $validated = $request->validate([
             'full_name'         => 'required|string|max:255',
@@ -143,18 +163,56 @@ class EmployeeController extends Controller
             'ic_number'         => 'required|string|max:20',
         ]);
 
-        // if ($request->hasFile('image')) {
-        //     $imagePath = $request->file('image')->store('events', 'public');
-        //     $validated['image'] = $imagePath;
-        // } else {
-        //     $validated['image'] = $employee->image; // keep old image if not replaced
-        // }
-
-        // Update employee
         $employee->update($validated);
+        return redirect()->route('profile.show', $employee->employee_id)->with('success', 'Profile updated successfully!');
+    }
 
-        return redirect()->route('profile.show', $employee->id)->with('success', 'Profile updated successfully!');
-    
+    public function editEmployment(Employee $employee)
+    {
+        // Only admin can edit employment details
+        if (Auth::user()->role_id !== 2) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $employment = $employee->employment ?? new Employment(['employee_id' => $employee->employee_id]);
+
+        return view('profile.editemployment', compact('employee', 'employment'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function updateEmployment(Request $request, Employee $employee)
+    {
+        // Only admin can update employment details
+        if (Auth::user()->role_id !== 2) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $employment = $employee->employment;
+
+        $validated = $request->validate([
+            'employee_id'        => 'required|exists:employees,employee_id',
+            'employment_type'    => 'required|string|max:100',
+            'employment_status'  => 'required|string|max:100',
+            'company_branch'     => 'required|string|max:100',
+            'report_to'          => 'nullable|exists:employees,employee_id',
+            'department'         => 'required|string|max:100',
+            'position'           => 'required|string|max:100',
+            'date_joined'       => 'required|date',
+            'probation_start'    => 'nullable|date',
+            'probation_end'      => 'nullable|date',
+            'suspended_start'    => 'nullable|date',
+            'suspended_end'      => 'nullable|date',
+            'resigned_date'      => 'nullable|date',
+            'termination_date'   => 'nullable|date',
+            'work_start_time'    => 'nullable|date_format:H:i',
+            'work_end_time'      => 'nullable|date_format:H:i',
+        ]);
+
+        $employment->update($validated);
+
+        return redirect()->route('profile.show', $employee->employee_id)->with('success', 'Employment details updated successfully!');
     }
 
     /**
