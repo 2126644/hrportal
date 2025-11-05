@@ -11,7 +11,7 @@
                                 <h3 class="page-title"><br>Admin Dashboard</h3>
                                 <p class="text-muted">Monitor team activities and system overview</p>
                             </div>
-                            <div class="datetime-punch">
+                            <div class="datetime-punch text-end">
                                 <div class="datetime-time" id="currentTime"></div>
                                 <div class="datetime-date" id="currentDate"></div>
                             </div>

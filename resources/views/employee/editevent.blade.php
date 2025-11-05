@@ -10,6 +10,13 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.event') }}">Events</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Edit Event</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Edit Event</h3>
                                 <p class="text-muted">Update the event details below.</p>
                             </div>

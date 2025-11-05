@@ -1,7 +1,6 @@
 @extends('layouts.master')
 
 @section('content')
-
     <div class="content container-fluid">
 
         <div class="page-header">
@@ -10,6 +9,14 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.task') }}">Tasks</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">New Task</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Tasks & Projects</h3>
                                 <p class="text-muted">Manage your tasks and track project progress.</p>
                             </div>
@@ -110,19 +117,19 @@
                                     <a href="{{ route('admin.task') }}" class="btn btn-secondary me-2">
                                         Cancel
                                     </a>
-                                    @elseif ($role_id == 3)
-                                        <a href="{{ route('employee.task') }}" class="btn btn-secondary me-2">
-                                            Cancel
-                                        </a>
-                                    @endif
-                                    <button type="submit" class="btn btn-primary">
-                                        Create Task
-                                    </button>
+                                @elseif ($role_id == 3)
+                                    <a href="{{ route('employee.task') }}" class="btn btn-secondary me-2">
+                                        Cancel
+                                    </a>
+                                @endif
+                                <button type="submit" class="btn btn-primary">
+                                    Create Task
+                                </button>
                             </div>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
-
     </div>
 @endsection

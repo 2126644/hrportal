@@ -3,18 +3,19 @@
 @section('content')
 
     <div class="content container-fluid">
-
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.event') }}">Events</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">New Event</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>New Event</h3>
                                 <p class="text-muted">Create a new event or program for the team.</p>
                             </div>

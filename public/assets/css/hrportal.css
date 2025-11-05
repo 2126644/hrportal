@@ -97,6 +97,29 @@ footer {
     color: var(--primary-color) !important;
 }
 
+.breadcrumb {
+    background: transparent;
+    margin-bottom: 0;
+    font-size: 0.5rem;
+}
+
+.breadcrumb-item a {
+    color: #6c757d; /* muted gray for normal state */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd; /* Bootstrap primary blue on hover */
+    text-decoration: underline;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #0d6efd;
+    font-weight: 500;
+}
+
 /* =============================
    SIDEBAR
 ============================= */
@@ -988,7 +1011,7 @@ footer {
 }
 
 .status-cancelled {
-    background-color:var(--danger-color);
+    background-color: var(--danger-color);
     color: white;
 }
 
@@ -1173,7 +1196,6 @@ footer {
    LAYOUT ADJUSTMENTS
 ============================= */
 
-
 .main-content {
     transition: margin-left 0.3s ease;
     margin-left: 250px;
@@ -1199,8 +1221,6 @@ body.sidebar-collapsed .main-content {
     padding-left: 1rem;
     padding-right: 1rem;
 }
-
-/* admin */
 
 /* Admin Dashboard Styles */
 .stat-card {

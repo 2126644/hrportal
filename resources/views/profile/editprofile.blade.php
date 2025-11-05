@@ -9,6 +9,13 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('profile.show') }}">Profile</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Edit Personal Details</h3>
                                 <p class="text-muted">Update your personal details below.</p>
                             </div>
@@ -78,7 +85,7 @@
 
                         <div class="row g-3 mb-3">
 
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                 <select id="gender" name="gender" class="form-select" required>
                                     <option value="" disabled {{ old('gender') ? '' : 'selected' }}>Select gender
@@ -97,10 +104,10 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-md-6">
                                 <label for="birthday" class="form-label">Birthday</label>
                                 <input type="date" id="birthday" name="birthday" class="form-control"
-                                    value="{{ old('birthday', $employee->birthday) }}">
+                                    value="{{ old('birthday', $employee->birthday?->format('Y-m-d')) }}">
                                 @error('birthday')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -182,4 +189,4 @@
             </div>
         </div>
     </div>
-    @endsection
+@endsection

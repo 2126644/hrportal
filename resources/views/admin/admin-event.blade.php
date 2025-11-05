@@ -3,16 +3,17 @@
 @section('content')
     <div class="content container-fluid">
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header w-100">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Events</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Events</h3>
                                 <p class="text-muted">Manage all events and schedule.</p>
                             </div>
@@ -71,7 +72,8 @@
                                 <span class="input-group-text">
                                     <i class="bi bi-search"></i>
                                 </span>
-                                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Name or tags...">
+                                <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                    placeholder="Name or tags...">
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -100,7 +102,8 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Date</label>
-                            <input type="date" name="event_date" value="{{ request('event_date') }}" class="form-control">
+                            <input type="date" name="event_date" value="{{ request('event_date') }}"
+                                class="form-control">
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
@@ -141,7 +144,8 @@
                                     @if ($event->rsvp_required)
                                         <span class="event-rsvp" title="RSVP Required">RSVP</span>
                                     @endif
-                                    <span class="event-status {{ $isPast ? 'event-status-past' : 'event-status-upcoming' }}">
+                                    <span
+                                        class="event-status {{ $isPast ? 'event-status-past' : 'event-status-upcoming' }}">
                                         {{ $isPast ? 'Past' : 'Upcoming' }}
                                     </span>
                                 </div>

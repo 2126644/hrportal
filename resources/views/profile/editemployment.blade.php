@@ -9,6 +9,13 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.employee') }}">Employees</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Edit Employment</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Edit Employment Details</h3>
                                 <p class="text-muted">Update employee's employment details below.</p>
                             </div>

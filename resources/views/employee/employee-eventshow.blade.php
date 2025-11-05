@@ -8,6 +8,13 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.event') }}">Events</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Show Event</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Events</h3>
                                 <p class="text-muted">Manage your events and view your schedule.</p>
                             </div>

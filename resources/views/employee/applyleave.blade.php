@@ -64,18 +64,19 @@
     </style>
 
     <div class="content container-fluid">
-
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.leave') }}">Leave</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Apply Leave</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Apply for Leave</h3>
                                 <p class="text-muted">Submit your leave request for supervisor approval.</p>
                             </div>

@@ -9,6 +9,12 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Profile</h3>
                                 <p class="text-muted">Manage your personal information and settings.</p>
                             </div>
@@ -23,7 +29,7 @@
         <!-- Top Two Cards - Equal Height -->
         <div class="row mb-4">
             <!-- Left Card - Profile Picture and Basic Info -->
-            <div class="col-lg-4 mb-4">
+            <div class="col-lg-5">
                 <div class="card h-100">
                     <div class="card-body text-center p-4">
                         <!-- Profile Picture -->
@@ -56,37 +62,38 @@
                             <div class="detail-row d-flex justify-content-between align-items-center mb-2">
                                 <span class="detail-label text-muted">Employee ID:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $employee->employee_id ?? 'EMP001' }}
+                                    {{ $employee->employee_id ?? '-' }}
                                 </span>
                             </div>
 
-                            <div class="detail-row d-flex justify-content-between align-items-center">
-                                <span class="detail-label text-muted">Date Joined:</span>
+                            <div class="detail-row d-flex justify-content-between align-items-center mb-2">
+                                <span class="detail-label text-muted">User ID:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $employment->date_joined ?? '-' }}
+                                    {{ $employment->user_id ?? '-' }}
+                                </span>
+                            </div>
+
+                            <div class="detail-row d-flex justify-content-between align-items-center mb-2">
+                                <span class="detail-label text-muted">Employment Status:</span>
+                                <span class="detail-value fw-semibold">
+                                    {{ $employment->employment_status ?? '-' }}
                                 </span>
                             </div>
                         </div>
-
-                        <!-- Edit Profile Button -->
-                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.settings') }}'">
-                            <i class="bi bi-gear-fill me-2"></i>Profile Setting
-                        </button>
-                        <button class="btn btn-primary w-100 mt-3" onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
-                            <i class="bi bi-pencil-square me-2"></i>Profile Edit
-                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Right Card - Contact Information -->
-            <div class="col-lg-8 mb-4">
+            <div class="col-lg-7">
                 <div class="card h-100">
                     <div class="card-body p-4">
-                        <h4 class="card-title mb-4 text-primary">Contact Information</h4>
+                        <h5 class="section-title mb-3 text-primary">
+                            <i class="bi bi-telephone-fill me-3"></i>Contact Information
+                        </h5>
 
                         <form class="row g-3">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label small fw-semibold text-muted">Full Name</label>
                                 <div class="contact-display d-flex align-items-center">
                                     <i class="bi bi-person text-muted me-2"></i>
@@ -97,7 +104,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label small fw-semibold text-muted">Email Address</label>
                                 <div class="contact-display d-flex align-items-center">
                                     <i class="bi bi-envelope text-muted me-2"></i>
@@ -107,7 +114,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label class="form-label small fw-semibold text-muted">Phone Number</label>
                                 <div class="contact-display d-flex align-items-center">
                                     <i class="bi bi-telephone text-muted me-2"></i>
@@ -117,26 +124,15 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label small fw-semibold text-muted">Department</label>
-                                <div class="contact-display d-flex align-items-center">
-                                    <i class="bi bi-buildings text-muted me-2"></i>
-                                    <span class="{{ empty($employment->department) ? 'text-muted fst-italic' : '' }}">
-                                        {{ $employment->department ?? 'Not assigned' }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="col-12">
+                            <div class="col-md-12">
                                 <label class="form-label small fw-semibold text-muted">Address</label>
                                 <div class="contact-display d-flex align-items-start">
-                                    <i class="bi bi-geo-alt text-muted me-2 mt-1"></i>
+                                    <i class="bi bi-geo-alt text-muted me-2"></i>
                                     <span class="{{ empty($employee->address) ? 'text-muted fst-italic' : '' }}">
                                         {{ $employee->address ?? 'Not provided' }}
                                     </span>
                                 </div>
                             </div>
-
                         </form>
                     </div>
                 </div>
@@ -144,36 +140,42 @@
         </div>
 
         <div class="container-fluid mt-4">
-            <!-- Tabs navigation -->
-            <ul class="nav nav-tabs" id="profileTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
-                        type="button" role="tab" aria-controls="details" aria-selected="true">
-                        <i class="bi bi-person-lines-fill me-2"></i>Details
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Tabs navigation -->
+                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal"
+                            type="button" role="tab" aria-controls="personal" aria-selected="true">
+                            Personal
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment"
+                            type="button" role="tab" aria-controls="employment" aria-selected="false">
+                            Employment
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary mt-3" onclick="window.location='{{ route('profile.settings') }}'">
+                        <i class="bi bi-gear-fill me-2"></i>Profile Setting
                     </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment"
-                        type="button" role="tab" aria-controls="employment" aria-selected="false">
-                        <i class="bi bi-briefcase me-2"></i>Employment
-                    </button>
-                </li>
-            </ul>
+                </div>
+            </div>
 
             <!-- Tabs content -->
             <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="profileTabsContent"
                 style="min-height: 500px;">
-                <!-- Details tab -->
-                <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-
-                    <!-- Personal Information Row -->
+                <!-- Personal tab -->
+                <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
                     <div class="row mb-4">
                         <div class="col-12">
                             <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-person-vcard me-2"></i>Personal Information
+                                <i class="bi bi-person-fill me-3"></i>Personal Information
                             </h5>
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Gender</div>
                                         <div
@@ -182,7 +184,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Birthday</div>
                                         <div
@@ -191,7 +193,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Marital Status</div>
                                         <div
@@ -200,18 +202,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Information Row -->
-                    <div class="row">
-                        <div class="col-12">
-                            <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-info-circle me-2"></i>Additional Information
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Nationality</div>
                                         <div
@@ -220,7 +211,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Emergency Contact</div>
                                         <div
@@ -229,7 +220,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-12">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">IC Number</div>
                                         <div
@@ -241,19 +232,24 @@
                             </div>
                         </div>
                     </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-primary"
+                            onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Details
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Employment Tab -->
                 <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
-
                     <!-- Employment Information Row -->
                     <div class="row mb-4">
                         <div class="col-12">
                             <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-person-vcard me-2"></i>Employment Information
+                                <i class="bi bi-briefcase-fill me-3"></i>Employment Information
                             </h5>
                             <div class="row g-3">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Employment Type</div>
                                         <div
@@ -262,16 +258,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
-                                        <div class="detail-label text-muted small">Employment Status</div>
+                                        <div class="detail-label text-muted small">Date Joined</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->employment_status) ? 'text-muted' : '' }}">
-                                            {{ $employee->employment_status ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employee->date_joined) ? 'text-muted' : '' }}">
+                                            {{ $employee->date_joined ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Company Branch</div>
                                         <div
@@ -280,7 +276,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Report To</div>
                                         <div
@@ -289,7 +285,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Department</div>
                                         <div
@@ -298,7 +294,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Position</div>
                                         <div
@@ -307,7 +303,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Work Start</div>
                                         <div
@@ -316,7 +312,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Work End</div>
                                         <div
@@ -333,19 +329,10 @@
                     <div class="row">
                         <div class="col-12">
                             <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-info-circle me-2"></i>Dates Information
+                                <i class="bi bi-calendar-fill me-3"></i>Dates Information
                             </h5>
                             <div class="row g-3">
-                                <div class="col-md-4">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Date Joined</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->date_joined) ? 'text-muted' : '' }}">
-                                            {{ $employee->date_joined ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Probation Start</div>
                                         <div
@@ -354,7 +341,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Probation End</div>
                                         <div
@@ -363,7 +350,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Suspended Start</div>
                                         <div
@@ -372,7 +359,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Suspended End</div>
                                         <div
@@ -381,7 +368,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Resigned Date</div>
                                         <div
@@ -390,7 +377,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Termination Date</div>
                                         <div

@@ -3,16 +3,17 @@
 @section('content')
     <div class="content container-fluid">
         <div class="page-header">
-            @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
             <div class="row">
                 <div class="col-sm-12">
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Attendance</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Attendance</h3>
                                 <p class="text-muted">Track all employee daily attendance and working hours.</p>
                             </div>

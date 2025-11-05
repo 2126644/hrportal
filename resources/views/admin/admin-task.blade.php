@@ -8,6 +8,12 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb mb-0">
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Tasks</li>
+                                    </ol>
+                                </nav>
                                 <h3 class="page-title"><br>Tasks & Projects</h3>
                                 <p class="text-muted">Manage your tasks and track project progress.</p>
                             </div>
