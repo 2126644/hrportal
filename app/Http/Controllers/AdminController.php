@@ -30,7 +30,7 @@ class AdminController extends Controller
         $pendingLeaves = Leave::where('status', 'pending')->count();
 
         // Active Tasks (tasks that are not completed)
-        $activeTasks = Task::whereIn('status', ['to-do', 'in-progress', 'in-review'])->count();
+        $activeTasks = Task::whereIn('task_status', ['to-do', 'in-progress', 'in-review'])->count();
 
         // Today's attendance breakdown
         $absentToday = $totalEmployees - $presentToday;

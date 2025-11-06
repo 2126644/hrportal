@@ -11,6 +11,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\ProjectController;
 use App\Models\Employee;
 
 // Home page
@@ -74,6 +75,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/task/{task}', [TaskController::class, 'update'])->name('task.update');
     // Route::delete('/task/{id}', [TaskController::class, 'destroy'])->name('task.destroy');
 
+    Route::get('/projects', [ProjectController::class, 'index'])->name('employee.project');
+    Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
+    Route::get('/project/create', [ProjectController::class, 'create'])->name('project.create');
+
     Route::get('/event', [EventController::class, 'index'])->name('employee.event');
     Route::post('/event', [EventController::class, 'store'])->name('event.store');
     Route::get('/event/create', [EventController::class, 'create'])->name('event.create');
@@ -106,6 +111,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/tasks', [TaskController::class, 'index'])->name('admin.task');
 
     Route::get('/admin/event', [EventController::class, 'index'])->name('admin.event');
+
+    Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.project');
 
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

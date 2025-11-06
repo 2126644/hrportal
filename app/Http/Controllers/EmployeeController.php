@@ -46,11 +46,11 @@ class EmployeeController extends Controller
         $todayAttendance = Attendance::where('employee_id', $employee->employee_id)->whereDate('date', Carbon::today())->first();
 
         // Task Summary Card
-        $taskRecords = Task::where('employee_id', $employee->employee_id)->get();
+        $taskRecords = Task::where('assigned_to', $employee->employee_id)->get();
 
-        $pendingTask = optional($taskRecords->whereIn('status', ['to-do', 'in-progress', 'in-review']))->count();
-        $completedTask  = $taskRecords->where('status', 'completed')->count();
-        $overdueTask = $taskRecords->where('status', '!=', 'completed')->where('due_date', '<', now())->count();
+        $pendingTask = optional($taskRecords->whereIn('task_status', ['to-do', 'in-progress', 'in-review']))->count();
+        $completedTask  = $taskRecords->where('task_status', 'completed')->count();
+        $overdueTask = $taskRecords->where('task_status', '!=', 'completed')->where('due_date', '<', now())->count();
 
         $task = [
             'pending_task' => $pendingTask,
@@ -58,9 +58,9 @@ class EmployeeController extends Controller
             'overdue_task' => $overdueTask
         ];
 
-        $tasksByStatus = Task::where('employee_id', $employee->employee_id)
+        $tasksByStatus = Task::where('assigned_to', $employee->employee_id)
             ->get()
-            ->groupBy('status');
+            ->groupBy('task_status');
 
         return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance', 'attendance', 'task', 'tasksByStatus'));
     }

@@ -57,7 +57,7 @@
                                             <i class="bi bi-circle-fill" style="font-size:0.5rem"></i>
                                         </span>
                                         <div>
-                                            <strong>{{ $task->title }}</strong><br>
+                                            <strong>{{ $task->task_name }}</strong><br>
                                             <small class="text-muted">
                                                 Due {{ optional($task->due_date)->format('d M Y h:i A') ?? '-' }}
                                             </small>

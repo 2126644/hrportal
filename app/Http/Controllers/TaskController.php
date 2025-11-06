@@ -12,30 +12,27 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // Show task summary for logged-in employee
     public function index(Request $request)
     {
         $user = Auth::user();
         $employee = $user->employee;
 
-        $query = Task::with('employee')->orderBy('created_at', 'desc');
+        $query = Task::orderBy('created_at', 'desc');
 
         // Only apply filters if the inputs exist
         if ($user->role_id === 2) {
             if ($request->filled('employee')) {
-                $query->whereHas('employee', function ($q) use ($request) {
-                    $q->where('full_name', 'like', '%' . $request->employee . '%')
-                        ->orWhere('employee_id', 'like', '%' . $request->employee . '%');
-                });
+                $query->where('assigned_to', 'like', '%' . $request->employee . '%')
+                    ->orWhere('assigned_by', 'like', '%' . $request->employee . '%');
             }
         } else {
-            $query->where('employee_id', $employee->employee_id);
+            $query->where('assigned_to', $employee->employee_id);
         }
 
-         if ($request->filled('title')) {
-            $query->where('title', 'like', '%' . $request->title . '%');
+        if ($request->filled('task_name')) {
+            $query->where('task_name', 'like', '%' . $request->task_name . '%');
         }
-        
+
         if ($request->filled('due_date')) {
             $query->where('due_date', $request->due_date);
         }
@@ -52,11 +49,11 @@ class TaskController extends Controller
         $tasks = $query->get();
 
         $totalTasks         = $tasks->count();
-        $toDoTasks          = $tasks->where('status', 'to-do')->count();
-        $inProgressTasks    = $tasks->where('status', 'in-progress')->count();
-        $inReviewTasks      = $tasks->where('status', 'in-review')->count();
-        $toReviewTasks      = $tasks->where('status', 'to-review')->count();
-        $completedTasks     = $tasks->where('status', 'completed')->count();
+        $toDoTasks          = $tasks->where('task_status', 'to-do')->count();
+        $inProgressTasks    = $tasks->where('task_status', 'in-progress')->count();
+        $inReviewTasks      = $tasks->where('task_status', 'in-review')->count();
+        $toReviewTasks      = $tasks->where('task_status', 'to-review')->count();
+        $completedTasks     = $tasks->where('task_status', 'completed')->count();
 
         $view = $user->role_id == 2 ? 'admin.admin-task' : 'employee.employee-task';
 
@@ -88,28 +85,28 @@ class TaskController extends Controller
         $employee = Auth::user()->employee;
 
         $request->validate([
-            'title'         => 'required|string|max:255',
-            'description'   => 'nullable|string',
+            'task_name'     => 'required|string|max:255',
+            'task_desc'     => 'nullable|string',
             'assigned_to'   => 'required|string|max:255',
             'assigned_by'   => 'required|string|max:255',
-            'status'        => 'required|in:to-do,in-progress,in-review,completed',
+            'task_status'   => 'required|in:to-do,in-progress,in-review,completed',
             'notes'         => 'nullable|string',
             'due_date'      => 'nullable|date',
         ]);
 
         $task = new Task();
-        $task->employee_id  = $employee->employee_id;
-        $task->title        = $request->title;
-        $task->description  = $request->description;
+        $task->created_by   = $employee->employee_id;
+        $task->task_name    = $request->task_name;
+        $task->task_desc    = $request->task_desc;
         $task->assigned_to  = $request->assigned_to;
         $task->assigned_by  = $employee->employee_id; // Assuming the assigner is the logged-in employee
-        $task->status       = $request->status;
+        $task->task_status  = $request->task_status;
         $task->notes        = $request->notes;
         $task->due_date     = $request->due_date;
 
         $task->save();
 
-        return redirect()->route('task.create')->with('success','Task created successfully!');
+        return redirect()->route('task.create')->with('success', 'Task created successfully!');
     }
 
     // Mark task as completed
@@ -142,12 +139,12 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-         $request->validate([
-            'status' => 'required|in:to-do,in-progress,in-review,completed',
+        $request->validate([
+            'task_status' => 'required|in:to-do,in-progress,in-review,completed',
             'due_date' => 'nullable|date',
         ]);
 
-        $task->status = $request->status;
+        $task->task_status = $request->task_status;
         $task->due_date = $request->due_date;
         $task->save();
 

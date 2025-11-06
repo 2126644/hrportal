@@ -5,21 +5,41 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="page-sub-header w-100">
+                    <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Tasks</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Tasks & Projects</h3>
-                                <p class="text-muted">Manage your tasks and track project progress.</p>
+                                <h3 class="page-title"><br>Tasks</h3>
+                                <p class="text-muted">Manage your tasks and track their progress.</p>
                             </div>
-                            <button class="btn-new" onclick="window.location='{{ route('task.create') }}'">
-                                New Tasks
-                            </button>
+                            <div class="d-flex gap-3">
+                                <div class="btn-group" role="group">
+                                    <button
+                                        class="btn btn-outline-primary {{ request()->routeIs('task.index') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('employee.task') }}'"
+                                        {{ request()->routeIs('employee.task') ? 'disabled' : '' }}>
+                                        Tasks
+                                    </button>
+
+                                    <button
+                                        class="btn btn-outline-primary {{ request()->routeIs('projects.index') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('employee.project') }}'"
+                                        {{ request()->routeIs('employee.project') ? 'disabled' : '' }}>
+                                        Projects
+                                    </button>
+                                </div>
+
+                                <!-- New Task Button -->
+                                <button class="btn-new" onclick="window.location='{{ route('task.create') }}'">
+                                    New Task
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -78,7 +98,7 @@
                 <div class="card-body">
                     <i class="bi bi-bell-fill"></i>
                     <div class="card-title">To-Review</div>
-                    <span class="stat-number to-review">{{ $completedTasks }}</span>
+                    <span class="stat-number to-review">{{ $inReviewTasks }}</span>
                 </div>
             </div>
         </div>
@@ -103,15 +123,15 @@
                     <h4 class="card-title mb-3 ">Tasks</h4>
 
                     @forelse ($tasks as $task)
-                        <div class="card task-item mb-3" data-status="{{ $task->status }}" data-bs-toggle="modal"
+                        <div class="card task-item mb-3" data-status="{{ $task->task_status }}" data-bs-toggle="modal"
                             data-bs-target="#taskModal{{ $task->id }}" style="cursor:pointer;">
                             <div class="card-body">
                                 <div class="row">
                                     <!-- Left side: Task details -->
                                     <div class="col-md-8">
-                                        <h5 class="fw-bold mb-2 text-dark">{{ $task->title }}</h5>
+                                        <h5 class="fw-bold mb-2 text-dark">{{ $task->task_name }}</h5>
 
-                                        <p class="text-muted mb-3">{{ $task->description }}</p>
+                                        <p class="text-muted mb-3">{{ $task->task_desc }}</p>
 
                                         <div class="task-meta">
                                             <div class="mb-1">
@@ -142,7 +162,7 @@
                                     <!-- Right side: Status & Due date -->
                                     <div class="col-md-4 text-md-end">
                                         <!-- Status Badge -->
-                                        @switch($task->status)
+                                        @switch($task->task_status)
                                             @case('to-do')
                                                 <span class="badge bg-danger mb-3">To-Do</span>
                                             @break
@@ -197,12 +217,12 @@
                             <div class="modal-body">
                                 <table class="table table-sm">
                                     <tr>
-                                        <th>Task Title</th>
-                                        <td>{{ $task->title }}</td>
+                                        <th>Task Name</th>
+                                        <td>{{ $task->task_name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Description</th>
-                                        <td>{{ $task->description }}</td>
+                                        <td>{{ $task->task_desc }}</td>
                                     </tr>
                                     <tr>
                                         <th>Assigned to</th>
@@ -219,31 +239,32 @@
                                     <tr>
                                         <th>Status</th>
                                         <td>
-                                            <select id="status" name="status" class="form-select" required>
-                                                <option value="" disabled {{ !$task->status ? 'selected' : '' }}>Select
+                                            <select id="task_status" name="task_status" class="form-select" required>
+                                                <option value="" disabled {{ !$task->task_status ? 'selected' : '' }}>
+                                                    Select
                                                     Status</option>
 
                                                 <option value="to-do"
-                                                    {{ old('status', $task->status) === 'to-do' ? 'selected' : '' }}>
+                                                    {{ old('task_status', $task->task_status) === 'to-do' ? 'selected' : '' }}>
                                                     To-Do
                                                 </option>
 
                                                 <option value="in-progress"
-                                                    {{ old('status', $task->status) === 'in-progress' ? 'selected' : '' }}>
+                                                    {{ old('task_status', $task->task_status) === 'in-progress' ? 'selected' : '' }}>
                                                     In-Progress
                                                 </option>
 
                                                 <option value="in-review"
-                                                    {{ old('status', $task->status) === 'in-review' ? 'selected' : '' }}>
+                                                    {{ old('task_status', $task->task_status) === 'in-review' ? 'selected' : '' }}>
                                                     In-Review
                                                 </option>
 
                                                 <option value="completed"
-                                                    {{ old('status', $task->status) === 'completed' ? 'selected' : '' }}>
+                                                    {{ old('task_status', $task->task_status) === 'completed' ? 'selected' : '' }}>
                                                     Completed
                                                 </option>
                                             </select>
-                                            @error('status')
+                                            @error('task_status')
                                                 <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </td>

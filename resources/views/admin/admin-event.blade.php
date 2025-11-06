@@ -27,7 +27,6 @@
         </div>
     </div>
 
-
     <div class="container-fluid mt-4">
         <!-- Tabs navigation -->
         <ul class="nav nav-tabs" id="eventTabs" role="tablist">

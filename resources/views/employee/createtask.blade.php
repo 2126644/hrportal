@@ -17,8 +17,8 @@
                                         <li class="breadcrumb-item active" aria-current="page">New Task</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Tasks & Projects</h3>
-                                <p class="text-muted">Manage your tasks and track project progress.</p>
+                                <h3 class="page-title"><br>New Task</h3>
+                                <p class="text-muted">Create new task.</p>
                             </div>
                         </div>
                     </div>
@@ -37,18 +37,18 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
-                            <input type="text" id="title" name="title" class="form-control"
-                                placeholder="Name the task" value="{{ old('title') }}" required>
-                            @error('title')
+                            <label for="task_name" class="form-label">Task Name <span class="text-danger">*</span></label>
+                            <input type="text" id="task_name" name="task_name" class="form-control"
+                                placeholder="Name the task" value="{{ old('task_name') }}" required>
+                            @error('task_name')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea id="description" name="description" rows="3" class="form-control" placeholder="Describe the task">{{ old('description') }}</textarea>
-                            @error('description')
+                            <label for="task_desc" class="form-label">Description</label>
+                            <textarea id="task_desc" name="task_desc" rows="3" class="form-control" placeholder="Describe the task">{{ old('task_desc') }}</textarea>
+                            @error('task_desc')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -80,17 +80,18 @@
                                 <label for="status" class="form-label">Task Status <span
                                         class="text-danger">*</span></label>
                                 <select id="status"name="status" class="form-select" required>
-                                    <option value="" disabled {{ old('status') ? '' : 'selected' }}>Select Status
-                                    </option>
-                                    <option value="to-do" {{ old('status') === 'to-do' ? 'selected' : '' }}>To-Do</option>
-                                    <option value="in-progress" {{ old('status') === 'in-progress' ? 'selected' : '' }}>
+                                    <option value="" disabled {{ old('task_status') ? '' : 'selected' }}>
+                                        Select Status</option>
+                                    <option value="to-do" {{ old('task_status') === 'to-do' ? 'selected' : '' }}>
+                                        To-Do</option>
+                                    <option value="in-progress" {{ old('task_status') === 'in-progress' ? 'selected' : '' }}>
                                         In-Progress</option>
-                                    <option value="in-review" {{ old('status') === 'in-review' ? 'selected' : '' }}>
+                                    <option value="in-review" {{ old('task_status') === 'in-review' ? 'selected' : '' }}>
                                         In-Review</option>
-                                    <option value="completed" {{ old('status') === 'completed' ? 'selected' : '' }}>
+                                    <option value="completed" {{ old('task_status') === 'completed' ? 'selected' : '' }}>
                                         Completed</option>
                                 </select>
-                                @error('status')
+                                @error('task_status')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>

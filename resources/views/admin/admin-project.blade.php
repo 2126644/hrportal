@@ -12,11 +12,11 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Tasks</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Projects</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Tasks</h3>
-                                <p class="text-muted">Manage your tasks and track their progress.</p>
+                                <h3 class="page-title"><br>Projects</h3>
+                                <p class="text-muted">Manage your projects and track their progress.</p>
                             </div>
                             <div class="d-flex gap-3">
                                 <div class="btn-group" role="group">
@@ -35,9 +35,9 @@
                                     </button>
                                 </div>
 
-                                <!-- New Task Button -->
-                                <button class="btn-new" onclick="window.location='{{ route('task.create') }}'">
-                                    New Task
+                                <!-- New Project Button -->
+                                <button class="d-flex btn-new" onclick="window.location='{{ route('project.create') }}'">
+                                    New Project
                                 </button>
                             </div>
                         </div>
@@ -48,68 +48,57 @@
     </div>
 
     <div class="row">
-        <!-- Total Tasks -->
-        <div class="col-12 col-md-2 mb-4">
+        <!-- Total Projects -->
+        <div class="col-12 col-md-3 mb-4">
             <div class="card filter-card active" data-status="all">
                 <div class="card-body">
                     <i class="bi bi-list-task"></i>
-                    <div class="card-title">Total Tasks</div>
-                    <span class="stat-number total">{{ $totalTasks }}</span>
+                    <div class="card-title">Total Projects</div>
+                    <span class="stat-number total">{{ $totalProjects }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- To-Do Tasks -->
-        <div class="col-12 col-md-2 mb-4">
-            <div class="card filter-card" data-status="to-do">
+        <!-- Not Started Projects -->
+        <div class="col-12 col-md-3 mb-4">
+            <div class="card filter-card" data-status="not-started">
                 <div class="card-body">
                     <i class="bi bi-circle"></i>
-                    <div class="card-title">To-Do</div>
-                    <span class="stat-number to-do">{{ $toDoTasks }}</span>
+                    <div class="card-title">Not Started</div>
+                    <span class="stat-number not-started">{{ $notStartedProjects }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- In-Progress Tasks -->
+        <!-- In-Progress Projects -->
         <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="in-progress">
                 <div class="card-body">
                     <i class="bi bi-arrow-repeat"></i>
                     <div class="card-title">In Progress</div>
-                    <span class="stat-number in-progress">{{ $inProgressTasks }}</span>
+                    <span class="stat-number in-progress">{{ $inProgressProjects }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- In-Review Tasks -->
+        <!-- On Hold Projects -->
         <div class="col-12 col-md-2 mb-4">
-            <div class="card filter-card" data-status="in-review">
+            <div class="card filter-card" data-status="on-hold">
                 <div class="card-body">
                     <i class="bi bi-eye-fill"></i>
-                    <div class="card-title">In Review</div>
-                    <span class="stat-number in-review">{{ $inReviewTasks }}</span>
+                    <div class="card-title">On Hold</div>
+                    <span class="stat-number on-hold">{{ $onHoldProjects }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- To-Review Tasks -->
-        <div class="col-12 col-md-2 mb-4">
-            <div class="card filter-card" data-status="to-review">
-                <div class="card-body">
-                    <i class="bi bi-bell-fill"></i>
-                    <div class="card-title">To-Review</div>
-                    <span class="stat-number to-review">{{ $inReviewTasks }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Completed Tasks -->
+        <!-- Completed Projects -->
         <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="completed">
                 <div class="card-body">
                     <i class="bi bi-check-circle-fill"></i>
                     <div class="card-title">Completed</div>
-                    <span class="stat-number completed">{{ $completedTasks }}</span>
+                    <span class="stat-number completed">{{ $completedProjects }}</span>
                 </div>
             </div>
         </div>
@@ -118,61 +107,50 @@
 
     <div class="row">
         <div class="col-12">
-            <div class="card" id="tasksCard">
+            <div class="card" id="projectsCard">
                 <div class="card-body">
-                    <h4 class="card-title mb-3 ">Tasks</h4>
+                    <h4 class="card-title mb-3 ">Projects</h4>
 
-                    @forelse ($tasks as $task)
-                        <div class="card task-item mb-3" data-status="{{ $task->task_status }}" data-bs-toggle="modal"
-                            data-bs-target="#taskModal{{ $task->id }}" style="cursor:pointer;">
+                    @forelse ($projects as $project)
+                        <div class="card project-item mb-3" data-status="{{ $project->project_status }}"
+                            data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
+                            style="cursor:pointer;">
                             <div class="card-body">
                                 <div class="row">
-                                    <!-- Left side: Task details -->
+                                    <!-- Left side: Project details -->
                                     <div class="col-md-8">
-                                        <h5 class="fw-bold mb-2 text-dark">{{ $task->task_name }}</h5>
+                                        <h5 class="fw-bold mb-2 text-dark">{{ $project->project_name }}</h5>
 
-                                        <p class="text-muted mb-3">{{ $task->task_desc }}</p>
+                                        <p class="text-muted mb-3">{{ $project->project_desc }}</p>
 
                                         <div class="task-meta">
                                             <div class="mb-1">
                                                 <i class="bi bi-person-fill me-1 text-secondary"></i>
-                                                <strong>Assigned To:</strong> {{ $task->assigned_to }}
+                                                <strong>Created By:</strong> {{ $project->created_by }}
                                             </div>
-
-                                            <div class="mb-1">
-                                                <i class="bi bi-person-badge-fill me-1 text-secondary"></i>
-                                                <strong>Assigned By:</strong> {{ $task->assigned_by }}
-                                            </div>
-
-                                            @if ($task->notes)
-                                                <div class="mb-2">
-                                                    <i class="bi bi-stickies-fill me-1 text-secondary"></i>
-                                                    <strong>Notes:</strong> {{ $task->notes }}
-                                                </div>
-                                            @endif
                                         </div>
 
                                         <small class="text-muted">
                                             <i class="bi bi-clock-history me-1"></i>
-                                            Created: {{ $task->created_at->format('d M Y') }} |
-                                            Updated: {{ $task->updated_at->format('d M Y') }}
+                                            Created: {{ $project->created_at->format('d M Y') }} |
+                                            Updated: {{ $project->updated_at->format('d M Y') }}
                                         </small>
                                     </div>
 
                                     <!-- Right side: Status & Due date -->
                                     <div class="col-md-4 text-md-end">
                                         <!-- Status Badge -->
-                                        @switch($task->task_status)
-                                            @case('to-do')
-                                                <span class="badge bg-danger mb-3">To-Do</span>
+                                        @switch($project->project_status)
+                                            @case('not-started')
+                                                <span class="badge bg-danger mb-3">Not-Started</span>
                                             @break
 
                                             @case('in-progress')
                                                 <span class="badge bg-warning text-dark mb-3">In-Progress</span>
                                             @break
 
-                                            @case('in-review')
-                                                <span class="badge bg-primary mb-3">In-Review</span>
+                                            @case('on-hold')
+                                                <span class="badge bg-primary mb-3">On-Hold</span>
                                             @break
 
                                             @case('completed')
@@ -180,19 +158,22 @@
                                             @break
                                         @endswitch
 
-                                        <!-- Due Date -->
-                                        <div class="due-date">
+                                        <div class="start-date">
                                             <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                            <strong>Due:</strong> {{ $task->due_date }}
+                                            <strong>Start:</strong> {{ $project->start_date }}
+                                        </div>
+                                        <div class="end-date">
+                                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                                            <strong>End:</strong> {{ $project->end_date }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         @empty
-                            <div class="text-center py-4 text-muted no-tasks-static">
+                            <div class="text-center py-4 text-muted no-projects-static">
                                 <i class="bi bi-inbox display-6 mb-2"></i>
-                                <p class="mb-0">No tasks found</p>
+                                <p class="mb-0">No projects found</p>
                             </div>
                         @endforelse
                     </div>
@@ -200,81 +181,73 @@
             </div>
         </div>
 
-        {{-- Update/edit task modal --}}
-        @foreach ($tasks as $task)
-            <div class="modal fade" id="taskModal{{ $task->id }}" tabindex="-1" aria-hidden="true">
+        {{-- Update/edit project modal --}}
+        @foreach ($projects as $project)
+            <div class="modal fade" id="projectModal{{ $project->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <form action="{{ route('task.update', $task->id) }}" method="POST">
+                        <form action="{{ route('task.update', $project->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
                             <div class="modal-header">
-                                <h5 class="modal-title">Task Details</h5>
+                                <h5 class="modal-title">Project Details</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
                             <div class="modal-body">
                                 <table class="table table-sm">
                                     <tr>
-                                        <th>Task Name</th>
-                                        <td>{{ $task->task_name }}</td>
+                                        <th>Project Name</th>
+                                        <td>{{ $project->project_name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Description</th>
-                                        <td>{{ $task->task_desc }}</td>
+                                        <td>{{ $project->project_desc }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Assigned to</th>
-                                        <td>{{ $task->assigned_to }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Assigned by</th>
-                                        <td>{{ $task->assigned_by }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Notes</th>
-                                        <td>{{ $task->notes }}</td>
+                                        <th>Created by</th>
+                                        <td>{{ $project->created_by }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status</th>
                                         <td>
-                                            <select id="task_status" name="task_status" class="form-select" required>
-                                                <option value="" disabled {{ !$task->task_status ? 'selected' : '' }}>
-                                                    Select
+                                            <select id="project_status" name="project_status" class="form-select" required>
+                                                <option value="" disabled
+                                                    {{ !$project->project_status ? 'selected' : '' }}>Select
                                                     Status</option>
 
-                                                <option value="to-do"
-                                                    {{ old('task_status', $task->task_status) === 'to-do' ? 'selected' : '' }}>
-                                                    To-Do
+                                                <option value="not-started"
+                                                    {{ old('project_status', $project->project_status) === 'not-started' ? 'selected' : '' }}>
+                                                    Not Started
                                                 </option>
 
                                                 <option value="in-progress"
-                                                    {{ old('task_status', $task->task_status) === 'in-progress' ? 'selected' : '' }}>
+                                                    {{ old('project_status', $project->project_status) === 'in-progress' ? 'selected' : '' }}>
                                                     In-Progress
                                                 </option>
 
-                                                <option value="in-review"
-                                                    {{ old('task_status', $task->task_status) === 'in-review' ? 'selected' : '' }}>
-                                                    In-Review
+                                                <option value="on-hold"
+                                                    {{ old('project_status', $project->project_status) === 'on-hold' ? 'selected' : '' }}>
+                                                    On-Hold
                                                 </option>
 
                                                 <option value="completed"
-                                                    {{ old('task_status', $task->task_status) === 'completed' ? 'selected' : '' }}>
+                                                    {{ old('project_status', $project->project_status) === 'completed' ? 'selected' : '' }}>
                                                     Completed
                                                 </option>
                                             </select>
-                                            @error('task_status')
+                                            @error('project_status')
                                                 <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Due Date</th>
+                                        <th>End Date</th>
                                         <td>
-                                            <input type="date" name="due_date" class="form-control"
-                                                value="{{ old('due_date', $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('Y-m-d') : '') }}">
-                                            @error('due_date')
+                                            <input type="date" name="end_date" class="form-control"
+                                                value="{{ old('end_date', $project->end_date ? \Carbon\Carbon::parse($project->end_date)->format('Y-m-d') : '') }}">
+                                            @error('end_date')
                                                 <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </td>
@@ -304,15 +277,16 @@
                     let visibleCount = 0;
 
                     // Hide all existing static messages first
-                    document.querySelectorAll('#tasksCard .task-item, #tasksCard .no-tasks-static').forEach(
-                        item => {
-                            if (item.classList.contains('no-tasks-static')) {
-                                item.style.display = 'none';
-                            }
-                        });
+                    document.querySelectorAll('#projectsCard .project-item, #projectsCard .no-projects-static')
+                        .forEach(
+                            item => {
+                                if (item.classList.contains('no-projects-static')) {
+                                    item.style.display = 'none';
+                                }
+                            });
 
-                    // Show/hide task items based on filter
-                    document.querySelectorAll('#tasksCard .task-item').forEach(item => {
+                    // Show/hide project items based on filter
+                    document.querySelectorAll('#projectsCard .project-item').forEach(item => {
                         if (status === 'all' || item.dataset.status === status) {
                             item.style.display = '';
                             visibleCount++;
@@ -321,35 +295,35 @@
                         }
                     });
 
-                    // Handle the no tasks message
-                    const existingStaticMsg = document.querySelector('#tasksCard .no-tasks-static');
-                    let noTasksMessage = document.getElementById('noTasksMessage');
+                    // Handle the no projects message
+                    const existingStaticMsg = document.querySelector('#projectsCard .no-projects-static');
+                    let noProjectsMessage = document.getElementById('noProjectsMessage');
 
                     // Remove existing dynamic message if it exists
-                    if (noTasksMessage) {
-                        noTasksMessage.remove();
+                    if (noProjectsMessage) {
+                        noProjectsMessage.remove();
                     }
 
-                    // If no tasks are visible, show appropriate message
+                    // If no projects are visible, show appropriate message
                     if (visibleCount === 0) {
                         // If there's already a static message (from Blade), show it and update text
                         if (existingStaticMsg) {
                             existingStaticMsg.style.display = '';
                             existingStaticMsg.querySelector('p').textContent =
-                                `No ${getTaskStatusText(status).toLowerCase()} tasks found`;
+                                `No ${getProjectStatusText(status).toLowerCase()} projects found`;
                         } else {
                             // Create new dynamic message
-                            noTasksMessage = document.createElement('div');
-                            noTasksMessage.id = 'noTasksMessage';
-                            noTasksMessage.className = 'text-center py-4 text-muted no-tasks-dynamic';
-                            noTasksMessage.innerHTML = `
+                            noProjectsMessage = document.createElement('div');
+                            noProjectsMessage.id = 'noProjectsMessage';
+                            noProjectsMessage.className = 'text-center py-4 text-muted no-projects-dynamic';
+                            noProjectsMessage.innerHTML = `
                     <i class="bi bi-inbox display-6 mb-2"></i>
-                    <p class="mb-0">No ${getTaskStatusText(status).toLowerCase()} tasks found</p>
+                    <p class="mb-0">No ${getProjectStatusText(status).toLowerCase()} projects found</p>
                 `;
-                            document.querySelector('#tasksCard .card-body').appendChild(noTasksMessage);
+                            document.querySelector('#projectsCard .card-body').appendChild(noProjectsMessage);
                         }
                     } else {
-                        // Hide static message if tasks are visible
+                        // Hide static message if projects are visible
                         if (existingStaticMsg) {
                             existingStaticMsg.style.display = 'none';
                         }
@@ -357,12 +331,12 @@
                 });
             });
 
-            function getTaskStatusText(status) {
+            function getProjectStatusText(status) {
                 const statusMap = {
                     'all': 'all',
-                    'to-do': 'to-do',
+                    'not-started': 'not started',
                     'in-progress': 'in progress',
-                    'in-review': 'in review',
+                    'on-hold': 'on hold',
                     'completed': 'completed'
                 };
                 return statusMap[status] || status;
