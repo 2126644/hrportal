@@ -4,12 +4,6 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Employee;
-use App\Models\Task;
-use App\Models\Leave;
-use App\Models\Attendance;
-use App\Models\Event;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,15 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed fixed roles first (so the foreign key in users->role_id is valid)
-        $this->call(RoleSeeder::class);
-
-        // safely create the dependent tables: tasks, leaves, attendance, events
         $this->call([
+            RoleSeeder::class, // Seed fixed roles first (so the FK in users->role_id is valid)
             AdminSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class,
             EmploymentSeeder::class,
+            ProjectSeeder::class, // Seed project first
             TaskSeeder::class,
             AttendanceSeeder::class,
             EventSeeder::class,

@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->string('employee_id')->nullable();  // add foreign key column
-            $table->string('title');
-            $table->text('description')->nullable();
+            $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();   // add foreign key column
+            $table->string('created_by')->nullable();  // add foreign key column
+            $table->string('task_name');
+            $table->text('task_desc')->nullable();
             $table->string('assigned_to')->nullable();
             $table->string('assigned_by')->nullable();
-            $table->enum('status', ['to-do', 'in-progress', 'in-review','completed'])->default('to-do');
+            $table->enum('task_status', ['to-do', 'in-progress', 'in-review','to-review', 'completed'])->default('to-do');
             $table->text('notes')->nullable();
             $table->date('due_date')->nullable();
 
-            $table->foreign('employee_id')->references('employee_id')->on('employees')->nullOnDelete();   
+            $table->foreign('created_by')->references('employee_id')->on('employees')->nullOnDelete();
             $table->foreign('assigned_to')->references('employee_id')->on('employees')->nullOnDelete();
             $table->foreign('assigned_by')->references('employee_id')->on('employees')->nullOnDelete();
 
