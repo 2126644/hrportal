@@ -11,7 +11,7 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.event') }}">Events</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
                                         <li class="breadcrumb-item active" aria-current="page">Show Event</li>
                                     </ol>
                                 </nav>

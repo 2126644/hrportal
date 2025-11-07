@@ -62,7 +62,7 @@
             <!-- Events tab -->
             <div class="tab-pane fade" id="event" role="tabpanel" aria-labelledby="event-tab">
                 <!-- Filters and Search -->
-                <form method="GET" action="{{ route('admin.event') }}">
+                <form method="GET" action="{{ route('event.index.admin') }}">
                     <input type="hidden" name="tab" id="activeTabInput" value="event">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-4">
@@ -110,7 +110,7 @@
                             </button>
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
-                            <a href="{{ route('admin.event') }}" class="btn btn-secondary w-100">
+                            <a href="{{ route('event.index.admin') }}" class="btn btn-secondary w-100">
                                 <i class="bi bi-arrow-clockwise me-2"></i>Reset
                             </a>
                         </div>

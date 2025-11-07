@@ -13,7 +13,7 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.task') }}">Tasks</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('task.index.employee') }}">Tasks</a></li>
                                         <li class="breadcrumb-item active" aria-current="page">New Task</li>
                                     </ol>
                                 </nav>
@@ -115,11 +115,11 @@
 
                             <div class="d-flex justify-content-end">
                                 @if ($role_id == 2)
-                                    <a href="{{ route('admin.task') }}" class="btn btn-secondary me-2">
+                                    <a href="{{ route('task.index.admin') }}" class="btn btn-secondary me-2">
                                         Cancel
                                     </a>
                                 @elseif ($role_id == 3)
-                                    <a href="{{ route('employee.task') }}" class="btn btn-secondary me-2">
+                                    <a href="{{ route('task.index.employee') }}" class="btn btn-secondary me-2">
                                         Cancel
                                     </a>
                                 @endif

@@ -1,7 +1,6 @@
 @extends('layouts.master')
 
 @section('content')
-
     <div class="content container-fluid">
         <div class="page-header">
             <div class="row">
@@ -12,7 +11,11 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.event') }}">Events</a></li>
+                                        @if ($role_id == 2)
+                                            <li class="breadcrumb-item"><a href="{{ route('event.index.admin') }}">Events</a></li>
+                                        @elseif ($role_id == 3)
+                                            <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
+                                        @endif
                                         <li class="breadcrumb-item active" aria-current="page">New Event</li>
                                     </ol>
                                 </nav>
@@ -194,11 +197,11 @@
 
                         <div class="d-flex justify-content-end">
                             @if ($role_id == 2)
-                                <a href="{{ route('admin.event') }}" class="btn btn-secondary me-2">
+                                <a href="{{ route('event.index.admin') }}" class="btn btn-secondary me-2">
                                     Cancel
                                 </a>
                             @elseif ($role_id == 3)
-                                <a href="{{ route('employee.event') }}" class="btn btn-secondary me-2">
+                                <a href="{{ route('event.index.employee') }}" class="btn btn-secondary me-2">
                                     Cancel
                                 </a>
                             @endif

@@ -99,7 +99,7 @@
 
                             <div class="d-flex justify-content-end">
                                 @if ($role_id == 2)
-                                    <a href="{{ route('admin.project') }}" class="btn btn-secondary me-2">
+                                    <a href="{{ route('project.index.admin') }}" class="btn btn-secondary me-2">
                                         Cancel
                                     </a>
                                 @elseif ($role_id == 3)

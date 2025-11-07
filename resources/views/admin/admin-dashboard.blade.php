@@ -136,10 +136,10 @@
                             <a href="{{ route('admin.attendance') }}" class="btn btn-outline-primary text-start">
                                 <i class="bi bi-clock-history me-2"></i>View Attendance
                             </a>
-                            <a href="{{ route('admin.leave') }}" class="btn btn-outline-primary text-start">
+                            <a href="{{ route('leave.index.admin') }}" class="btn btn-outline-primary text-start">
                                 <i class="bi bi-calendar-check me-2"></i>Leave Requests
                             </a>
-                            <a href="{{ route('admin.task') }}" class="btn btn-outline-primary text-start">
+                            <a href="{{ route('task.index.admin') }}" class="btn btn-outline-primary text-start">
                                 <i class="bi bi-list-task me-2"></i>Manage Tasks
                             </a>
                         </div>

@@ -64,7 +64,7 @@ class EventController extends Controller
     public function create()
     {
         $role_id = Auth::user()->role_id;
-        return view('employee.newevent', compact('role_id'));
+        return view('employee.createevent', compact('role_id'));
     }
 
     /**
@@ -138,7 +138,8 @@ class EventController extends Controller
     public function edit(string $id)
     {
         $event = Event::findOrFail($id);
-        return view('employee.editevent', compact('event'));
+        $role_id = Auth::user()->role_id;
+        return view('employee.editevent', compact('event', 'role_id'));
     }
 
     /**

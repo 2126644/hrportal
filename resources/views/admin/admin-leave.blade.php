@@ -59,7 +59,7 @@
             <!-- Leave Application tab -->
             <div class="tab-pane fade" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
                 <!-- Filters and Search -->
-                <form method="GET" action="{{ route('admin.leave') }}">
+                <form method="GET" action="{{ route('leave.index.admin') }}">
                     <input type="hidden" name="tab" id="activeTabInput" value="leave-application">
                     <div class="row g-3 align-items-end">
                         @if (auth()->user()->role_id === 2)
@@ -103,7 +103,7 @@
                             </button>
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
-                            <a href="{{ route('admin.leave') }}" class="btn btn-secondary w-100">
+                            <a href="{{ route('leave.index.admin') }}" class="btn btn-secondary w-100">
                                 <i class="bi bi-arrow-clockwise me-2"></i>Reset
                             </a>
                         </div>
@@ -229,7 +229,7 @@
             <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
                 <div class="card-title">Leave Report</div>
 
-                <form method="GET" action="{{ route('admin.leave') }}" class="mb-3">
+                <form method="GET" action="{{ route('leave.index.admin') }}" class="mb-3">
                     <input type="hidden" name="tab" id="activeTabInput" value="leave-report">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
@@ -262,7 +262,7 @@
                         </div>
 
                         <div class="col-md-2">
-                            <a href="{{ route('admin.leave', ['year' => $selectedYear, 'full_name' => $selectedEmployeeName]) }}"
+                            <a href="{{ route('leave.index.admin', ['year' => $selectedYear, 'full_name' => $selectedEmployeeName]) }}"
                                 class="btn btn-success w-100">
                                 <i class="bi bi-file-earmark-excel"></i> Export to Excel
                             </a>

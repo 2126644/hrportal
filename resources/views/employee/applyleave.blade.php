@@ -73,7 +73,7 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.leave') }}">Leave</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('leave.index.employee') }}">Leave</a></li>
                                         <li class="breadcrumb-item active" aria-current="page">Apply Leave</li>
                                     </ol>
                                 </nav>

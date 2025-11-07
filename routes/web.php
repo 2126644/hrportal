@@ -51,6 +51,8 @@ Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->nam
 Route::middleware(['auth'])->group(function () {
     Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
 
+    // Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
+
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
@@ -58,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
     // Route::post('/attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
     Route::put('/attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
     
-    Route::get('/leave', [LeaveController::class, 'index'])->name('employee.leave');
+    Route::get('/leave', [LeaveController::class, 'index'])->name('leave.index.employee');
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
     Route::get('/leave/apply', [LeaveController::class, 'create'])->name('leave.create');
     // Route::get('/leave/{id}', [LeaveController::class, 'show'])->name('leave.show');
@@ -67,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     // Route::delete('/leave/{id}', [LeaveController::class, 'destroy'])->name('leave.destroy');
     Route::get('/leave/report', [LeaveController::class, 'export'])->name('leave.export');
 
-    Route::get('/tasks', [TaskController::class, 'index'])->name('employee.task');
+    Route::get('/tasks', [TaskController::class, 'index'])->name('task.index.employee');
     Route::post('/task', [TaskController::class, 'store'])->name('task.store');
     Route::get('/task/create', [TaskController::class, 'create'])->name('task.create');
     // Route::get('/task/{id}', [TaskController::class, 'show'])->name('task.show');
@@ -79,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
     Route::get('/project/create', [ProjectController::class, 'create'])->name('project.create');
 
-    Route::get('/event', [EventController::class, 'index'])->name('employee.event');
+    Route::get('/event', [EventController::class, 'index'])->name('event.index.employee');
     Route::post('/event', [EventController::class, 'store'])->name('event.store');
     Route::get('/event/create', [EventController::class, 'create'])->name('event.create');
     Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
@@ -102,17 +104,19 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
 
+    // Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.admin');
+
     Route::get('/admin/employee', [AdminController::class, 'employee'])->name('admin.employee');
 
     Route::get('/admin/attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
 
-    Route::get('/admin/leave', [LeaveController::class, 'index'])->name('admin.leave');
+    Route::get('/admin/leave', [LeaveController::class, 'index'])->name('leave.index.admin');
 
-    Route::get('/admin/tasks', [TaskController::class, 'index'])->name('admin.task');
+    Route::get('/admin/tasks', [TaskController::class, 'index'])->name('task.index.admin');
 
-    Route::get('/admin/event', [EventController::class, 'index'])->name('admin.event');
+    Route::get('/admin/event', [EventController::class, 'index'])->name('event.index.admin');
 
-    Route::get('/admin/projects', [ProjectController::class, 'index'])->name('admin.project');
+    Route::get('/admin/projects', [ProjectController::class, 'index'])->name('project.index.admin');
 
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

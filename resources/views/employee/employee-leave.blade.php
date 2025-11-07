@@ -163,7 +163,7 @@
             <div class="tab-pane fade" id="leave-report" role="tabpanel" aria-labelledby="leave-report-tab">
                 <div class="card-title">Leave Report</div>
 
-                <form method="GET" action="{{ route('employee.leave') }}" class="mb-3">
+                <form method="GET" action="{{ route('leave.index.employee') }}" class="mb-3">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-3">
                             <label for="year" class="form-label">Year</label>

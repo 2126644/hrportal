@@ -13,8 +13,12 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.event') }}">Events</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">Edit Event</li>
+                                        @if ($role_id == 2)
+                                            <li class="breadcrumb-item"><a href="{{ route('event.index.admin') }}">Events</a></li>
+                                        @elseif ($role_id == 3)
+                                            <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
+                                        @endif
+                                        <li class="breadcrumb-item active" aria-current="page">New Event</li>
                                     </ol>
                                 </nav>
                                 <h3 class="page-title"><br>Edit Event</h3>

@@ -35,8 +35,8 @@
                         <!-- Profile Picture -->
                         <div class="profile-pic mb-4">
                             <div class="profile-avatar position-relative mx-auto">
-                                @if ($employee->profile_pic)
-                                    <img src="{{ asset('storage/' . $employee->profile_pic) }}"
+                                @if ($employee->user && $employee->user->profile_photo_path)
+                                    <img src="{{ asset('storage/' . $employee->user->profile_photo_path) }}"
                                         alt="{{ $employee->full_name }}" class="rounded-circle img-fluid"
                                         style="width: 120px; height: 120px; object-fit: cover;">
                                 @else

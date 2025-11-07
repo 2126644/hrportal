@@ -21,16 +21,16 @@
                             <div class="d-flex gap-3">
                                 <div class="btn-group" role="group">
                                     <button
-                                        class="btn btn-outline-primary {{ request()->routeIs('task.index') ? 'active disabled' : '' }}"
-                                        onclick="window.location='{{ route('admin.task') }}'"
-                                        {{ request()->routeIs('admin.task') ? 'disabled' : '' }}>
+                                        class="btn btn-outline-primary {{ request()->routeIs('task.index.admin') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('task.index.admin') }}'"
+                                        {{ request()->routeIs('task.index.admin') ? 'disabled' : '' }}>
                                         Tasks
                                     </button>
 
                                     <button
-                                        class="btn btn-outline-primary {{ request()->routeIs('projects.index') ? 'active disabled' : '' }}"
-                                        onclick="window.location='{{ route('admin.project') }}'"
-                                        {{ request()->routeIs('admin.project') ? 'disabled' : '' }}>
+                                        class="btn btn-outline-primary {{ request()->routeIs('project.index.admin') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('project.index.admin') }}'"
+                                        {{ request()->routeIs('project.index.admin') ? 'disabled' : '' }}>
                                         Projects
                                     </button>
                                 </div>

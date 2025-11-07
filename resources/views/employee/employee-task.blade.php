@@ -21,9 +21,9 @@
                             <div class="d-flex gap-3">
                                 <div class="btn-group" role="group">
                                     <button
-                                        class="btn btn-outline-primary {{ request()->routeIs('task.index') ? 'active disabled' : '' }}"
-                                        onclick="window.location='{{ route('employee.task') }}'"
-                                        {{ request()->routeIs('employee.task') ? 'disabled' : '' }}>
+                                        class="btn btn-outline-primary {{ request()->routeIs('task.index.employee') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('task.index.employee') }}'"
+                                        {{ request()->routeIs('task.index.employee') ? 'disabled' : '' }}>
                                         Tasks
                                     </button>
 

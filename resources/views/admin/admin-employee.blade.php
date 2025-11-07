@@ -17,9 +17,6 @@
                                 <h3 class="page-title"><br>Employee Management</h3>
                                 <p class="text-muted">Manage your team members and their information</p>
                             </div>
-                            <button class="btn-new" onclick="window.location='{{ route('admin.employee') }}'">
-                                <i class="bi bi-person-plus me-2"></i>Add Employee
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -217,8 +214,8 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-sm me-3">
-                                                @if ($employee->profile_pic)
-                                                    <img src="{{ asset('storage/' . $employee->profile_pic) }}"
+                                                @if ($employee->user && $employee->user->profile_photo_path)
+                                                    <img src="{{ asset('storage/' . $employee->user->profile_photo_path) }}"
                                                         alt="{{ $employee->full_name }}" class="rounded-circle"
                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
