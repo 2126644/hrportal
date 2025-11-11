@@ -10,7 +10,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Attendance</li>
                                     </ol>
                                 </nav>
@@ -75,10 +76,11 @@
                                 <i class="bi bi-check-circle-fill me-1"></i>You have punched out for today.
                             </span>
                         @endif
+                        <button class="btn btn-punch" id="timeSlipBtn">
+                            <i class="bi bi-receipt me-1"></i> Request Time Slip
+                        </button>
                     </div>
-
                 </div>
-
             </div>
         </div>
 
@@ -216,6 +218,54 @@
                                         <td>
                                             @if ($attendance->status_time_out === 'Early Leave')
                                                 <textarea name="early_leave_reason" class="form-control" rows="1">{{ $attendance->early_leave_reason }}</textarea>
+                                            @else
+                                                <span class="text-muted fst-italic">Not Applicable</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div id="timeSlipModalContainer">
+        @foreach ($attendances as $attendance)
+            <div class="modal fade" id="timeSlipModal{{ $attendance->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">Time Slip Request ({{ $attendance->date }})</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <th>Time Slip Start</th>
+                                        <td>{{ $attendance->time_slip_start }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Time Slip End</th>
+                                        <td>{{ $attendance->time_slip_end }}</td>
+
+                                    <tr>
+                                        <th>Time Slip Reason</th>
+                                        <td>
+                                            @if ($attendance->time_slip_reason)
+                                                <textarea name="time_slip_reason" class="form-control" rows="1">{{ $attendance->time_slip_reason }}</textarea>
                                             @else
                                                 <span class="text-muted fst-italic">Not Applicable</span>
                                             @endif

@@ -23,10 +23,13 @@ return new class extends Migration
             $table->string('late_reason')->nullable();
             $table->string('early_leave_reason')->nullable();
             $table->enum('status', ['on-site', 'off-site', 'leave'])->default('on-site');
+            $table->time('time_slip_start')->nullable();
+            $table->time('time_slip_end')->nullable();
+            $table->string('time_slip_reason')->nullable();
+            $table->enum('time_slip_status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->timestamps();
 
             $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  
-            
-            $table->timestamps();
         });
     }
 

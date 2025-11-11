@@ -36,6 +36,10 @@ class AttendanceFactory extends Factory
             ? ($timeOut->lt(Carbon::instance($date)->setTime(17, 30)) ? 'Early Leave' : 'On Time')
             : null;
 
+        $hasTimeSlip = $this->faker->boolean(30); // 30% chance to have a slip
+        $timeSlipStart = $hasTimeSlip ? Carbon::instance($date)->setTime(14, 0) : null;
+        $timeSlipEnd = $hasTimeSlip ? Carbon::instance($date)->setTime(15, 0) : null;
+
         return [
             // Randomly decide if the employee is present, absent, or on leave
             'employee_id'        => Employee::inRandomOrder()->value('employee_id'),
@@ -48,6 +52,9 @@ class AttendanceFactory extends Factory
             'status_time_out'    => $statusTimeOut,
             'late_reason'        => fake()->optional()->sentence(),
             'early_leave_reason' => fake()->optional()->sentence(),
+            'time_slip_start'    => $timeSlipStart?->toTimeString(),
+            'time_slip_end'      => $timeSlipEnd?->toTimeString(),
+            'time_slip_reason'   => $hasTimeSlip ? $this->faker->sentence() : null,
         ];
     }
 }

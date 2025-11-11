@@ -299,4 +299,59 @@ class AttendanceController extends Controller
     {
         //
     }
+
+    public function requestTimeSlip(Request $request)
+    {
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        $request->validate([
+            'time_slip_start' => 'required|date_format:H:i',
+            'time_slip_end'   => 'required|date_format:H:i|after:time_slip_start',
+            'time_slip_reason' => 'required|string|max:255',
+        ]);
+
+        // Limit max duration to 2 hours
+        $start = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_start);
+        $end = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_end);
+        if ($end->diffInMinutes($start) > 120) {
+            return redirect()->back()->withErrors(['time_slip_end' => 'Time slip cannot exceed 2 hours']);
+        }
+
+        $todayAttendance = Attendance::firstOrCreate(
+            ['employee_id' => $employee->employee_id, 'date' => now()->toDateString()]
+        );
+
+        $todayAttendance->update([
+            'time_slip_start' => $request->time_slip_start,
+            'time_slip_end' => $request->time_slip_end,
+            'time_slip_reason' => $request->time_slip_reason,
+            'time_slip_status' => 'pending',
+        ]);
+
+        return redirect()->back()->with('success', 'Time slip requested successfully.');
+    }
+
+    public function approveTimeSlip(Attendance $attendance)
+    {
+        $attendance->update(['time_slip_status' => 'approved']);
+        return redirect()->back()->with('success', 'Time slip approved.');
+    }
+
+    public function rejectTimeSlip(Attendance $attendance)
+    {
+        $attendance->update(['time_slip_status' => 'rejected']);
+        return redirect()->back()->with('success', 'Time slip rejected.');
+    }
+
+    public function pendingTimeSlips()
+    {
+        $pendingTimeSlips = Attendance::with('employee')
+            ->whereNotNull('time_slip_start')
+            ->where('time_slip_status', 'pending')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        return view('admin.pending-time-slips', compact('pendingTimeSlips'));
+    }
 }

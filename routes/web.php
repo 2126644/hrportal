@@ -12,6 +12,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\AnnouncementController;
+
 use App\Models\Employee;
 
 // Home page
@@ -117,6 +119,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/event', [EventController::class, 'index'])->name('event.index.admin');
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('project.index.admin');
+
+    Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
 
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });
