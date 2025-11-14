@@ -7,9 +7,11 @@ use App\Models\Event;
 use App\Models\Attendance;
 use App\Models\Task;
 use App\Models\Leave;
+use App\Models\Announcement;
 use Carbon\Carbon;
 use App\Models\Employment;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\LeaveEntitlement;
@@ -64,6 +66,50 @@ class AdminController extends Controller
         // Recent Activities (last 10 activities across different models)
         $recentActivities = $this->getRecentActivities();
 
+        // recent announcements (latest 5)
+        $announcements = Announcement::orderBy('created_at', 'desc')->take(5)->get();
+
+        // ✅ Fetch latest Time Slip requests
+        $timeSlips = Attendance::with('employee')
+            ->whereNotNull('time_slip_start')
+            ->whereIn('time_slip_status', ['pending', 'approved', 'rejected'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'id' => $item->id,
+                    'employee' => $item->employee->full_name ?? 'Unknown',
+                    'type' => 'Time Slip',
+                    // 'date' => $item->date->format('d-m-Y'),
+                    'duration' => $item->time_slip_start->format('h:i A') . ' - ' . $item->time_slip_end->format('h:i A'),
+                    'status' => $item->time_slip_status,
+                    'submitted_date' => $item->created_at->diffForHumans(),
+                    'is_time_slip' => true,
+                ];
+            });
+
+        // ✅ Fetch latest Leave requests
+        $leaves = Leave::with('employee')
+            ->whereIn('status', ['pending', 'approved', 'rejected'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'id' => $item->id,
+                    'employee' => $item->employee->full_name ?? 'Unknown',
+                    'type' => ucfirst($item->leave_type) . ' Leave',
+                    'duration' => Carbon::parse($item->start_date)->format('d-m-Y') . ' - ' . Carbon::parse($item->end_date)->format('d-m-Y'),
+                    'status' => $item->status,
+                    'submitted_date' => $item->created_at->diffForHumans(),
+                    'is_time_slip' => false,
+                ];
+            });
+
+        // ✅ Merge both & sort by submission time
+        $recentRequests = $timeSlips->merge($leaves)->sortByDesc('submitted_date')->take(5);
+
         return view('admin.admin-dashboard', compact(
             'totalEmployees',
             'presentToday',
@@ -72,8 +118,16 @@ class AdminController extends Controller
             'absentToday',
             'recentActivities',
             'allEmployees',
-            'todayAttendance'
+            'todayAttendance',
+            'recentRequests',
+            'announcements',
+            'recentRequests'
         ));
+    }
+
+    public function showDashboardForLoggedInAdmin()
+    {
+        return $this->dashboard();
     }
 
     private function getRecentActivities()
@@ -119,9 +173,49 @@ class AdminController extends Controller
         return array_slice($activities, 0, 8);
     }
 
-    public function showDashboardForLoggedInAdmin()
+    public function approvals()
     {
-        return $this->dashboard();
+        // --- Time Slip Requests ---
+        $timeSlips = Attendance::with('employee')
+            ->whereNotNull('time_slip_start')
+            ->whereIn('time_slip_status', ['pending', 'approved', 'rejected'])
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'id' => $item->id,
+                    'employee' => $item->employee->full_name ?? 'Unknown',
+                    'type' => 'Time Slip',
+                    'date' => Carbon::parse($item->date)->format('M d, Y'),
+                    'duration' => $item->time_slip_start . ' - ' . $item->time_slip_end,
+                    'reason' => $item->time_slip_reason,
+                    'status' => $item->time_slip_status,
+                    'created_at' => $item->created_at->diffForHumans(),
+                ];
+            });
+
+        // --- Leave Requests ---
+        $leaves = Leave::with('employee')
+            ->whereIn('status', ['pending', 'approved', 'rejected'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'id' => $item->id,
+                    'employee' => $item->employee->full_name ?? 'Unknown',
+                    'type' => ucfirst($item->leave_type) . ' Leave',
+                    'date' => Carbon::parse($item->start_date)->format('M d, Y') . ' - ' . Carbon::parse($item->end_date)->format('M d, Y'),
+                    'duration' => $item->total_days . ' days',
+                    'reason' => $item->reason,
+                    'status' => $item->status,
+                    'created_at' => $item->created_at->diffForHumans(),
+                ];
+            });
+
+        // --- Merge both ---
+        $requests = $timeSlips->merge($leaves)->sortByDesc('created_at');
+
+        return view('admin.approvals', compact('requests'));
     }
 
     public function employee(Request $request)
@@ -164,8 +258,8 @@ class AdminController extends Controller
             });
         }
 
-        // Sort and paginate
-        $employees = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Sort and paginate by name A-Z
+        $employees = $query->orderBy('full_name')->paginate(10);
 
         $totalEmployees = Employee::count();
         $activeToday = Attendance::whereDate('date', Carbon::today())->distinct('employee_id')->count();

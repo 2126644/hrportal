@@ -72,8 +72,10 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('leave.index.employee') }}">Leave</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                                        </li>
+                                        <li class="breadcrumb-item"><a href="{{ route('leave.index.employee') }}">Leave</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Apply Leave</li>
                                     </ol>
                                 </nav>
@@ -100,15 +102,12 @@
                         <div class="mb-3">
                             <label for="leave_type" class="form-label">Leave Type <span class="text-danger">*</span></label>
                             <select id="leave_type" name="leave_type" class="form-select" required>
-                                <option value="" disabled {{ old('leave_type') ? '' : 'selected' }}>Select Type
-                                </option>
-                                <option value="annual" {{ old('leave_type') === 'annual' ? 'selected' : '' }}>Annual Leave
-                                </option>
-                                <option value="sick" {{ old('leave_type') === 'sick' ? 'selected' : '' }}>Sick Leave
-                                </option>
-                                <option value="emergency" {{ old('leave_type') === 'emergency' ? 'selected' : '' }}>
-                                    Emergency Leave
-                                </option>
+                                <option value="" disabled selected>Select Type</option>
+                                @foreach ($leaveTypeEnum as $type)
+                                    <option value="{{ $type }}" {{ old('leave_type') == $type ? 'selected' : '' }}>
+                                        {{ ucfirst($type) }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('leave_type')
                                 <div class="text-danger small">{{ $message }}</div>
@@ -116,15 +115,14 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="leave_length" class="form-label">Leave Length <span
-                                    class="text-danger">*</span></label>
+                            <label for="leave_length" class="form-label">Leave Length <span class="text-danger">*</span></label>
                             <select id="leave_length" name="leave_length" class="form-select" required>
-                                <option value="" disabled {{ old('leave_length') ? '' : 'selected' }}>Select Length
-                                </option>
-                                <option value="full_day" {{ old('leave_length') === 'full_day' ? 'selected' : '' }}>Full Day
-                                </option>
-                                <option value="AM" {{ old('leave_length') === 'AM' ? 'selected' : '' }}>AM</option>
-                                <option value="PM" {{ old('leave_length') === 'PM' ? 'selected' : '' }}>PM</option>
+                                <option value="" disabled selected>Select Length</option>
+                                @foreach ($leaveLengthEnum as $length)
+                                    <option value="{{ $length }}" {{ old('leave_length') == $length ? 'selected' : '' }}>
+                                        {{ ucfirst(str_replace('_', ' ', $length)) }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('leave_length')
                                 <div class="text-danger small">{{ $message }}</div>

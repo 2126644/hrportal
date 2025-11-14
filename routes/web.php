@@ -100,6 +100,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit/employment/{employee}', [EmployeeController::class, 'editEmployment'])->name('profile.editEmployment');
     Route::put('/profile/update/employment/{employee}', [EmployeeController::class, 'updateEmployment'])->name('profile.updateEmployment');
 
+    Route::post('/attendance/time-slip', [AttendanceController::class, 'requestTimeSlip'])->name('attendance.time-slip');
+
+
 });
 
 //Route for admin
@@ -122,5 +125,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
 
+    Route::get('/admin/approvals', [AdminController::class, 'approvals'])->name('admin.approvals');   
+    
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

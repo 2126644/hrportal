@@ -418,6 +418,30 @@ footer {
     background-color: #f8f9fa;
     border-radius: 6px;
 }
+/* ----------- */
+.request-stat-card {
+    padding: 1rem 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.request-stat-card:hover {
+    background-color: #f8f9fa;
+}
+
+.request-item,
+.announcement-item {
+    transition: background-color 0.2s ease;
+}
+
+.hover-bg:hover {
+    background-color: #f8f9fa;
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+}
 
 @media (max-width: 768px) {
     .events-grid {
@@ -655,7 +679,7 @@ footer {
 }
 .filter-card[data-status="completed"] i {
     color: var(--success-color);
-} 
+}
 
 .stat-number {
     font-size: 1.5rem;
@@ -775,7 +799,7 @@ footer {
 }
 .filter-card[data-status="completed"] i {
     color: var(--success-color);
-} 
+}
 
 .stat-number.total {
     color: #3498db;

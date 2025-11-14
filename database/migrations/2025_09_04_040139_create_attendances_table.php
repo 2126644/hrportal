@@ -26,7 +26,7 @@ return new class extends Migration
             $table->time('time_slip_start')->nullable();
             $table->time('time_slip_end')->nullable();
             $table->string('time_slip_reason')->nullable();
-            $table->enum('time_slip_status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('time_slip_status', ['pending', 'approved', 'rejected'])->nullable();
             $table->timestamps();
 
             $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  

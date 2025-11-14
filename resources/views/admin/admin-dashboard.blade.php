@@ -96,67 +96,146 @@
             </div>
         </div>
 
-        <!-- Main Content Grid -->
+        <!-- Leave/Time Slip Requests & Announcements Section -->
         <div class="row">
+            <!-- Leave/Time Slip Requests -->
             <div class="col-12 col-md-8 mb-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">System Status</h5>
+                        <h5 class="card-title mb-0">Leave/Time Slip Requests</h5>
                     </div>
                     <div class="card-body">
-                        <div class="system-status">
-                            <div class="status-item d-flex justify-content-between align-items-center mb-2">
-                                <span>Database</span>
-                                <span class="badge bg-success">Online</span>
+                        <!-- Pending Requests Summary -->
+                        <div class="row text-center mb-4">
+                            <div class="col-4">
+                                <div class="request-stat-card"
+                                    onclick="window.location.href='{{ route('leave.index.admin') }}?status=pending'"
+                                    style="cursor: pointer;">
+                                    <h4 class="text-warning">{{ $pendingRequests ?? 5 }}</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div>
                             </div>
-                            <div class="status-item d-flex justify-content-between align-items-center mb-2">
-                                <span>Active Users</span>
-                                <span class="text-muted">{{ $totalEmployees }}</span>
+                            <div class="col-4">
+                                <div class="request-stat-card"
+                                    onclick="window.location.href='{{ route('leave.index.admin') }}?status=approved'"
+                                    style="cursor: pointer;">
+                                    <h4 class="text-success">{{ $approvedRequests ?? 12 }}</h4>
+                                    <small class="text-muted">Approved</small>
+                                </div>
                             </div>
-                            <div class="status-item d-flex justify-content-between align-items-center">
-                                <span>Last Update</span>
-                                <span class="text-muted">{{ now()->format('M j, g:i A') }}</span>
+                            <div class="col-4">
+                                <div class="request-stat-card"
+                                    onclick="window.location.href='{{ route('leave.index.admin') }}?status=rejected'"
+                                    style="cursor: pointer;">
+                                    <h4 class="text-danger">{{ $rejectedRequests ?? 3 }}</h4>
+                                    <small class="text-muted">Rejected</small>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Recent Requests List -->
+                        <h6 class="mb-3">Recent Requests</h6>
+                        <div class="request-list">
+                            @forelse($recentRequests as $request)
+                                <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
+                                    onclick="window.location.href='{{ route('admin.approvals') }}'"
+                                    style="cursor: pointer; border-radius: 8px;">
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="avatar-sm bg-light rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ $request->employee }}</strong>
+                                            <div class="text-muted small">
+                                                {{ $request->type }} — {{ $request->submitted_date }}
+                                                @if ($request->is_time_slip)
+                                                    <span class="badge bg-info ms-1">Time Slip</span>
+                                                @else
+                                                    <span class="badge bg-primary ms-1">Leave</span>
+                                                @endif
+                                            </div>
+                                            <small class="text-muted">{{ $request->duration }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span
+                                            class="badge 
+                                            @if ($request->status == 'pending') bg-warning 
+                                            @elseif($request->status == 'approved') bg-success 
+                                            @else bg-danger @endif">
+                                            {{ ucfirst($request->status) }}
+                                        </span>
+                                        <div class="text-muted small mt-1">{{ $request->submitted_date }}</div>
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-muted small">No recent requests found.</p>
+                            @endforelse
+                        </div>
+
+                        <!-- View All Link -->
+                        <div class="text-center mt-3">
+                            <a href="{{ route('leave.index.admin') }}" class="btn btn-outline-primary btn-sm">
+                                View All Requests <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
+            <!-- Announcements -->
             <div class="col-12 col-md-4 mb-4">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Quick Actions</h5>
+                        <h5 class="card-title mb-0">Announcements</h5>
                     </div>
                     <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="{{ route('admin.employee') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-people me-2"></i>Manage Employees
-                            </a>
-                            <a href="{{ route('admin.attendance') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-clock-history me-2"></i>View Attendance
-                            </a>
-                            <a href="{{ route('leave.index.admin') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-calendar-check me-2"></i>Leave Requests
-                            </a>
-                            <a href="{{ route('task.index.admin') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-list-task me-2"></i>Manage Tasks
-                            </a>
+                        <!-- Announcements List -->
+                        <div class="announcement-list mb-4">
+                            @forelse($announcements as $announcement)
+                                <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="mb-0">{{ $announcement->title }}</h6>
+                                        <span
+                                            class="badge 
+                                            @if ($announcement->priority == 'high') bg-danger 
+                                            @elseif($announcement->priority == 'medium') bg-warning 
+                                            @else bg-info @endif">
+                                            {{ ucfirst($announcement->priority) }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted mb-1 small">{{ Str::limit($announcement->content, 80) }}</p>
+                                    <small
+                                        class="text-muted">{{ $announcement->created_at->format('M j, g:i A') }}</small>
+                                </div>
+                            @empty
+                                <!-- Sample announcements for demonstration -->
+                                <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="mb-0">Office Closure</h6>
+                                        <span class="badge bg-danger">High</span>
+                                    </div>
+                                    <p class="text-muted mb-1 small">The office will be closed on September 4th for Labor
+                                        Day.</p>
+                                    <small class="text-muted">Aug 10, 2023</small>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="row">
-            <!-- Today's Attendance - Fixed -->
+            <!-- Today's Attendance -->
             <div class="col-12 col-md-8 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Today's Attendance</h5>
                         <div class="text-end">
                             <div class="text-muted small">{{ \Carbon\Carbon::today()->format('l') }}</div>
-                            <div class="text-primary fw-semibold">{{ \Carbon\Carbon::today()->format('F j, Y') }}</div>
+                            <div class="text-primary fw-semibold">
+                                {{ \Carbon\Carbon::today()->format('F j, Y') }}</div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -230,7 +309,7 @@
                         <h5 class="card-title mb-0">Recent Activities</h5>
                     </div>
                     <div class="card-body">
-                        <div class="activity-timeline" style="max-height: 300px; overflow-y: auto;">
+                        <div class="activity-timeline">
                             @forelse($recentActivities as $activity)
                                 <div class="activity-item d-flex mb-3">
                                     <div class="activity-icon me-3">
@@ -252,7 +331,57 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="row">
+            <div class="col-12 col-md-8 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">System Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="system-status">
+                            <div class="status-item d-flex justify-content-between align-items-center mb-2">
+                                <span>Database</span>
+                                <span class="badge bg-success">Online</span>
+                            </div>
+                            <div class="status-item d-flex justify-content-between align-items-center mb-2">
+                                <span>Active Users</span>
+                                <span class="text-muted">{{ $totalEmployees }}</span>
+                            </div>
+                            <div class="status-item d-flex justify-content-between align-items-center">
+                                <span>Last Update</span>
+                                <span class="text-muted">{{ now()->format('M j, g:i A') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="col-12 col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ route('admin.employee') }}" class="btn btn-outline-primary text-start">
+                                <i class="bi bi-people me-2"></i>Manage Employees
+                            </a>
+                            <a href="{{ route('admin.attendance') }}" class="btn btn-outline-primary text-start">
+                                <i class="bi bi-clock-history me-2"></i>View Attendance
+                            </a>
+                            <a href="{{ route('leave.index.admin') }}" class="btn btn-outline-primary text-start">
+                                <i class="bi bi-calendar-check me-2"></i>Leave Requests
+                            </a>
+                            <a href="{{ route('task.index.admin') }}" class="btn btn-outline-primary text-start">
+                                <i class="bi bi-list-task me-2"></i>Manage Tasks
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -378,5 +507,32 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make request items clickable
+            document.querySelectorAll('.request-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    // Navigation is handled by onclick attribute
+                });
+            });
+
+            // Update date and time
+            function updateDateTime() {
+                const now = new Date();
+                const dateOptions = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+
+                document.getElementById('currentDate').textContent = now.toLocaleDateString(undefined, dateOptions);
+                document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
     </script>
 @endsection

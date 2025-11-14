@@ -27,7 +27,7 @@
 
     <div class="row">
         <!-- Total Requests -->
-        <div class="col-12 col-md-4 mb-4">
+        <div class="col-12 col-md-3 mb-4">
             <div class="card">
                 <div class="card-body">
                     {{-- makes content flexible row-pushes text left, icon right --}}
@@ -49,14 +49,16 @@
                             <i class="bi bi-box-arrow-in-right me-2"></i>
                             Time In:
                             <span class="text-primary" id="timeInDisplay">
-                                {{ $todayAttendance?->time_in ?? '—' }}
+                                {{ $todayAttendance?->time_in?->format('h:i:s A') ?? '—' }}
+                                {{-- the model attributes are Carbon instances, echoing them directly uses Carbon’s default string (which includes date + time). 
+                                format explicitly in Blade: use ->format(...) or ->toDateString() and null-safe operator --}}
                             </span>
                         </h5>
                         <h5>
                             <i class="bi bi-box-arrow-right me-2"></i>
                             Time Out:
                             <span class="text-primary" id="timeOutDisplay">
-                                {{ $todayAttendance?->time_out ?? '—' }}
+                                {{ $todayAttendance?->time_out?->format('h:i:s A') ?? '—' }}
                             </span>
                         </h5>
 
@@ -64,19 +66,19 @@
 
                     <div id="punchContainer">
                         @if (!$todayAttendance)
-                            <button class="btn btn-punch" id="punchInBtn">
+                            <button class="btn btn-punch mb-2" id="punchInBtn">
                                 <i class="bi bi-hand-index-thumb me-1"></i> Punch In
                             </button>
                         @elseif ($todayAttendance && !$todayAttendance->time_out)
-                            <button class="btn btn-punch" id="punchOutBtn">
+                            <button class="btn btn-punch mb-2" id="punchOutBtn">
                                 <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
                             </button>
                         @else
-                            <span class="text-success mt-3">
+                            <span class="text-success mb-2 d-block">
                                 <i class="bi bi-check-circle-fill me-1"></i>You have punched out for today.
                             </span>
                         @endif
-                        <button class="btn btn-punch" id="timeSlipBtn">
+                        <button class="btn btn-punch" data-bs-toggle="modal" data-bs-target="#timeSlipModal">
                             <i class="bi bi-receipt me-1"></i> Request Time Slip
                         </button>
                     </div>
@@ -85,7 +87,7 @@
         </div>
 
         <!-- Attendance History -->
-        <div class="col-12 col-md-8 mb-4">
+        <div class="col-12 col-md-9 mb-4">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -107,15 +109,17 @@
                                     <th>Time-Out</th>
                                     <th>Status Time-Out</th>
                                     <th>Status</th>
+                                    <th>Time Slip</th>
+                                    <th>Time Slip Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="attendanceHistoryTable">
                                 @foreach ($attendances as $attendance)
                                     <tr>
-                                        <td>{{ $attendance->date }}</td>
+                                        <td>{{ $attendance->date?->format('d-m-Y') ?? '—' }}</td>
 
-                                        <td>{{ $attendance->time_in }}</td>
+                                        <td>{{ $attendance->time_in?->format('h:i:s A') ?? '-' }}</td>
 
                                         {{-- Status Time In with color --}}
                                         <td>
@@ -126,7 +130,7 @@
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->time_out }}</td>
+                                        <td>{{ $attendance->time_out?->format('h:i:s A') ?? '-' }}</td>
 
                                         {{-- Status Time Out with color --}}
                                         <td>
@@ -138,6 +142,28 @@
                                         </td>
 
                                         <td>{{ $attendance->status }}</td>
+
+                                        <td>
+                                            @if ($attendance->time_slip_start && $attendance->time_slip_end)
+                                                {{ $attendance->time_slip_start }} - {{ $attendance->time_slip_end }}
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
+
+                                        <td>
+                                            @if ($attendance->time_slip_status)
+                                                @if ($attendance->time_slip_status === 'pending')
+                                                    <span class="badge bg-warning">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @elseif ($attendance->ime_slip_status === 'rejected')
+                                                    <span class="badge bg-danger">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @else
+                                                    <span class="badge bg-success">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+                                        </td>
 
                                         <td>
                                             <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
@@ -171,7 +197,7 @@
                             @method('PUT')
 
                             <div class="modal-header">
-                                <h5 class="modal-title">Attendance Details ({{ $attendance->date }})</h5>
+                                <h5 class="modal-title">Attendance Details ({{ $attendance->date?->format('d-m-Y') ?? '—' }})</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
@@ -179,11 +205,11 @@
                                 <table class="table table-sm">
                                     <tr>
                                         <th>Date</th>
-                                        <td>{{ $attendance->date }}</td>
+                                        <td>{{ $attendance->date?->format('d-m-Y') ?? '—' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Time In</th>
-                                        <td>{{ $attendance->time_in }}</td>
+                                        <td>{{ $attendance->time_in?->format('h:i:s A') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status In</th>
@@ -191,7 +217,7 @@
                                     </tr>
                                     <tr>
                                         <th>Time Out</th>
-                                        <td>{{ $attendance->time_out }}</td>
+                                        <td>{{ $attendance->time_out?->format('h:i:s A') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status Out</th>
@@ -237,52 +263,43 @@
         @endforeach
     </div>
 
-    <div id="timeSlipModalContainer">
-        @foreach ($attendances as $attendance)
-            <div class="modal fade" id="timeSlipModal{{ $attendance->id }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <form action="{{ route('attendance.update', $attendance->id) }}" method="POST">
-                            @csrf
-                            @method('PUT')
+    <div class="modal fade" id="timeSlipModal" tabindex="-1" aria-hidden="true" aria-labelledby="timeSlipModalLabel">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="{{ route('attendance.time-slip') }}" method="POST">
+                    @csrf
 
-                            <div class="modal-header">
-                                <h5 class="modal-title">Time Slip Request ({{ $attendance->date }})</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <table class="table table-sm">
-                                    <tr>
-                                        <th>Time Slip Start</th>
-                                        <td>{{ $attendance->time_slip_start }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Time Slip End</th>
-                                        <td>{{ $attendance->time_slip_end }}</td>
-
-                                    <tr>
-                                        <th>Time Slip Reason</th>
-                                        <td>
-                                            @if ($attendance->time_slip_reason)
-                                                <textarea name="time_slip_reason" class="form-control" rows="1">{{ $attendance->time_slip_reason }}</textarea>
-                                            @else
-                                                <span class="text-muted fst-italic">Not Applicable</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            </div>
-                        </form>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip ({{ $attendance->date?->format('d-m-Y') ?? '—' }})</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="time_slip_start" class="form-label">Start Time</label>
+                            <input type="time" name="time_slip_start" id="time_slip_start" class="form-control"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="time_slip_end" class="form-label">End Time</label>
+                            <input type="time" name="time_slip_end" id="time_slip_end" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="time_slip_reason" class="form-label">Reason</label>
+                            <textarea name="time_slip_reason" id="time_slip_reason" class="form-control" rows="2"
+                                placeholder="Explain briefly (e.g. short errand, clinic visit)" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
-        @endforeach
+        </div>
     </div>
 
     <script>

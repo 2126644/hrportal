@@ -193,7 +193,10 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        return view('employee.applyleave');
+        $leaveTypeEnum     = Leave::select('leave_type')->distinct()->pluck('leave_type');
+        $leaveLengthEnum     = Leave::select('leave_length')->distinct()->pluck('leave_length');
+
+        return view('employee.applyleave', compact('leaveTypeEnum', 'leaveLengthEnum'));
     }
 
     /**
