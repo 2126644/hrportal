@@ -41,10 +41,12 @@ class LeaveController extends Controller
 
         // Only apply filters if the inputs exist
         if ($user->role_id === 2) {
-            if ($request->filled('employee')) {
-                $query->whereHas('employee', function ($q) use ($request) {
-                    $q->where('full_name', 'like', '%' . $request->employee . '%')
-                        ->orWhere('employee_id', 'like', '%' . $request->employee . '%');
+            // Search by name or employee_id
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('full_name', 'like', "%{$search}%")
+                        ->orWhere('employee_id', 'like', "%{$search}%");
                 });
             }
         } else {
@@ -277,5 +279,17 @@ class LeaveController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function approveLeave(Request $request, Leave $leave)
+    {
+        $request->validate([
+            'action' => 'required|in:approved,rejected'
+        ]);
+
+        $leave->status = $request->action;
+        $leave->save();
+
+        return redirect()->back()->with('success', 'Leave has been approved.');
     }
 }

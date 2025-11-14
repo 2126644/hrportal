@@ -143,9 +143,9 @@
                                 @foreach ($attendances as $attendance)
                                     <tr>
                                         <td>{{ $attendance->employee->full_name }}</td>
-                                        <td>{{ $attendance->date }}</td>
+                                        <td>{{ $attendance->date->format('d M Y') }}</td>
 
-                                        <td>{{ $attendance->time_in }}</td>
+                                        <td>{{ $attendance->time_in->format('g:i:s A') }}</td>
 
                                         {{-- Status Time In with color --}}
                                         <td>
@@ -156,7 +156,7 @@
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->time_out }}</td>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') }}</td>
 
                                         {{-- Status Time Out with color --}}
                                         <td>

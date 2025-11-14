@@ -49,7 +49,7 @@
                             <i class="bi bi-box-arrow-in-right me-2"></i>
                             Time In:
                             <span class="text-primary" id="timeInDisplay">
-                                {{ $todayAttendance?->time_in?->format('h:i:s A') ?? '—' }}
+                                {{ $todayAttendance?->time_in?->format('g:i:s A') ?? '—' }}
                                 {{-- the model attributes are Carbon instances, echoing them directly uses Carbon’s default string (which includes date + time). 
                                 format explicitly in Blade: use ->format(...) or ->toDateString() and null-safe operator --}}
                             </span>
@@ -58,7 +58,7 @@
                             <i class="bi bi-box-arrow-right me-2"></i>
                             Time Out:
                             <span class="text-primary" id="timeOutDisplay">
-                                {{ $todayAttendance?->time_out?->format('h:i:s A') ?? '—' }}
+                                {{ $todayAttendance?->time_out?->format('g:i:s A') ?? '—' }}
                             </span>
                         </h5>
 
@@ -117,9 +117,9 @@
                             <tbody id="attendanceHistoryTable">
                                 @foreach ($attendances as $attendance)
                                     <tr>
-                                        <td>{{ $attendance->date?->format('d-m-Y') ?? '—' }}</td>
+                                        <td>{{ $attendance->date?->format('d M Y') ?? '—' }}</td>
 
-                                        <td>{{ $attendance->time_in?->format('h:i:s A') ?? '-' }}</td>
+                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}</td>
 
                                         {{-- Status Time In with color --}}
                                         <td>
@@ -130,7 +130,7 @@
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->time_out?->format('h:i:s A') ?? '-' }}</td>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}</td>
 
                                         {{-- Status Time Out with color --}}
                                         <td>
@@ -197,7 +197,7 @@
                             @method('PUT')
 
                             <div class="modal-header">
-                                <h5 class="modal-title">Attendance Details ({{ $attendance->date?->format('d-m-Y') ?? '—' }})</h5>
+                                <h5 class="modal-title">Attendance Details ({{ $attendance->date?->format('d M Y') ?? '—' }})</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
@@ -205,11 +205,11 @@
                                 <table class="table table-sm">
                                     <tr>
                                         <th>Date</th>
-                                        <td>{{ $attendance->date?->format('d-m-Y') ?? '—' }}</td>
+                                        <td>{{ $attendance->date?->format('d M Y') ?? '—' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Time In</th>
-                                        <td>{{ $attendance->time_in?->format('h:i:s A') ?? '-' }}</td>
+                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status In</th>
@@ -217,7 +217,7 @@
                                     </tr>
                                     <tr>
                                         <th>Time Out</th>
-                                        <td>{{ $attendance->time_out?->format('h:i:s A') ?? '-' }}</td>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status Out</th>
@@ -270,7 +270,7 @@
                     @csrf
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip ({{ $attendance->date?->format('d-m-Y') ?? '—' }})</h5>
+                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip ({{ $attendance->date?->format('d M Y') ?? '—' }})</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 

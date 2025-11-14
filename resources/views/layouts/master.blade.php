@@ -132,7 +132,7 @@
                     <a class="nav-link {{ request()->routeIs('admin.employee*') ? 'active' : '' }}"
                         href="{{ route('admin.employee') }}">
                         <i class="bi bi-people"></i>
-                        <span>Employees</span>
+                        <span>Employee</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('admin.attendance*') ? 'active' : '' }}"
                         href="{{ route('admin.attendance') }}">
@@ -147,12 +147,17 @@
                     <a class="nav-link {{ request()->routeIs('task*', 'project*') ? 'active' : '' }}"
                         href="{{ route('task.index.admin') }}">
                         <i class="bi bi-ui-checks"></i>
-                        <span>Tasks</span>
+                        <span>Task & Project</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('event*') ? 'active' : '' }}"
                         href="{{ route('event.index.admin') }}">
                         <i class="bi bi-megaphone"></i>
-                        <span>Events</span>
+                        <span>Event</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.approval*') ? 'active' : '' }}"
+                        href="{{ route('admin.approval') }}">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Approval</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
                         href="{{ route('profile.show') }}">
@@ -160,8 +165,8 @@
                         <span>Profile</span>
                     </a>
 
-                <!-- Employee Navigation (Role ID: 3) -->
-                @elseif (Auth::user()->role_id == '3')
+                    <!-- Employee Navigation (Role ID: 3) -->
+                    @elseif (Auth::user()->role_id == '3')
                     <a class="nav-link {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}"
                         href="{{ route('employee.dashboard') }}">
                         <i class="bi bi-house-door"></i>
@@ -185,12 +190,12 @@
                     <a class="nav-link {{ request()->routeIs('task*') ? 'active' : '' }}"
                         href="{{ route('task.index.employee') }}">
                         <i class="bi bi-ui-checks"></i>
-                        <span>Tasks</span>
+                        <span>Task & Project</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('event*') ? 'active' : '' }}"
                         href="{{ route('event.index.employee') }}">
                         <i class="bi bi-calendar3"></i>
-                        <span>Events</span>
+                        <span>Event</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
                         href="{{ route('profile.show') }}">

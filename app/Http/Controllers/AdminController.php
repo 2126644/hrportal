@@ -175,47 +175,23 @@ class AdminController extends Controller
 
     public function approvals()
     {
-        // --- Time Slip Requests ---
-        $timeSlips = Attendance::with('employee')
-            ->whereNotNull('time_slip_start')
-            ->whereIn('time_slip_status', ['pending', 'approved', 'rejected'])
-            ->orderBy('date', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return (object) [
-                    'id' => $item->id,
-                    'employee' => $item->employee->full_name ?? 'Unknown',
-                    'type' => 'Time Slip',
-                    'date' => Carbon::parse($item->date)->format('M d, Y'),
-                    'duration' => $item->time_slip_start . ' - ' . $item->time_slip_end,
-                    'reason' => $item->time_slip_reason,
-                    'status' => $item->time_slip_status,
-                    'created_at' => $item->created_at->diffForHumans(),
-                ];
-            });
-
         // --- Leave Requests ---
-        $leaves = Leave::with('employee')
-            ->whereIn('status', ['pending', 'approved', 'rejected'])
+        $pendingLeaves = Leave::with('employee')
+            ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return (object) [
-                    'id' => $item->id,
-                    'employee' => $item->employee->full_name ?? 'Unknown',
-                    'type' => ucfirst($item->leave_type) . ' Leave',
-                    'date' => Carbon::parse($item->start_date)->format('M d, Y') . ' - ' . Carbon::parse($item->end_date)->format('M d, Y'),
-                    'duration' => $item->total_days . ' days',
-                    'reason' => $item->reason,
-                    'status' => $item->status,
-                    'created_at' => $item->created_at->diffForHumans(),
-                ];
-            });
+            ->get();
 
-        // --- Merge both ---
-        $requests = $timeSlips->merge($leaves)->sortByDesc('created_at');
+        // --- Time Slip Requests ---
+        $pendingTimeSlips = Attendance::with('employee')
+            ->whereNotNull('time_slip_start')
+            ->where('time_slip_status', 'pending')
+            ->orderBy('date', 'desc')
+            ->get();
 
-        return view('admin.approvals', compact('requests'));
+        return view('admin.admin-approval', compact(
+            'pendingLeaves',
+            'pendingTimeSlips'
+        ));
     }
 
     public function employee(Request $request)

@@ -61,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/attendance/report', [AttendanceController::class, 'export'])->name('attendance.export');
     // Route::post('/attendance/{attendance}/edit', [AttendanceController::class, 'edit'])->name('attendance.edit');
     Route::put('/attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
-    
+
     Route::get('/leave', [LeaveController::class, 'index'])->name('leave.index.employee');
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
     Route::get('/leave/apply', [LeaveController::class, 'create'])->name('leave.create');
@@ -101,8 +101,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/update/employment/{employee}', [EmployeeController::class, 'updateEmployment'])->name('profile.updateEmployment');
 
     Route::post('/attendance/time-slip', [AttendanceController::class, 'requestTimeSlip'])->name('attendance.time-slip');
-
-
 });
 
 //Route for admin
@@ -125,7 +123,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
 
-    Route::get('/admin/approvals', [AdminController::class, 'approvals'])->name('admin.approvals');   
-    
+    Route::get('/admin/approvals', [AdminController::class, 'approvals'])->name('admin.approval');
+
+    // Time slip approval
+    Route::post('/timeslip/{attendance}/update-status', [AttendanceController::class, 'approveTimeSlip'])->name('timeslip.updateStatus');
+
+    // Leave approval
+    Route::post('/leaves/{leave}/update-status', [LeaveController::class, 'approveLeave'])->name('leave.updateStatus');
+
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

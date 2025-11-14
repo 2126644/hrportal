@@ -341,7 +341,7 @@ class AttendanceController extends Controller
         $attendance->time_slip_status = $request->action;
         $attendance->save();
 
-        return redirect()->back()->with('success', 'Time slip has been updated.');
+        return redirect()->back()->with('success', 'Time slip has been approved.');
     }
 
     public function pendingTimeSlips()

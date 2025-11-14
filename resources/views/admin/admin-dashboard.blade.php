@@ -109,7 +109,6 @@
                         <div class="row text-center mb-4">
                             <div class="col-4">
                                 <div class="request-stat-card"
-                                    onclick="window.location.href='{{ route('leave.index.admin') }}?status=pending'"
                                     style="cursor: pointer;">
                                     <h4 class="text-warning">{{ $pendingRequests ?? 5 }}</h4>
                                     <small class="text-muted">Pending</small>
@@ -117,7 +116,6 @@
                             </div>
                             <div class="col-4">
                                 <div class="request-stat-card"
-                                    onclick="window.location.href='{{ route('leave.index.admin') }}?status=approved'"
                                     style="cursor: pointer;">
                                     <h4 class="text-success">{{ $approvedRequests ?? 12 }}</h4>
                                     <small class="text-muted">Approved</small>
@@ -125,7 +123,6 @@
                             </div>
                             <div class="col-4">
                                 <div class="request-stat-card"
-                                    onclick="window.location.href='{{ route('leave.index.admin') }}?status=rejected'"
                                     style="cursor: pointer;">
                                     <h4 class="text-danger">{{ $rejectedRequests ?? 3 }}</h4>
                                     <small class="text-muted">Rejected</small>
@@ -138,7 +135,7 @@
                         <div class="request-list">
                             @forelse($recentRequests as $request)
                                 <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
-                                    onclick="window.location.href='{{ route('admin.approvals') }}'"
+                                    onclick="window.location.href='{{ route('admin.approval') }}'"
                                     style="cursor: pointer; border-radius: 8px;">
                                     <div class="d-flex align-items-center">
                                         <div

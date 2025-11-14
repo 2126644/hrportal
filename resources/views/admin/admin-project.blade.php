@@ -105,79 +105,72 @@
 
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card" id="projectsCard">
-                <div class="card-body">
-                    <h4 class="card-title mb-3 ">Projects</h4>
+    <div id="projectsCard">
+        <div class="row">
+            @forelse ($projects as $project)
+                <div class="col-md-6 mb-3 project-item" data-status="{{ $project->project_status }}">
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
+                        style="cursor:pointer;">
 
-                    @forelse ($projects as $project)
-                        <div class="card project-item mb-3" data-status="{{ $project->project_status }}"
-                            data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
-                            style="cursor:pointer;">
-                            <div class="card-body">
-                                <div class="row">
-                                    <!-- Left side: Project details -->
-                                    <div class="col-md-8">
-                                        <h5 class="fw-bold mb-2 text-dark">{{ $project->project_name }}</h5>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Left side: Project details -->
+                                <div class="col-8">
+                                    <h5 class="fw-bold mb-2 text-dark">{{ $project->project_name }}</h5>
+                                    <p class="text-muted mb-3">{{ $project->project_desc }}</p>
 
-                                        <p class="text-muted mb-3">{{ $project->project_desc }}</p>
-
-                                        <div class="task-meta">
-                                            <div class="mb-1">
-                                                <i class="bi bi-person-fill me-1 text-secondary"></i>
-                                                <strong>Created By:</strong> {{ $project->created_by }}
-                                            </div>
-                                        </div>
-
-                                        <small class="text-muted">
-                                            <i class="bi bi-clock-history me-1"></i>
-                                            Created: {{ $project->created_at->format('d M Y') }} |
-                                            Updated: {{ $project->updated_at->format('d M Y') }}
-                                        </small>
+                                    <div class="task-meta mb-1">
+                                        <i class="bi bi-person-fill me-1 text-secondary"></i>
+                                        <strong>Created By:</strong> {{ $project->created_by }}
                                     </div>
 
-                                    <!-- Right side: Status & Due date -->
-                                    <div class="col-md-4 text-md-end">
-                                        <!-- Status Badge -->
-                                        @switch($project->project_status)
-                                            @case('not-started')
-                                                <span class="badge bg-danger mb-3">Not-Started</span>
-                                            @break
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Created: {{ $project->created_at->format('d M Y') }} |
+                                        Updated: {{ $project->updated_at->format('d M Y') }}
+                                    </small>
+                                </div>
 
-                                            @case('in-progress')
-                                                <span class="badge bg-warning text-dark mb-3">In-Progress</span>
-                                            @break
+                                <!-- Right side: Status & Due date -->
+                                <div class="col-md-4 text-md-end">
+                                    <!-- Status Badge -->
+                                    @switch($project->project_status)
+                                        @case('not-started')
+                                            <span class="badge bg-danger mb-3">Not-Started</span>
+                                        @break
 
-                                            @case('on-hold')
-                                                <span class="badge bg-primary mb-3">On-Hold</span>
-                                            @break
+                                        @case('in-progress')
+                                            <span class="badge bg-warning text-dark mb-3">In-Progress</span>
+                                        @break
 
-                                            @case('completed')
-                                                <span class="badge bg-success mb-3">Completed</span>
-                                            @break
-                                        @endswitch
+                                        @case('on-hold')
+                                            <span class="badge bg-primary mb-3">On-Hold</span>
+                                        @break
 
-                                        <div class="start-date">
-                                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                            <strong>Start:</strong> {{ $project->start_date }}
-                                        </div>
-                                        <div class="end-date">
-                                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                            <strong>End:</strong> {{ $project->end_date }}
-                                        </div>
+                                        @case('completed')
+                                            <span class="badge bg-success mb-3">Completed</span>
+                                        @break
+                                    @endswitch
+
+                                    <div>
+                                        <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                                        <strong>Start:</strong> {{ $project->start_date }}
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                                        <strong>End:</strong> {{ $project->end_date }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        @empty
-                            <div class="text-center py-4 text-muted no-projects-static">
-                                <i class="bi bi-inbox display-6 mb-2"></i>
-                                <p class="mb-0">No projects found</p>
-                            </div>
-                        @endforelse
                     </div>
                 </div>
+                @empty
+                    <div class="text-center py-4 text-muted no-projects-static">
+                        <i class="bi bi-inbox display-6 mb-2"></i>
+                        <p class="mb-0">No projects found</p>
+                    </div>
+                @endforelse
             </div>
         </div>
 

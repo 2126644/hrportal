@@ -10,7 +10,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Leave</li>
                                     </ol>
                                 </nav>
@@ -23,7 +24,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="container-fluid mt-4">
         <!-- Tabs navigation -->
@@ -61,19 +61,20 @@
                 <!-- Filters and Search -->
                 <form method="GET" action="{{ route('leave.index.admin') }}">
                     <input type="hidden" name="tab" id="activeTabInput" value="leave-application">
-                    <div class="row g-3 align-items-end">
+                    <div class="row g-2 align-items-end">
                         @if (auth()->user()->role_id === 2)
-                            <div class="col-md-2">
+                            <div class="col-12 col-sm-6 col-lg-2">
                                 <label class="form-label">Search Employees</label>
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-search"></i>
                                     </span>
-                                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Name or ID...">
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        class="form-control" placeholder="Name or ID...">
                                 </div>
                             </div>
                         @endif
-                        <div class="col-md-2">
+                        <div class="col-12 col-sm-6 col-lg-2">
                             <label class="form-label">Leave Type</label>
                             <select name="leave_type" class="form-control">
                                 <option value="">All Leave Types</option>
@@ -85,24 +86,26 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-12 col-sm-6 col-lg-2">
                             <label class="form-label">Start Date</label>
-                            <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
+                            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                                class="form-control">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-12 col-sm-6 col-lg-2">
                             <label class="form-label">End Date</label>
                             <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-12 col-sm-6 col-lg-2">
                             <label class="form-label">Applied Date</label>
-                            <input type="date" name="applied_date" value="{{ request('applied_date') }}" class="form-control">
+                            <input type="date" name="applied_date" value="{{ request('applied_date') }}"
+                                class="form-control">
                         </div>
-                        <div class="col-md-1 d-flex align-items-end">
+                        <div class="col-12 col-sm-6 col-lg-1">
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="bi bi-funnel me-2"></i>Filter
                             </button>
                         </div>
-                        <div class="col-md-1 d-flex align-items-end">
+                        <div class="col-12 col-sm-6 col-lg-1">
                             <a href="{{ route('leave.index.admin') }}" class="btn btn-secondary w-100">
                                 <i class="bi bi-arrow-clockwise me-2"></i>Reset
                             </a>
@@ -155,70 +158,74 @@
                     </div>
                 </div>
 
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Leave Requests</h4>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Employee</th>
-                                            <th>Type</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Reason</th>
-                                            <th>Status</th>
-                                            <th>Applied</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="leavesTable">
-                                        @foreach ($leaves as $leave)
-                                            <tr data-status="{{ $leave->status }}">
-                                                <td>{{ $leave->employee->full_name ?? 'N/A' }}</td>
-                                                <td>{{ $leave->leave_type }}</td>
-                                                <td>{{ $leave->start_date }}</td>
-                                                <td>{{ $leave->end_date }}</td>
-                                                <td>{{ $leave->reason }}</td>
-                                                <td>
-                                                    @if ($leave->status === 'approved')
-                                                        <span class="badge bg-success">Approved</span>
-                                                    @elseif ($leave->status === 'rejected')
-                                                        <span class="badge bg-danger">Rejected</span>
-                                                    @else
-                                                        <span class="badge bg-warning text-dark">Pending</span>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $leave->applied_date }}</td>
-                                                <td>
-                                                    <div class="btn-group">
-                                                        <button class="btn btn-sm btn-outline-primary"
-                                                            onclick="window.location='{{ route('admin.dashboard', $leave->id) }}'">
-                                                            <i class="bi bi-pencil"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-info"
-                                                            onclick="window.location='{{ route('admin.dashboard', $leave->id) }}'">
-                                                            <i class="bi bi-eye"></i>
-                                                        </button>
-                                                        <button class="btn btn-sm btn-outline-danger">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-                                        <!-- No data message row -->
-                                        @if ($leaves->count() == 0)
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Leave Requests</h4>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
                                             <tr>
-                                                <td colspan="8" class="text-center py-4 text-muted">
-                                                    <i class="bi bi-inbox me-2"></i>No leave requests found
-                                                </td>
+                                                <th>Applied Date</th>
+                                                <th>Employee</th>
+                                                <th>Leave Type</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Duration</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
                                             </tr>
-                                        @endif
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody id="leavesTable">
+                                            @foreach ($leaves as $leave)
+                                                <tr data-status="{{ $leave->status }}">
+                                                    <td>{{ $leave->applied_date->format('d M Y') }}</td>
+                                                    <td>{{ $leave->employee->full_name ?? 'N/A' }}</td>
+                                                    <td>{{ $leave->leave_type }}</td>
+                                                    <td>{{ $leave->start_date->format('d M Y')  }}</td>
+                                                    <td>{{ $leave->end_date->format('d M Y')  }}</td>
+                                                    <td>{{ $leave->days }} days</td>
+                                                    <td>{{ $leave->reason }}</td>
+                                                    <td>
+                                                        @if ($leave->status === 'approved')
+                                                            <span class="badge bg-success">Approved</span>
+                                                        @elseif ($leave->status === 'rejected')
+                                                            <span class="badge bg-danger">Rejected</span>
+                                                        @else
+                                                            <span class="badge bg-warning text-dark">Pending</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-sm btn-outline-primary"
+                                                                onclick="window.location='{{ route('admin.dashboard', $leave->id) }}'">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-info"
+                                                                onclick="window.location='{{ route('admin.dashboard', $leave->id) }}'">
+                                                                <i class="bi bi-eye"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+
+                                            <!-- No data message row -->
+                                            @if ($leaves->count() == 0)
+                                                <tr>
+                                                    <td colspan="8" class="text-center py-4 text-muted">
+                                                        <i class="bi bi-inbox me-2"></i>No leave requests found
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
