@@ -102,7 +102,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div id="projectsCard">
@@ -131,7 +130,7 @@
                                     </small>
                                 </div>
 
-                                <!-- Right side: Status & Due date -->
+                                <!-- Right side: Status & Dates -->
                                 <div class="col-md-4 text-md-end">
                                     <!-- Status Badge -->
                                     @switch($project->project_status)
@@ -310,9 +309,9 @@
                             noProjectsMessage.id = 'noProjectsMessage';
                             noProjectsMessage.className = 'text-center py-4 text-muted no-projects-dynamic';
                             noProjectsMessage.innerHTML = `
-                    <i class="bi bi-inbox display-6 mb-2"></i>
-                    <p class="mb-0">No ${getProjectStatusText(status).toLowerCase()} projects found</p>
-                `;
+                            <i class="bi bi-inbox display-6 mb-2"></i>
+                            <p class="mb-0">No ${getProjectStatusText(status).toLowerCase()} projects found</p>
+                            `;
                             document.querySelector('#projectsCard .card-body').appendChild(noProjectsMessage);
                         }
                     } else {

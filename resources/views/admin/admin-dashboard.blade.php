@@ -108,22 +108,19 @@
                         <!-- Pending Requests Summary -->
                         <div class="row text-center mb-4">
                             <div class="col-4">
-                                <div class="request-stat-card"
-                                    style="cursor: pointer;">
+                                <div class="request-stat-card" style="cursor: pointer;">
                                     <h4 class="text-warning">{{ $pendingRequests ?? 5 }}</h4>
                                     <small class="text-muted">Pending</small>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="request-stat-card"
-                                    style="cursor: pointer;">
+                                <div class="request-stat-card" style="cursor: pointer;">
                                     <h4 class="text-success">{{ $approvedRequests ?? 12 }}</h4>
                                     <small class="text-muted">Approved</small>
                                 </div>
                             </div>
                             <div class="col-4">
-                                <div class="request-stat-card"
-                                    style="cursor: pointer;">
+                                <div class="request-stat-card" style="cursor: pointer;">
                                     <h4 class="text-danger">{{ $rejectedRequests ?? 3 }}</h4>
                                     <small class="text-muted">Rejected</small>
                                 </div>
@@ -172,8 +169,8 @@
                         </div>
 
                         <!-- View All Link -->
-                        <div class="text-center mt-3">
-                            <a href="{{ route('leave.index.admin') }}" class="btn btn-outline-primary btn-sm">
+                        <div class="text-center">
+                            <a href="{{ route('admin.approval') }}" class="btn btn-outline-primary btn-sm">
                                 View All Requests <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -189,7 +186,7 @@
                     </div>
                     <div class="card-body">
                         <!-- Announcements List -->
-                        <div class="announcement-list mb-4">
+                        <div class="announcement-list mb-3">
                             @forelse($announcements as $announcement)
                                 <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
@@ -202,23 +199,22 @@
                                             {{ ucfirst($announcement->priority) }}
                                         </span>
                                     </div>
-                                    <p class="text-muted mb-1 small">{{ Str::limit($announcement->content, 80) }}</p>
+                                    <p class="text-muted mb-1 small">{{ Str::limit($announcement->description, 100) }}</p>
                                     <small
                                         class="text-muted">{{ $announcement->created_at->format('M j, g:i A') }}</small>
                                 </div>
                             @empty
-                                <!-- Sample announcements for demonstration -->
-                                <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
-                                    <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <h6 class="mb-0">Office Closure</h6>
-                                        <span class="badge bg-danger">High</span>
-                                    </div>
-                                    <p class="text-muted mb-1 small">The office will be closed on September 4th for Labor
-                                        Day.</p>
-                                    <small class="text-muted">Aug 10, 2023</small>
-                                </div>
+                                <p class="text-muted small">No recent announcements found.</p>
                             @endforelse
                         </div>
+
+                        <!-- View All Link -->
+                        <div class="text-center">
+                            <a href="{{ route('announcement.index.admin') }}" class="btn btn-outline-primary btn-sm">
+                                View All Announcements <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+
                     </div>
                 </div>
             </div>

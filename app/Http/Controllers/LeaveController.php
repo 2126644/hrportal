@@ -25,12 +25,36 @@ class LeaveController extends Controller
 
         // FOR CALENDAR TAB
         $allApprovedLeaves = Leave::with('employee')->where('status', 'approved')->get();
-        $employeeLeaves = $allApprovedLeaves->map(function ($allApprovedLeaves) {
+
+        $colors = [
+            '#f87171', // red
+            '#60a5fa', // blue
+            '#34d399', // green
+            '#fbbf24', // yellow
+            '#a78bfa', // purple
+            '#f472b6', // pink
+            '#38bdf8', // sky
+            '#fde047', // amber
+            '#6ee7b7', // emerald
+            '#fca5a5', // light red
+            '#93c5fd', // light blue
+        ];
+
+        $employeeColorMap = [];
+        $colorIndex = 0;
+
+        $employeeLeaves = $allApprovedLeaves->map(function ($leave) use (&$employeeColorMap, &$colorIndex, $colors) {
+            $empName = $leave->employee->full_name;
+            // Assign color if employee has no color yet
+            if (!isset($employeeColorMap[$empName])) {
+                $employeeColorMap[$empName] = $colors[$colorIndex % count($colors)];
+                $colorIndex++;
+            }
             return [
-                'title'         => $allApprovedLeaves->employee->full_name,
-                'start'         => Carbon::parse($allApprovedLeaves->start_date)->toDateString(),
-                'end'           => Carbon::parse($allApprovedLeaves->end_date)->addDay()->toDateString(), // include end date
-                'color'          => '#f87171',
+                'title'         => $empName,
+                'start'         => Carbon::parse($leave->start_date)->toDateString(),
+                'end'           => Carbon::parse($leave->end_date)->addDay()->toDateString(), // include end date
+                'color'          => $employeeColorMap[$empName],  
             ];
         });
 
@@ -45,11 +69,13 @@ class LeaveController extends Controller
             if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('full_name', 'like', "%{$search}%")
-                        ->orWhere('employee_id', 'like', "%{$search}%");
+                    $q->whereHas('employee', function ($qe) use ($search) {
+                        $qe->where('full_name', 'like', "%{$search}%");
+                    })
+                    ->orWhere('employee_id', 'like', "%{$search}%");
                 });
             }
-        } else {
+        } else { // non-admin sees own leaves
             $query->where('employee_id', $employee->employee_id);
         }
 
@@ -62,11 +88,11 @@ class LeaveController extends Controller
         }
 
         if ($request->filled('start_date')) {
-            $query->whereDate('start_date', '>=', $request->start_date);
+            $query->whereDate('start_date', $request->start_date);
         }
 
         if ($request->filled('end_date')) {
-            $query->whereDate('end_date', '<=', $request->end_date);
+            $query->whereDate('end_date', $request->end_date);
         }
 
         if ($request->filled('applied_date')) {
@@ -74,7 +100,7 @@ class LeaveController extends Controller
         }
 
         // Finally fetch results
-        $leaves = $query->get();
+        $leaves = $query->paginate(10)->withQueryString();
 
         $totalRequests  = $leaves->count();
         $approvedLeaves = $leaves->where('status', 'approved')->count();

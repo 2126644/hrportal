@@ -20,49 +20,25 @@ class AttendanceController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $employee = $user->employee; // null for admin if no employee record
+        $query = Attendance::with('employee')->orderBy('created_at', 'desc');
 
         // 🔹 Admin: view all attendance
         if ($user->role_id == 2) {
-            $query = Attendance::with('employee')->orderBy('created_at', 'desc');
 
-            // Apply filters dynamically
-            if ($request->filled('employee')) {
-                $query->whereHas('employee', function ($q) use ($request) {
-                    $q->where('full_name', 'like', '%' . $request->employee . '%')
-                        ->orWhere('employee_id', 'like', '%' . $request->employee . '%');
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('employee', function ($qe) use ($search) {
+                        $qe->where('full_name', 'like', "%{$search}%");
+                    })
+                        ->orWhere('employee_id', 'like', "%{$search}%");
                 });
             }
-
-            if ($request->filled('date')) {
-                $query->whereDate('date', $request->date);
-            }
-
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
-            }
-
-            if ($request->filled('status_time_in')) {
-                $query->where('status_time_in', $request->status_time_in);
-            }
-
-            if ($request->filled('status_time_out')) {
-                $query->where('status_time_out', $request->status_time_out);
-            }
-
-            // Finally fetch results
-            $attendances = $query->paginate(10);
-
-            return view('admin.admin-attendance', compact('attendances'));
+        } else {
+            $query->where('employee_id', $employee->employee_id);
         }
 
-        // 🔹 Employee: view own attendance
-        $employee = $user->employee;
-
-        // Get all requests to show in a table
-        $query = Attendance::where('employee_id', $employee->employee_id)
-            ->orderBy('created_at', 'desc');
-
-        // Apply optional filters for employee view
         if ($request->filled('date')) {
             $query->whereDate('date', $request->date);
         }
@@ -79,7 +55,8 @@ class AttendanceController extends Controller
             $query->where('status_time_out', $request->status_time_out);
         }
 
-        $attendances = $query->paginate(7);
+        // Finally fetch results
+        $attendances = $query->paginate(10)->withQueryString();
 
         // Latest record (also filter by today)
         $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
@@ -87,8 +64,15 @@ class AttendanceController extends Controller
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->first();
+        
+         // provide distinct status options to the view (move DB calls out of blade)
+        $statusTimeInOptions = Attendance::select('status_time_in')->distinct()->pluck('status_time_in')->filter()->values();
+        $statusTimeOutOptions = Attendance::select('status_time_out')->distinct()->pluck('status_time_out')->filter()->values();
+        $statusOptions = Attendance::select('status')->distinct()->pluck('status')->filter()->values();
 
-        return view('employee.employee-attendance', compact('attendances', 'todayAttendance'));
+        $view = $user->role_id == 2 ? 'admin.admin-attendance' : 'employee.employee-attendance';
+
+        return view($view, compact('attendances', 'todayAttendance', 'statusTimeInOptions', 'statusTimeOutOptions', 'statusOptions'));
     }
 
     // Punch in (mark attendance)

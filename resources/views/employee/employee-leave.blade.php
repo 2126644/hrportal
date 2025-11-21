@@ -61,7 +61,61 @@
 
             <!-- Leave Application tab -->
             <div class="tab-pane fade" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
-                <div class="row">
+                <!-- Filters and Search -->
+                <form method="GET" action="{{ route('leave.index.employee') }}">
+                    <input type="hidden" name="tab" id="activeTabInput" value="leave-application">
+                    <div class="row g-2 align-items-end">
+                        @if (auth()->user()->role_id === 2)
+                            <div class="col-12 col-sm-6 col-lg-2">
+                                <label class="form-label">Search Employees</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </span>
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        class="form-control" placeholder="Name or ID...">
+                                </div>
+                            </div>
+                        @endif
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label">Leave Type</label>
+                            <select name="leave_type" class="form-control">
+                                <option value="">All Leave Types</option>
+                                @foreach ($leaveTypes as $type)
+                                    <option value="{{ $type->leave_type }}"
+                                        {{ request('leave_type') == $type->leave_type ? 'selected' : '' }}>
+                                        {{ ucwords(str_replace('_', ' ', $type->leave_type)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                                class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label">Applied Date</label>
+                            <input type="date" name="applied_date" value="{{ request('applied_date') }}"
+                                class="form-control">
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel me-2"></i>Filter
+                            </button>
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-1">
+                            <a href="{{ route('leave.index.employee') }}" class="btn btn-secondary w-100">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                            </a>
+                        </div>
+                    </div>
+                </form>
+                <div class="row mt-4">
                     <!-- Total Requests -->
                     <div class="col-12 col-md-3 mb-4">
                         <div class="card filter-card active" data-status="all">

@@ -107,7 +107,13 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
 
-    // Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.admin');
+    Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.admin');
+    Route::get('/announcement/create', [AnnouncementController::class, 'create'])->name('announcement.create');
+    Route::post('/announcement', [AnnouncementController::class, 'store'])->name('announcement.store');
+    // Route::get('/announcement/{announcement}', [AnnouncementController::class, 'show'])->name('announcement.show');
+    // Route::get('/announcement/{announcement}/edit', [AnnouncementController::class, 'edit'])->name('announcement.edit');
+    Route::put('/announcement/{announcement}', [AnnouncementController::class, 'update'])->name('announcement.update');
+    // Route::delete('/announcement/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcement.destroy');
 
     Route::get('/admin/employee', [AdminController::class, 'employee'])->name('admin.employee');
 
@@ -120,8 +126,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/event', [EventController::class, 'index'])->name('event.index.admin');
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('project.index.admin');
-
-    Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
 
     Route::get('/admin/approvals', [AdminController::class, 'approvals'])->name('admin.approval');
 

@@ -270,7 +270,7 @@
                     @csrf
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip ({{ $attendance->date?->format('d M Y') ?? '—' }})</h5>
+                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip ({{ $todayAttendance?->date?->format('d M Y') ?? now()->format('d M Y') }})</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 

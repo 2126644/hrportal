@@ -124,8 +124,8 @@
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.employee*') ? 'active' : '' }}"
-                        href="{{ route('admin.employee') }}">
+                    <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
+                        href="{{ route('announcement.index.admin') }}">
                         <i class="bi bi-megaphone"></i>
                         <span>Announcement</span>
                     </a>
@@ -172,11 +172,11 @@
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('employee.attendance*') ? 'active' : '' }}"
-                        href="{{ route('employee.attendance') }}">
+                    {{-- <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
+                        href="{{ route('announcement.index.employee') }}">
                         <i class="bi bi-megaphone"></i>
                         <span>Announcement</span>
-                    </a>            
+                    </a>             --}}
                     <a class="nav-link {{ request()->routeIs('employee.attendance*') ? 'active' : '' }}"
                         href="{{ route('employee.attendance') }}">
                         <i class="bi bi-clock-history"></i>

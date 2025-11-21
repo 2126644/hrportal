@@ -66,7 +66,7 @@ class AnnouncementController extends Controller
      */
     public function create()
     {
-        return view('announcements.create');
+        return view('admin.createannouncement');
     }
 
     /**
@@ -91,24 +91,24 @@ class AnnouncementController extends Controller
             'created_by'    => Auth::id(),
         ]);
 
-        return redirect()->route('announcements.index')->with('success', 'Announcement created successfully.');
+        return redirect()->route('announcement.index.admin')->with('success', 'Announcement created successfully!');
     }
 
 
     /**
      * Display the specified resource.
      */
-    public function show(Announcement $announcement)
+    public function show()
     {
-        return view('announcements.show', compact('announcement'));
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Announcement $announcement)
+    public function edit()
     {
-        return view('announcements.edit', compact('announcement'));
+        //
     }
 
     /**
@@ -132,8 +132,7 @@ class AnnouncementController extends Controller
             'expires_date',
         ]));
 
-        return redirect()->route('announcements.index')
-            ->with('success', 'Announcement updated successfully.');
+        return redirect()->back()->with('success', 'Announcement updated successfully.');
     }
 
     /**

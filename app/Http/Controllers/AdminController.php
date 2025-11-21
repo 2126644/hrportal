@@ -72,7 +72,7 @@ class AdminController extends Controller
         // ✅ Fetch latest Time Slip requests
         $timeSlips = Attendance::with('employee')
             ->whereNotNull('time_slip_start')
-            ->whereIn('time_slip_status', ['pending', 'approved', 'rejected'])
+            ->whereIn('time_slip_status', ['pending'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
@@ -91,7 +91,7 @@ class AdminController extends Controller
 
         // ✅ Fetch latest Leave requests
         $leaves = Leave::with('employee')
-            ->whereIn('status', ['pending', 'approved', 'rejected'])
+            ->whereIn('status', ['pending'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
@@ -138,7 +138,7 @@ class AdminController extends Controller
         $recentPunches = Attendance::with('employee')
             ->whereDate('date', Carbon::today())
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(10)
             ->get();
 
         foreach ($recentPunches as $punch) {
@@ -217,7 +217,7 @@ class AdminController extends Controller
         // Filter by status
         if ($request->filled('employment_status')) {
             $query->whereHas('employment', function ($q) use ($request) {
-                $q->where('employment_status', $request->status);
+                $q->where('employment_status', $request->employment_status);
             });
         }
 
@@ -230,7 +230,7 @@ class AdminController extends Controller
 
         if ($request->filled('date_joined')) {
             $query->whereDate('employment', function ($q) use ($request) {
-                $q->where('date_joined', '>=', $request->date_joined);
+                $q->where('date_joined', $request->date_joined);
             });
         }
 

@@ -69,7 +69,7 @@
                                 @foreach ($statuses as $status)
                                     <option value="{{ $status }}"
                                         {{ request('employment_status') == $status ? 'selected' : '' }}>
-                                        {{ $status }}
+                                        {{ ucfirst($status) }}
                                     </option>
                                 @endforeach
                             </select>

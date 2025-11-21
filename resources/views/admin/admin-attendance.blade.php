@@ -47,54 +47,28 @@
                         <label class="form-label">Status Time In</label>
                         <select name="status_time_in" class="form-select">
                             <option value="">All Statuses</option>
-                            @php
-                                $statuses = \App\Models\Attendance::select('status_time_in')
-                                    ->distinct()
-                                    ->pluck('status_time_in')
-                                    ->filter();
-                            @endphp
-                            @foreach ($statuses as $status)
-                                <option value="{{ $status }}"
-                                    {{ request('status_time_in') == $status ? 'selected' : '' }}>
-                                    {{ $status }}
-                                </option>
+                            @foreach($statusTimeInOptions as $status)
+                                <option value="{{ $status }}" {{ request('status_time_in') == $status ? 'selected' : '' }}>{{ $status }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status Time Out</label>
                         <select name="status_time_out" class="form-select">
-                            <option value="">All Statuses</option>
-                            @php
-                                $statuses = \App\Models\Attendance::select('status_time_out')
-                                    ->distinct()
-                                    ->pluck('status_time_out')
-                                    ->filter();
-                            @endphp
-                            @foreach ($statuses as $status)
-                                <option value="{{ $status }}"
-                                    {{ request('status_time_out') == $status ? 'selected' : '' }}>
-                                    {{ $status }}
-                                </option>
++                            <option value="">All Statuses</option>
++                            @foreach($statusTimeOutOptions as $status)
+                                <option value="{{ $status }}" {{ request('status_time_out') == $status ? 'selected' : '' }}>{{ $status }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select">
-                            <option value="">All Statuses</option>
-                            @php
-                                $statuses = \App\Models\Attendance::select('status')
-                                    ->distinct()
-                                    ->pluck('status')
-                                    ->filter();
-                            @endphp
-                            @foreach ($statuses as $status)
-                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                                    {{ $status }}
-                                </option>
-                            @endforeach
-                        </select>
++                            <option value="">All Statuses</option>
++                            @foreach($statusOptions as $status)
++                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
++                            @endforeach
++                        </select>
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
                         <button class="btn btn-primary w-100">
@@ -201,7 +175,7 @@
                             @method('PUT')
 
                             <div class="modal-header">
-                                <h5 class="modal-title">Attendance Details ({{ $attendance->date }})</h5>
+                                <h5 class="modal-title">Attendance Details ({{ $attendance->date->format('d M Y') }})</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
@@ -209,11 +183,11 @@
                                 <table class="table table-sm">
                                     <tr>
                                         <th>Date</th>
-                                        <td>{{ $attendance->date }}</td>
+                                        <td>{{ $attendance->date->format('d M Y') }}</td>
                                     </tr>
                                     <tr>
                                         <th>Time In</th>
-                                        <td>{{ $attendance->time_in }}</td>
+                                        <td>{{ $attendance->time_in->format('g:i:s A') }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status In</th>
@@ -221,7 +195,7 @@
                                     </tr>
                                     <tr>
                                         <th>Time Out</th>
-                                        <td>{{ $attendance->time_out }}</td>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') }}</td>
                                     </tr>
                                     <tr>
                                         <th>Status Out</th>
