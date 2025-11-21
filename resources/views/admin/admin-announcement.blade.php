@@ -42,44 +42,66 @@
                         <div class="card-body">
                             <div class="row">
                                 <!-- Left side: Announcement details -->
-                                <div class="col-8">
-                                    <h5 class="fw-bold mb-2 text-dark">{{ $announcement->title }}</h5>
-                                    <p class="text-muted mb-3">{{ Str::limit($announcement->description, 150) }}</p>
-
-                                    <div class="announcement-meta mb-1">
-                                        <i class="bi bi-person-fill me-1 text-secondary"></i>
-                                        <strong>Published By:</strong> {{ $announcement->created_by }}
-                                    </div>
-
-                                    <small class="text-muted">
-                                        <i class="bi bi-clock-history me-1"></i>
-                                        Created: {{ $announcement->created_at?->format('d M Y') ?? '-' }} |
-                                        Updated: {{ $announcement->updated_at?->format('d M Y') ?? '-' }}
-                                    </small>
-                                </div>
-
-                                <!-- Right side: Priority & Expires Date -->
-                                <div class="col-md-4 text-md-end">
-                                    <!-- Priority Badge -->
+                                <div class="col-12">
                                     @switch($announcement->priority)
                                         @case('low')
-                                            <span class="badge bg-primary mb-3">Low</span>
+                                            <span class="badge bg-primary mb-3 p-2 me-2">Low Priority</span>
                                         @break
 
                                         @case('medium')
-                                            <span class="badge bg-warning text-dark mb-3">Medium</span>
+                                            <span class="badge bg-warning mb-3 p-2 me-2">Medium Priority</span>
                                         @break
 
                                         @case('high')
-                                            <span class="badge bg-danger mb-3">High</span>
+                                            <span class="badge bg-danger mb-3 p-2 me-2">High Priority</span>
                                         @break
                                     @endswitch
 
-                                    <div>
-                                        <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>Expires:</strong> {{ $announcement->expires_date?->format('d M Y') ?? '-' }}
-                                    </div>
+                                    @switch($announcement->category)
+                                        @case('general')
+                                            <span class="badge bg-purple mb-3 p-2">
+                                                <i class="bi bi-info-circle me-1"></i>General
+                                            </span>
+                                        @break
+
+                                        @case('policy')
+                                            <span class="badge bg-light-blue mb-3 p-2">
+                                                <i class="bi bi-file-text me-1"></i>Policy
+                                            </span>
+                                        @break
+
+                                        @case('system')
+                                            <span class="badge bg-light-red mb-3 p-2">
+                                                <i class="bi bi-gear me-1"></i>System
+                                            </span>
+                                        @break
+
+                                        @case('other')
+                                            <span class="badge bg-light-green mb-3 p-2">
+                                                <i class="bi bi-tag me-1"></i>Other
+                                            </span>
+                                        @break
+                                    @endswitch
+
+                                    <h5 class="fw-bold mb-2 text-dark">{{ $announcement->title }}</h5>
+                                    <p class="text-muted mb-3">{{ Str::limit($announcement->description, 150) }}</p>
                                 </div>
+
+                                <div class="announcement-meta mb-1">
+                                    <i class="bi bi-person-fill me-1 text-secondary"></i>
+                                    Published By: {{ $announcement->created_by }}
+                                </div>
+
+                                <small class="text-muted mb-1 d-block">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    Created: {{ $announcement->created_at?->format('d M Y') ?? '-' }} |
+                                    Updated: {{ $announcement->updated_at?->format('d M Y') ?? '-' }}
+                                </small>
+
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    Expires: {{ $announcement->expires_date?->format('d M Y') ?? '-' }}
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -127,10 +149,6 @@
                                                 <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Created by</th>
-                                        <td>{{ $announcement->created_by }}</td>
                                     </tr>
                                     <tr>
                                         <th>Category</th>
@@ -189,6 +207,10 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th>Published by</th>
+                                        <td>{{ $announcement->created_by }}</td>
+                                    </tr>
+                                    <tr>
                                         <th>Expires Date</th>
                                         <td>
                                             <input type="date" name="expires_date" class="form-control"
@@ -198,6 +220,14 @@
                                                 <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Created At</th>
+                                        <td>{{ $announcement->created_at?->format('d M Y') ?? '-' }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Updated At</th>
+                                        <td>{{ $announcement->updated_at?->format('d M Y') ?? '-' }}</td>
                                     </tr>
                                 </table>
                             </div>

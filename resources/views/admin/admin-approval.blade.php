@@ -37,7 +37,7 @@
                             <tbody>
                                 @forelse ($pendingLeaves as $leave)
                                     <tr>
-                                        <td>{{ $leave->applied_date->format('d M Y') }}</td>
+                                        <td>{{ $leave->created_at->format('d M Y') }}</td>
                                         <td>{{ $leave->employee->full_name }}</td>
                                         <td>{{ ucfirst($leave->leave_type) }}</td>
                                         <td>{{ $leave->start_date->format('d M Y') }} →
@@ -166,7 +166,7 @@
                             </tr>
                             <tr>
                                 <th>Date Applied</th>
-                                <td>{{ $leave->applied_date?->format('d M Y') ?? '-' }}</td>
+                                <td>{{ $leave->created_at->format('d M Y') }}</td>
                             </tr>
                         </table>
                     </div>

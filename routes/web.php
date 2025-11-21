@@ -53,8 +53,8 @@ Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->nam
 Route::middleware(['auth'])->group(function () {
     Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
 
-    // Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
-
+    Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
+    
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
@@ -107,7 +107,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('admin-dashboard', [AdminController::class, 'showDashboardForLoggedInAdmin'])->name('admin.dashboard');
 
-    Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.admin');
+    Route::get('/admin/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.admin');
     Route::get('/announcement/create', [AnnouncementController::class, 'create'])->name('announcement.create');
     Route::post('/announcement', [AnnouncementController::class, 'store'])->name('announcement.store');
     // Route::get('/announcement/{announcement}', [AnnouncementController::class, 'show'])->name('announcement.show');

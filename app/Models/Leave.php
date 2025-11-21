@@ -12,7 +12,6 @@ class Leave extends Model
 
     protected $fillable = [
         'employee_id',
-        'applied_date',
         'leave_type',
         'leave_length',
         'reason',
@@ -26,7 +25,6 @@ class Leave extends Model
     ];
 
     protected $casts = [
-        'applied_date' => 'date',
         'start_date' => 'date',
         'end_date' => 'date'
     ];

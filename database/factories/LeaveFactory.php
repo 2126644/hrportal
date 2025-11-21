@@ -21,8 +21,7 @@ class LeaveFactory extends Factory
     {
         return [
             'employee_id'   => Employee::inRandomOrder()->first()->employee_id,
-            'applied_date'  => fake()->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
-            'leave_type'    => fake()->randomElement(['annual_leave', 'medical_leave', 'emergency_leave', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid_leave', 'marriage']),
+            'leave_type'    => fake()->randomElement(['annual', 'medical', 'emergency', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid', 'marriage']),
             'leave_length'  => fake()->randomElement(['full_day', 'AM', 'PM']),
             'reason'        => fake()->optional()->sentence(),
             'start_date'    => $start = fake()->dateTimeBetween('now', '+1 month')->format('Y-m-d'),

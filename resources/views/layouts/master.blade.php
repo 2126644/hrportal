@@ -172,11 +172,11 @@
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
-                    {{-- <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
                         href="{{ route('announcement.index.employee') }}">
                         <i class="bi bi-megaphone"></i>
                         <span>Announcement</span>
-                    </a>             --}}
+                    </a>            
                     <a class="nav-link {{ request()->routeIs('employee.attendance*') ? 'active' : '' }}"
                         href="{{ route('employee.attendance') }}">
                         <i class="bi bi-clock-history"></i>

@@ -35,7 +35,7 @@ class LeaveController extends Controller
             '#f472b6', // pink
             '#38bdf8', // sky
             '#fde047', // amber
-            '#6ee7b7', // emerald
+            '#80d0b0', // light green
             '#fca5a5', // light red
             '#93c5fd', // light blue
         ];
@@ -95,8 +95,8 @@ class LeaveController extends Controller
             $query->whereDate('end_date', $request->end_date);
         }
 
-        if ($request->filled('applied_date')) {
-            $query->whereDate('applied_date', $request->applied_date);
+        if ($request->filled('created_at')) {
+            $query->whereDate('created_at', $request->created_at);
         }
 
         // Finally fetch results
@@ -257,7 +257,7 @@ class LeaveController extends Controller
 
         $leave = new Leave();
         $leave->employee_id  = $employee->employee_id;
-        $leave->applied_date = Carbon::now()->toDateString();
+        $leave->created_at   = Carbon::now()->toDateString();
         $leave->leave_type   = $request->leave_type;
         $leave->reason       = $request->reason;
         $leave->start_date   = $request->start_date;

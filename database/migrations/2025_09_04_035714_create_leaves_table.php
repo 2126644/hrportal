@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
             $table->string('employee_id');  // add foreign key column
-            $table->date('applied_date');
-            $table->enum('leave_type', ['annual_leave', 'medical_leave', 'emergency_leave', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid_leave', 'marriage']); 
+            $table->enum('leave_type', ['annual', 'medical', 'emergency', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid', 'marriage']); 
             $table->enum('leave_length', ['full_day', 'AM', 'PM']);
             $table->text('reason')->nullable();
             $table->date('start_date');

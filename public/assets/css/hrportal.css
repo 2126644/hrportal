@@ -606,6 +606,22 @@ footer {
     color: #212529 !important;
 }
 
+.badge.bg-purple {
+    background-color: #a78bfa !important;
+}
+
+.badge.bg-light-red {
+    background-color: #fca5a5 !important;
+}
+
+.badge.bg-light-blue {
+    background-color: #93c5fd !important;
+}
+
+.badge.bg-light-green {
+    background-color: #80d0b0 !important;
+}
+
 .datetime-punch {
     text-align: center;
     margin: 1rem 0;

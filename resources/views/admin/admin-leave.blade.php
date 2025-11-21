@@ -81,7 +81,7 @@
                                 @foreach ($leaveTypes as $type)
                                     <option value="{{ $type->leave_type }}"
                                         {{ request('leave_type') == $type->leave_type ? 'selected' : '' }}>
-                                        {{ ucwords(str_replace('_', ' ', $type->leave_type)) }}
+                                        {{ ucfirst($type->leave_type) }} Leave
                                     </option>
                                 @endforeach
                             </select>
@@ -97,7 +97,7 @@
                         </div>
                         <div class="col-12 col-sm-6 col-lg-2">
                             <label class="form-label">Applied Date</label>
-                            <input type="date" name="applied_date" value="{{ request('applied_date') }}"
+                            <input type="date" name="created_at" value="{{ request('created_at') }}"
                                 class="form-control">
                         </div>
                         <div class="col-12 col-sm-6 col-lg-1">
@@ -181,9 +181,9 @@
                                         <tbody id="leavesTable">
                                             @foreach ($leaves as $leave)
                                                 <tr data-status="{{ $leave->status }}">
-                                                    <td>{{ $leave->applied_date->format('d M Y') }}</td>
+                                                    <td>{{ $leave->created_at->format('d M Y') }}</td>
                                                     <td>{{ $leave->employee->full_name ?? 'N/A' }}</td>
-                                                    <td>{{ $leave->leave_type }}</td>
+                                                    <td>{{ ucfirst($leave->leave_type) }} Leave</td>
                                                     <td>{{ $leave->start_date->format('d M Y') }}</td>
                                                     <td>{{ $leave->end_date->format('d M Y') }}</td>
                                                     <td>{{ $leave->days }} days</td>
