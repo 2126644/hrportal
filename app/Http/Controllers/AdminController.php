@@ -11,10 +11,6 @@ use App\Models\Announcement;
 use Carbon\Carbon;
 use App\Models\Employment;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Models\LeaveEntitlement;
 
 class AdminController extends Controller
 {
@@ -69,46 +65,67 @@ class AdminController extends Controller
         // recent announcements (latest 5)
         $announcements = Announcement::orderBy('created_at', 'desc')->take(5)->get();
 
-        // ✅ Fetch latest Time Slip requests
+        // --- Leave Counts ---
+        $totalPendingLeaves   = Leave::where('status', 'pending')->count();
+        $totalApprovedLeaves  = Leave::where('status', 'approved')->count();
+        $totalRejectedLeaves  = Leave::where('status', 'rejected')->count();
+
+        // --- Time Slip Counts ---
+        $totalPendingTimeSlips   = Attendance::whereNotNull('time_slip_start')
+            ->where('time_slip_status', 'pending')->count();
+
+        $totalApprovedTimeSlips  = Attendance::whereNotNull('time_slip_start')
+            ->where('time_slip_status', 'approved')->count();
+
+        $totalRejectedTimeSlips  = Attendance::whereNotNull('time_slip_start')
+            ->where('time_slip_status', 'rejected')->count();
+
+        // --- Combined (ALL pending/approved/rejected) ---
+        $totalPending   = $totalPendingLeaves + $totalPendingTimeSlips;
+        $totalApproved  = $totalApprovedLeaves + $totalApprovedTimeSlips;
+        $totalRejected  = $totalRejectedLeaves + $totalRejectedTimeSlips;
+
         $timeSlips = Attendance::with('employee')
             ->whereNotNull('time_slip_start')
-            ->whereIn('time_slip_status', ['pending'])
+            ->where('time_slip_status', 'pending')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
-            ->map(function ($item) {
-                return (object) [
-                    'id' => $item->id,
-                    'employee' => $item->employee->full_name ?? 'Unknown',
-                    'type' => 'Time Slip',
-                    // 'date' => $item->date->format('d-m-Y'),
-                    'duration' => $item->time_slip_start->format('h:i A') . ' - ' . $item->time_slip_end->format('h:i A'),
-                    'status' => $item->time_slip_status,
-                    'submitted_date' => $item->created_at->diffForHumans(),
-                    'is_time_slip' => true,
+            ->map(function ($ts) {
+                return [
+                    'employee'        => $ts->employee->full_name,
+                    'type'            => 'Time Slip',
+                    'status'          => $ts->time_slip_status,
+                    'submitted_date'  => $ts->created_at->format('d M Y g:i A'),
+                    'duration'        => $ts->time_slip_start->format('g:i A') . ' - ' . $ts->time_slip_end->format('g:i A'),
+                    'is_time_slip'    => true,
+                    'timestamp'       => $ts->created_at, // For sorting
                 ];
             });
 
-        // ✅ Fetch latest Leave requests
         $leaves = Leave::with('employee')
-            ->whereIn('status', ['pending'])
+            ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
-            ->map(function ($item) {
-                return (object) [
-                    'id' => $item->id,
-                    'employee' => $item->employee->full_name ?? 'Unknown',
-                    'type' => ucfirst($item->leave_type) . ' Leave',
-                    'duration' => Carbon::parse($item->start_date)->format('d-m-Y') . ' - ' . Carbon::parse($item->end_date)->format('d-m-Y'),
-                    'status' => $item->status,
-                    'submitted_date' => $item->created_at->diffForHumans(),
-                    'is_time_slip' => false,
+            ->map(function ($lv) {
+                return [
+                    'employee'        => $lv->employee->full_name,
+                    'type'            => ucfirst($lv->leave_type) . ' Leave',
+                    'status'          => $lv->status,
+                    'submitted_date'  => $lv->created_at->format('d M Y g:i A'),
+                    'duration'        => $lv->start_date->format('d M Y') . ' → ' . $lv->end_date->format('d M Y'),
+                    'is_time_slip'    => false,
+                    'timestamp'       => $lv->created_at, // For sorting
                 ];
             });
 
-        // ✅ Merge both & sort by submission time
-        $recentRequests = $timeSlips->merge($leaves)->sortByDesc('submitted_date')->take(5);
+        $recentRequests = collect()
+            ->merge($timeSlips)
+            ->merge($leaves)
+            ->sortByDesc('timestamp')
+            ->take(5)
+            ->values();
 
         return view('admin.admin-dashboard', compact(
             'totalEmployees',
@@ -121,7 +138,9 @@ class AdminController extends Controller
             'todayAttendance',
             'recentRequests',
             'announcements',
-            'recentRequests'
+            'totalApproved',
+            'totalPending',
+            'totalRejected'
         ));
     }
 
@@ -173,7 +192,7 @@ class AdminController extends Controller
         return array_slice($activities, 0, 8);
     }
 
-    public function approvals()
+    public function requests()
     {
         // --- Leave Requests ---
         $pendingLeaves = Leave::with('employee')
@@ -188,7 +207,7 @@ class AdminController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        return view('admin.admin-approval', compact(
+        return view('admin.admin-request', compact(
             'pendingLeaves',
             'pendingTimeSlips'
         ));
@@ -229,8 +248,8 @@ class AdminController extends Controller
         }
 
         if ($request->filled('date_joined')) {
-            $query->whereDate('employment', function ($q) use ($request) {
-                $q->where('date_joined', $request->date_joined);
+            $query->whereHas('employment', function ($q) use ($request) {
+                $q->whereDate('date_joined', $request->date_joined);
             });
         }
 

@@ -10,7 +10,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Events</li>
                                     </ol>
                                 </nav>
@@ -26,7 +27,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="container-fluid mt-4">
         <!-- Tabs navigation -->
@@ -66,7 +66,8 @@
                                 <span class="input-group-text">
                                     <i class="bi bi-search"></i>
                                 </span>
-                                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Name or tags...">
+                                <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                    placeholder="Name or tags...">
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -95,7 +96,8 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Date</label>
-                            <input type="date" name="event_date" value="{{ request('event_date') }}" class="form-control">
+                            <input type="date" name="event_date" value="{{ request('event_date') }}"
+                                class="form-control">
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary w-100">
@@ -136,8 +138,8 @@
                                     @if ($event->rsvp_required)
                                         <span class="event-rsvp" title="RSVP Required">RSVP</span>
                                     @endif
-                                    <span class="event-status {{ $isPast ? 'event-status-past' : 'event-status-upcoming' }}">
-                                        {{ $isPast ? 'Past' : 'Upcoming' }}
+                                    <span class="event-status event-status-{{ strtolower($event->event_status) }}">
+                                        {{ ucfirst($event->event_status) }}
                                     </span>
                                 </div>
 

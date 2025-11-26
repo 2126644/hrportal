@@ -25,6 +25,58 @@
         </div>
     </div>
 
+    
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.attendance') }}">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="date" value="{{ request('date') }}" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Status Time In</label>
+                        <select name="status_time_in" class="form-select">
+                            <option value="">All Statuses</option>
+                            @foreach($statusTimeInOptions as $status)
+                                <option value="{{ $status }}" {{ request('status_time_in') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Status Time Out</label>
+                        <select name="status_time_out" class="form-select">
++                            <option value="">All Statuses</option>
++                            @foreach($statusTimeOutOptions as $status)
+                                <option value="{{ $status }}" {{ request('status_time_out') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
++                            <option value="">All Statuses</option>
++                            @foreach($statusOptions as $status)
++                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
++                            @endforeach
++                        </select>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <a href="{{ route('admin.attendance') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Total Requests -->
         <div class="col-12 col-md-3 mb-4">

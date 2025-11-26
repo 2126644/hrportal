@@ -10,6 +10,7 @@ use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Leave;
 
 class EmployeeController extends Controller
 {
@@ -221,5 +222,30 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function requests()
+    {
+        $employee = Auth::user()->employee;
+        
+        // --- Leave Requests ---
+        $pendingLeaves = Leave::with('$employee_id')
+            ->where('employee_id', $employee->employee_id)
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // --- Time Slip Requests ---
+        $pendingTimeSlips = Attendance::with('employee')
+            ->where('employee_id', $employee->employee_id)
+            ->whereNotNull('time_slip_start')
+            ->where('time_slip_status', 'pending')
+            ->orderBy('date', 'desc')
+            ->get();
+
+        return view('employee.employee-request', compact(
+            'pendingLeaves',
+            'pendingTimeSlips'
+        ));
     }
 }

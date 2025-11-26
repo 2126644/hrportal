@@ -143,9 +143,8 @@
                                     @if ($event->rsvp_required)
                                         <span class="event-rsvp" title="RSVP Required">RSVP</span>
                                     @endif
-                                    <span
-                                        class="event-status {{ $isPast ? 'event-status-past' : 'event-status-upcoming' }}">
-                                        {{ $isPast ? 'Past' : 'Upcoming' }}
+                                    <span class="event-status event-status-{{ strtolower($event->event_status) }}">
+                                        {{ ucfirst($event->event_status) }}
                                     </span>
                                 </div>
 

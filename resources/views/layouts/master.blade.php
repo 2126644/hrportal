@@ -154,10 +154,10 @@
                         <i class="bi bi-megaphone"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.approval*') ? 'active' : '' }}"
-                        href="{{ route('admin.approval') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.request*') ? 'active' : '' }}"
+                        href="{{ route('admin.request') }}">
                         <i class="bi bi-clipboard"></i>
-                        <span>Approval</span>
+                        <span>Request</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
                         href="{{ route('profile.show') }}">
@@ -196,6 +196,11 @@
                         href="{{ route('event.index.employee') }}">
                         <i class="bi bi-calendar3"></i>
                         <span>Event</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('employee.requests*') ? 'active' : '' }}"
+                        href="{{ route('employee.requests') }}">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Requests</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
                         href="{{ route('profile.show') }}">

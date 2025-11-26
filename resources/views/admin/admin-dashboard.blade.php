@@ -99,7 +99,7 @@
         <!-- Leave/Time Slip Requests & Announcements Section -->
         <div class="row">
             <!-- Leave/Time Slip Requests -->
-            <div class="col-12 col-md-8 mb-4">
+            <div class="col-12 col-md-8">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Leave/Time Slip Requests</h5>
@@ -109,30 +109,30 @@
                         <div class="row text-center mb-4">
                             <div class="col-4">
                                 <div class="request-stat-card" style="cursor: pointer;">
-                                    <h4 class="text-warning">{{ $pendingRequests ?? 5 }}</h4>
+                                    <h4 class="text-warning">{{ $totalPending }}</h4>
                                     <small class="text-muted">Pending</small>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="request-stat-card" style="cursor: pointer;">
-                                    <h4 class="text-success">{{ $approvedRequests ?? 12 }}</h4>
+                                    <h4 class="text-success">{{ $totalApproved }}</h4>
                                     <small class="text-muted">Approved</small>
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="request-stat-card" style="cursor: pointer;">
-                                    <h4 class="text-danger">{{ $rejectedRequests ?? 3 }}</h4>
+                                    <h4 class="text-danger">{{ $totalRejected }}</h4>
                                     <small class="text-muted">Rejected</small>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Recent Requests List -->
-                        <h6 class="mb-3">Recent Requests</h6>
+                        <h6 class="mb-4">Recent Requests</h6>
                         <div class="request-list">
                             @forelse($recentRequests as $request)
                                 <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
-                                    onclick="window.location.href='{{ route('admin.approval') }}'"
+                                    onclick="window.location.href='{{ route('admin.request') }}'"
                                     style="cursor: pointer; border-radius: 8px;">
                                     <div class="d-flex align-items-center">
                                         <div
@@ -140,27 +140,27 @@
                                             <i class="bi bi-person text-muted"></i>
                                         </div>
                                         <div>
-                                            <strong>{{ $request->employee }}</strong>
+                                            <strong>{{ $request['employee'] }}</strong>
                                             <div class="text-muted small">
-                                                {{ $request->type }} — {{ $request->submitted_date }}
-                                                @if ($request->is_time_slip)
+                                                {{ $request['type'] }}
+                                                @if ($request['is_time_slip'])
                                                     <span class="badge bg-info ms-1">Time Slip</span>
                                                 @else
                                                     <span class="badge bg-primary ms-1">Leave</span>
                                                 @endif
                                             </div>
-                                            <small class="text-muted">{{ $request->duration }}</small>
+                                            <small class="text-muted">{{ $request['duration'] }}</small>
                                         </div>
                                     </div>
                                     <div class="text-end">
                                         <span
                                             class="badge 
-                                            @if ($request->status == 'pending') bg-warning 
-                                            @elseif($request->status == 'approved') bg-success 
+                                            @if ($request['status'] == 'pending') bg-warning 
+                                            @elseif($request['status'] == 'approved') bg-success 
                                             @else bg-danger @endif">
-                                            {{ ucfirst($request->status) }}
+                                            {{ ucfirst($request['status']) }}
                                         </span>
-                                        <div class="text-muted small mt-1">{{ $request->submitted_date }}</div>
+                                        <div class="text-muted small mt-1">{{ $request['submitted_date'] }}</div>
                                     </div>
                                 </div>
                             @empty
@@ -170,7 +170,7 @@
 
                         <!-- View All Link -->
                         <div class="text-center">
-                            <a href="{{ route('admin.approval') }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('admin.request') }}" class="btn btn-outline-primary btn-sm">
                                 View All Requests <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -186,7 +186,7 @@
                     </div>
                     <div class="card-body">
                         <!-- Announcements List -->
-                        <div class="announcement-list mb-3">
+                        <div class="announcement-list">
                             @forelse($announcements as $announcement)
                                 <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
@@ -219,8 +219,9 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
-            <!-- Today's Attendance -->
+            <!-- LEFT: Attendance -->
             <div class="col-12 col-md-8 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -274,10 +275,10 @@
                                     <thead>
                                         <tr>
                                             <th>Employee</th>
-                                            <th>Department</th>
                                             <th>Status</th>
                                             <th>Punch In</th>
                                             <th>Punch Out</th>
+                                            <th>Department</th>
                                         </tr>
                                     </thead>
                                     <tbody id="attendanceTable">
@@ -295,8 +296,9 @@
                 </div>
             </div>
 
-            <!-- Recent Activities -->
-            <div class="col-12 col-md-4 mb-4">
+            <!-- RIGHT: Recent Activities + System Status stacked -->
+            <div class="col-12 col-md-4">
+
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Recent Activities</h5>
@@ -304,11 +306,11 @@
                     <div class="card-body">
                         <div class="activity-timeline">
                             @forelse($recentActivities as $activity)
-                                <div class="activity-item d-flex mb-3">
+                                <div class="activity-item d-flex">
                                     <div class="activity-icon me-3">
                                         <i class="bi bi-{{ $activity['icon'] }} text-primary"></i>
                                     </div>
-                                    <div class="activity-content flex-grow-1">
+                                    <div class="activity-content">
                                         <h6 class="mb-1">{{ $activity['title'] }}</h6>
                                         <p class="text-muted mb-1">{{ $activity['description'] }}</p>
                                         <small class="text-muted">{{ $activity['time'] }}</small>
@@ -323,11 +325,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col-12 col-md-8 mb-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">System Status</h5>
@@ -346,31 +344,6 @@
                                 <span>Last Update</span>
                                 <span class="text-muted">{{ now()->format('M j, g:i A') }}</span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="{{ route('admin.employee') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-people me-2"></i>Manage Employees
-                            </a>
-                            <a href="{{ route('admin.attendance') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-clock-history me-2"></i>View Attendance
-                            </a>
-                            <a href="{{ route('leave.index.admin') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-calendar-check me-2"></i>Leave Requests
-                            </a>
-                            <a href="{{ route('task.index.admin') }}" class="btn btn-outline-primary text-start">
-                                <i class="bi bi-list-task me-2"></i>Manage Tasks
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -437,11 +410,12 @@
                         <div>
                             <strong>${employee.full_name}</strong>
                             <br>
+                            <small class="text-muted">${employee.employee_id}</small>
+                            <br>
                             <small class="text-muted">${employee.position}</small>
                         </div>
                     </div>
                 </td>
-                <td>${employee.department || '-'}</td>
                 <td>
                     ${attendance ? 
                         `<span class="badge bg-success">Present</span>` : 
@@ -453,6 +427,7 @@
                 </td>
                 <td>${attendance ? attendance.time_in : '-'}</td>
                 <td>${attendance ? (attendance.time_out || '-') : '-'}</td>
+                <td>${employee.department}</td>
             `;
                     attendanceTable.appendChild(row);
                 });

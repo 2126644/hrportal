@@ -101,6 +101,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/update/employment/{employee}', [EmployeeController::class, 'updateEmployment'])->name('profile.updateEmployment');
 
     Route::post('/attendance/time-slip', [AttendanceController::class, 'requestTimeSlip'])->name('attendance.time-slip');
+
+    Route::get('/requests', [EmployeeController::class, 'requests'])->name('employee.requests');
+
+    Route::delete('/employee/leave/{leave}', [LeaveController::class, 'destroy'])->name('leave.destroy.employee');
+    Route::delete('/employee/timeslip/{attendance}', [AttendanceController::class, 'destroyTimeSlip'])->name('timeslip.destroy.employee');
 });
 
 //Route for admin
@@ -127,7 +132,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('project.index.admin');
 
-    Route::get('/admin/approvals', [AdminController::class, 'approvals'])->name('admin.approval');
+    Route::get('/admin/requests', [AdminController::class, 'requests'])->name('admin.request');
 
     // Time slip approval
     Route::post('/timeslip/{attendance}/update-status', [AttendanceController::class, 'approveTimeSlip'])->name('timeslip.updateStatus');

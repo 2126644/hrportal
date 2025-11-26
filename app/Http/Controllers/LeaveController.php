@@ -54,7 +54,7 @@ class LeaveController extends Controller
                 'title'         => $empName,
                 'start'         => Carbon::parse($leave->start_date)->toDateString(),
                 'end'           => Carbon::parse($leave->end_date)->addDay()->toDateString(), // include end date
-                'color'          => $employeeColorMap[$empName],  
+                'color'          => $employeeColorMap[$empName],
             ];
         });
 
@@ -72,7 +72,7 @@ class LeaveController extends Controller
                     $q->whereHas('employee', function ($qe) use ($search) {
                         $qe->where('full_name', 'like', "%{$search}%");
                     })
-                    ->orWhere('employee_id', 'like', "%{$search}%");
+                        ->orWhere('employee_id', 'like', "%{$search}%");
                 });
             }
         } else { // non-admin sees own leaves
@@ -302,9 +302,21 @@ class LeaveController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Leave $leave)
     {
-        //
+        $employee = Auth::user()->employee;
+        if (! $employee || $leave->employee_id !== $employee->employee_id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        // Only allow cancelling a pending leave
+        if ($leave->status !== 'pending') {
+            return redirect()->back()->with('error', 'Only pending requests can be cancelled.');
+        }
+
+        $leave->delete();   // or $leave->update(['status' => 'cancelled']) for history
+
+        return redirect()->back()->with('success', 'Leave request cancelled.');
     }
 
     public function approveLeave(Request $request, Leave $leave)

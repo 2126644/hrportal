@@ -284,6 +284,32 @@ class AttendanceController extends Controller
         //
     }
 
+    /**
+     * Allow employee to cancel their pending time slip request.
+     */
+    public function destroyTimeSlip(Attendance $attendance)
+    {
+        $employee = Auth::user()->employee;
+        if (! $employee || $attendance->employee_id !== $employee->employee_id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        // only act when time slip exists & is pending
+        if (! $attendance->time_slip_start || $attendance->time_slip_status !== 'pending') {
+            return redirect()->back()->with('error', 'Only pending time slip requests can be cancelled.');
+        }
+
+        // safer: cancel time slip fields instead of deleting attendance row
+        $attendance->update([
+            'time_slip_start'  => null,
+            'time_slip_end'    => null,
+            'time_slip_reason' => null,
+            'time_slip_status' => null,
+        ]);
+
+        return redirect()->back()->with('success', 'Time slip request cancelled.');
+    }
+
     public function requestTimeSlip(Request $request)
     {
         $user = Auth::user();

@@ -289,7 +289,6 @@ footer {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     margin-bottom: 1rem; /* Consistent bottom margin */
-    height: 100%; /* Take full height of column */
     display: flex;
     flex-direction: column;
 }
@@ -1001,17 +1000,20 @@ footer {
     font-weight: 600;
     padding: 4px 10px;
     border-radius: 12px;
-    color: var(--primary-color);
     user-select: none;
     margin-left: auto;
 }
 
-.event-status-upcoming {
-    background-color: #3498db;
+.event-status-upcoming, .event-status-ongoing {
+    color: var(--primary-color);
 }
 
-.event-status-past {
-    background-color: #95a5a6;
+.event-status-cancelled {
+    color: var(--danger-color);
+}
+
+.event-status-completed {
+    color: var(--success-color);
 }
 
 .event-meta {
@@ -1312,7 +1314,6 @@ footer {
 }
 
 .card-body {
-    flex: 1; /* Fill available space */
     display: flex;
     flex-direction: column;
 }
