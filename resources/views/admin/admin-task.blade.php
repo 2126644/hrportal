@@ -47,6 +47,77 @@
         </div>
     </div>
 
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('task.index.admin') }}">
+                <input type="hidden" name="status" id="filterStatusInput" value="{{ request('status') }}">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Search Task</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Task name or ID...">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Project</label>
+                        <select name="project_id" class="form-control">
+                            <option value="">All Projects</option>
+                            @foreach ($projects as $project)
+                                <option value="{{ $project->id }}"
+                                    {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                                    {{ $project->project_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Created By</label>
+                        <select name="created_by" class="form-control">
+                            <option value="">All Employees</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->employee_id }}"
+                                    {{ request('created_by') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ $employee->full_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Assigned To</label>
+                        <select name="assigned_to" class="form-control">
+                            <option value="">All Employees</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->employee_id }}"
+                                    {{ request('assigned_to') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ $employee->full_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" name="due_date" value="{{ request('due_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <a href="{{ route('task.index.admin') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Total Tasks -->
         <div class="col-12 col-md-2 mb-4">
@@ -98,7 +169,7 @@
                 <div class="card-body">
                     <i class="bi bi-bell-fill"></i>
                     <div class="card-title">To-Review</div>
-                    <span class="stat-number to-review">{{ $inReviewTasks }}</span>
+                    <span class="stat-number to-review">{{ $toReviewTasks }}</span>
                 </div>
             </div>
         </div>
@@ -120,7 +191,6 @@
             <div class="card" id="tasksCard">
                 <div class="card-body">
                     <h4 class="card-title mb-3 ">Tasks</h4>
-
                     @forelse ($tasks as $task)
                         <div class="card task-item mb-3" data-status="{{ $task->task_status }}" data-bs-toggle="modal"
                             data-bs-target="#taskModal{{ $task->id }}" style="cursor:pointer;">
@@ -167,11 +237,15 @@
                                             @break
 
                                             @case('in-progress')
-                                                <span class="badge bg-warning text-dark mb-3">In-Progress</span>
+                                                <span class="badge bg-info mb-3">In-Progress</span>
                                             @break
 
                                             @case('in-review')
                                                 <span class="badge bg-primary mb-3">In-Review</span>
+                                            @break
+
+                                            @case('to-review')
+                                                <span class="badge bg-warning mb-3">To-Review</span>
                                             @break
 
                                             @case('completed')
@@ -182,7 +256,7 @@
                                         <!-- Due Date -->
                                         <div class="due-date">
                                             <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                            <strong>Due:</strong> {{ $task->due_date }}
+                                            <strong>Due:</strong> {{ $task->due_date?->format('d M Y') ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -240,8 +314,7 @@
                                         <td>
                                             <select id="task_status" name="task_status" class="form-select" required>
                                                 <option value="" disabled {{ !$task->task_status ? 'selected' : '' }}>
-                                                    Select
-                                                    Status</option>
+                                                    Select Status</option>
 
                                                 <option value="to-do"
                                                     {{ old('task_status', $task->task_status) === 'to-do' ? 'selected' : '' }}>
@@ -256,6 +329,11 @@
                                                 <option value="in-review"
                                                     {{ old('task_status', $task->task_status) === 'in-review' ? 'selected' : '' }}>
                                                     In-Review
+                                                </option>
+
+                                                <option value="to-review"
+                                                    {{ old('task_status', $task->task_status) === 'to-review' ? 'selected' : '' }}>
+                                                    To-Review
                                                 </option>
 
                                                 <option value="completed"
@@ -291,7 +369,9 @@
                 </div>
             </div>
         @endforeach
+    @endsection
 
+    @push('scripts')
         <script>
             document.querySelectorAll('.filter-card').forEach(card => {
                 card.addEventListener('click', function() {
@@ -362,9 +442,10 @@
                     'to-do': 'to-do',
                     'in-progress': 'in progress',
                     'in-review': 'in review',
+                    'to-review': 'to-review',
                     'completed': 'completed'
                 };
                 return statusMap[status] || status;
             }
         </script>
-    @endsection
+    @endpush

@@ -166,7 +166,7 @@
                     </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
-                    @elseif (Auth::user()->role_id == '3')
+                @elseif (Auth::user()->role_id == '3')
                     <a class="nav-link {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}"
                         href="{{ route('employee.dashboard') }}">
                         <i class="bi bi-house-door"></i>
@@ -176,7 +176,7 @@
                         href="{{ route('announcement.index.employee') }}">
                         <i class="bi bi-megaphone"></i>
                         <span>Announcement</span>
-                    </a>            
+                    </a>
                     <a class="nav-link {{ request()->routeIs('employee.attendance*') ? 'active' : '' }}"
                         href="{{ route('employee.attendance') }}">
                         <i class="bi bi-clock-history"></i>

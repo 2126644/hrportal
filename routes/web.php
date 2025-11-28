@@ -79,9 +79,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/task/{task}', [TaskController::class, 'update'])->name('task.update');
     // Route::delete('/task/{id}', [TaskController::class, 'destroy'])->name('task.destroy');
 
-    Route::get('/projects', [ProjectController::class, 'index'])->name('employee.project');
+    Route::get('/projects', [ProjectController::class, 'index'])->name('project.index.employee');
     Route::post('/project', [ProjectController::class, 'store'])->name('project.store');
     Route::get('/project/create', [ProjectController::class, 'create'])->name('project.create');
+    Route::put('/project/{project}', [ProjectController::class, 'update'])->name('project.update');
 
     Route::get('/event', [EventController::class, 'index'])->name('event.index.employee');
     Route::post('/event', [EventController::class, 'store'])->name('event.store');

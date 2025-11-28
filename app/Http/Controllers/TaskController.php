@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use App\Models\Project;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -16,43 +18,98 @@ class TaskController extends Controller
         $user = Auth::user();
         $employee = $user->employee;
 
+        // Preload supporting lists for the filters (blade)
+        $projects = Project::orderBy('project_name')->get();
+        $employees = Employee::orderBy('full_name')->get();
+
         $query = Task::orderBy('created_at', 'desc');
 
-        // Only apply filters if the inputs exist
-        if ($user->role_id === 2) {
-            if ($request->filled('employee')) {
-                $query->where('assigned_to', 'like', '%' . $request->employee . '%')
-                    ->orWhere('assigned_by', 'like', '%' . $request->employee . '%');
+        // --- Scope to employee when not admin ---
+        if ($user->role_id !== 2) {
+            if ($employee) {
+                $query->where('assigned_to', $employee->employee_id)
+                    ->orWhere('created_by', $employee->employee_id);
             }
-        } else {
-            $query->where('assigned_to', $employee->employee_id);
         }
 
+        // --- Admin filters ---
+        if ($user->role_id === 2) {
+            // status filter: server-side
+            if ($request->filled('status')) {
+                $query->where('task_status', $request->status);
+            }
+            // Search — Task name OR ID
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('task_name', 'like', '%' . $search . '%')
+                        ->orWhere('id', $search);
+                });
+            }
+
+            // project filter
+            if ($request->filled('project_id')) {
+                $query->where('project_id', $request->project_id);
+            }
+
+            // created_by filter (accepts either numeric id or employee_id string)
+            if ($request->filled('created_by')) {
+                $createdByInput = $request->created_by;
+                $createdByEmployee = Employee::where('id', $createdByInput)
+                    ->orWhere('employee_id', $createdByInput)
+                    ->first();
+                if ($createdByEmployee) {
+                    $query->where('created_by', $createdByEmployee->employee_id);
+                } else {
+                    // if a raw employee_id string was passed
+                    $query->where('created_by', $createdByInput);
+                }
+            }
+
+            // assigned_to filter
+            if ($request->filled('assigned_to')) {
+                $assignedToInput = $request->assigned_to;
+                $assignedToEmployee = Employee::where('id', $assignedToInput)
+                    ->orWhere('employee_id', $assignedToInput)
+                    ->first();
+                if ($assignedToEmployee) {
+                    $query->where('assigned_to', $assignedToEmployee->employee_id);
+                } else {
+                    $query->where('assigned_to', $assignedToInput);
+                }
+            }
+
+            // assigned_by filter
+            if ($request->filled('assigned_by')) {
+                $assignedByInput = $request->assigned_by;
+                $assignedByEmployee = Employee::where('id', $assignedByInput)
+                    ->orWhere('employee_id', $assignedByInput)
+                    ->first();
+                if ($assignedByEmployee) {
+                    $query->where('assigned_by', $assignedByEmployee->employee_id);
+                } else {
+                    $query->where('assigned_by', $assignedByInput);
+                }
+            }
+        }
+
+        // --- Common filters ---
         if ($request->filled('task_name')) {
             $query->where('task_name', 'like', '%' . $request->task_name . '%');
         }
 
         if ($request->filled('due_date')) {
-            $query->where('due_date', $request->due_date);
+            $query->whereDate('due_date', $request->due_date);
         }
 
-        if ($request->filled('assigned_to')) {
-            $query->where('assigned_to', 'like', '%' . $request->assigned_to . '%');
-        }
-
-        if ($request->filled('assigned_by')) {
-            $query->where('assigned_by', 'like', '%' . $request->assigned_by . '%');
-        }
-
-        // Finally fetch results
         $tasks = $query->get();
 
-        $totalTasks         = $tasks->count();
-        $toDoTasks          = $tasks->where('task_status', 'to-do')->count();
-        $inProgressTasks    = $tasks->where('task_status', 'in-progress')->count();
-        $inReviewTasks      = $tasks->where('task_status', 'in-review')->count();
-        $toReviewTasks      = $tasks->where('task_status', 'to-review')->count();
-        $completedTasks     = $tasks->where('task_status', 'completed')->count();
+        $totalTasks = $tasks->count();
+        $toDoTasks = $tasks->where('task_status', 'to-do')->count();
+        $inProgressTasks = $tasks->where('task_status', 'in-progress')->count();
+        $inReviewTasks = $tasks->where('task_status', 'in-review')->count();
+        $toReviewTasks = $tasks->where('task_status', 'to-review')->count();
+        $completedTasks = $tasks->where('task_status', 'completed')->count();
 
         $view = $user->role_id == 2 ? 'admin.admin-task' : 'employee.employee-task';
 
@@ -61,8 +118,11 @@ class TaskController extends Controller
             'toDoTasks',
             'inProgressTasks',
             'inReviewTasks',
+            'toReviewTasks',
             'completedTasks',
-            'tasks'
+            'tasks',
+            'projects',
+            'employees'
         ));
     }
 

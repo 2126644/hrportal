@@ -33,6 +33,15 @@ class EventController extends Controller
             $query->where('event_status', $request->event_status);
         }
 
+        // RSVP filter: 'required' => true, 'not_required' => false
+        if ($request->filled('rsvp_status')) {
+            if ($request->rsvp_status === 'required') {
+                $query->where('rsvp_required', true);
+            } elseif ($request->rsvp_status === 'not_required') {
+                $query->where('rsvp_required', false);
+            }
+        }
+
         if ($request->filled('event_date')) {
             $query->whereDate('event_date', '=', $request->event_date);
         }
@@ -52,10 +61,11 @@ class EventController extends Controller
 
         $categories = ['meeting', 'conference', 'workshop', 'networking', 'webinar', 'social', 'other'];
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
+        $rsvpOptions = ['required' => 'Required', 'not_required' => 'Not Required'];
 
         $view = $user->role_id == 2 ? 'admin.admin-event' : 'employee.employee-event';
 
-        return view($view, compact('events', 'calendarEvents', 'categories', 'eventStatuses'));
+        return view($view, compact('events', 'calendarEvents', 'categories', 'eventStatuses', 'rsvpOptions'));
     }
 
     /**

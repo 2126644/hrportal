@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
+use App\Models\Employee;
 
 class ProjectController extends Controller
 {
@@ -16,20 +17,29 @@ class ProjectController extends Controller
         $user = Auth::user();
         $employee = $user->employee;
 
+        // Preload supporting lists for the filters (blade)
+        $projects = Project::orderBy('project_name')->get();
+        $employees = Employee::orderBy('full_name')->get();
+
         $query = Project::orderBy('created_at', 'desc');
 
         // Only apply filters if the inputs exist
         if ($user->role_id === 2) {
-            if ($request->filled('employee')) {
-                $query->where('created_by', 'like', '%' . $request->employee . '%')
-                    ->orWhere('created_by', 'like', '%' . $request->employee . '%');
+            if ($request->filled('status')) {
+                 $query->where('project_status', $request->status);
             }
-        } else {
-            $query->where('created_by', $employee->employee_id);
+            // Search — Project name OR ID
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('project_name', 'like', '%' . $search . '%')
+                        ->orWhere('id', $search);
+                });
+            }
         }
 
-        if ($request->filled('project_name')) {
-            $query->where('project_name', 'like', '%' . $request->project_name . '%');
+        if ($request->filled('created_by')) {
+            $query->where('created_by', $request->created_by);
         }
 
         if ($request->filled('start_date')) {
@@ -57,7 +67,8 @@ class ProjectController extends Controller
             'inProgressProjects',
             'onHoldProjects',
             'completedProjects',
-            'projects'
+            'projects',
+            'employees'
         ));
     }
 

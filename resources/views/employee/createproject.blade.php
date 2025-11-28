@@ -13,7 +13,7 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.project') }}">Projects</a>
+                                        <li class="breadcrumb-item"><a href="{{ route('project.index.employee') }}">Projects</a>
                                         </li>
                                         <li class="breadcrumb-item active" aria-current="page">New Project</li>
                                     </ol>
@@ -34,7 +34,7 @@
                 <div class="card-body justify-content-between">
                     {{-- makes content flexible row-pushes text left, icon right --}}
 
-                    <form action="{{ route('task.store') }}" method="POST" novalidate>
+                    <form action="{{ route('project.store') }}" method="POST" novalidate>
                         @csrf
 
                         <div class="mb-3">
@@ -50,7 +50,7 @@
                         <div class="mb-3">
                             <label for="project_desc" class="form-label">Description <span
                                     class="text-danger">*</span></label>
-                            <textarea id="project_desc" name="project_desc" rows="3" class="form-control" placeholder="Describe the task">{{ old('project_desc') }}</textarea>
+                            <textarea id="project_desc" name="project_desc" rows="3" class="form-control" placeholder="Describe the project">{{ old('project_desc') }}</textarea>
                             @error('project_desc')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -103,7 +103,7 @@
                                         Cancel
                                     </a>
                                 @elseif ($role_id == 3)
-                                    <a href="{{ route('employee.project') }}" class="btn btn-secondary me-2">
+                                    <a href="{{ route('project.index.employee') }}" class="btn btn-secondary me-2">
                                         Cancel
                                     </a>
                                 @endif

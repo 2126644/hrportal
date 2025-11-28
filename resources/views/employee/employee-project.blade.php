@@ -35,7 +35,7 @@
                                     </button>
 
                                     <!-- New Project Button -->
-                                    <button class="btn-new" onclick="window.location='{{ route('project.create') }}'">
+                                    <button class="d-flex btn-new" onclick="window.location='{{ route('project.create') }}'">
                                         New Project
                                     </button>
                                 </div>
@@ -44,6 +44,57 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('project.index.employee') }}">
+                <input type="hidden" name="status" id="filterStatusInput" value="{{ request('status') }}">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Search Project</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Project name or ID...">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Created By</label>
+                        <select name="created_by" class="form-control">
+                            <option value="">All Employees</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->employee_id }}"
+                                    {{ request('created_by') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ $employee->full_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <a href="{{ route('project.index.employee') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 

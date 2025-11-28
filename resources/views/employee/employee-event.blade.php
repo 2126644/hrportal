@@ -60,7 +60,7 @@
                 <form method="GET" action="{{ route('event.index.employee') }}">
                     <input type="hidden" name="tab" id="activeTabInput" value="event">
                     <div class="row g-3 align-items-end">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Search Events</label>
                             <div class="input-group">
                                 <span class="input-group-text">
@@ -90,6 +90,17 @@
                                     <option value="{{ $status }}"
                                         {{ request('event_status') == $status ? 'selected' : '' }}>
                                         {{ ucwords(str_replace('_', ' ', $status)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">RSVP</label>
+                            <select name="rsvp_status" class="form-control">
+                                <option value="">All</option>
+                                @foreach ($rsvpOptions as $key => $label)
+                                    <option value="{{ $key }}" {{ request('rsvp_status') == $key ? 'selected' : '' }}>
+                                        {{ $label }} 
                                     </option>
                                 @endforeach
                             </select>

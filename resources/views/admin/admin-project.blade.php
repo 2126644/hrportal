@@ -47,6 +47,57 @@
         </div>
     </div>
 
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('project.index.admin') }}">
+                <input type="hidden" name="status" id="filterStatusInput" value="{{ request('status') }}">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Search Project</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Project name or ID...">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Created By</label>
+                        <select name="created_by" class="form-control">
+                            <option value="">All Employees</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->employee_id }}"
+                                    {{ request('created_by') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ $employee->full_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <a href="{{ route('project.index.admin') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Total Projects -->
         <div class="col-12 col-md-3 mb-4">
@@ -139,11 +190,11 @@
                                         @break
 
                                         @case('in-progress')
-                                            <span class="badge bg-warning text-dark mb-3">In-Progress</span>
+                                            <span class="badge bg-info text-dark mb-3">In-Progress</span>
                                         @break
 
                                         @case('on-hold')
-                                            <span class="badge bg-primary mb-3">On-Hold</span>
+                                            <span class="badge bg-warning mb-3">On-Hold</span>
                                         @break
 
                                         @case('completed')
@@ -178,7 +229,7 @@
             <div class="modal fade" id="projectModal{{ $project->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <form action="{{ route('task.update', $project->id) }}" method="POST">
+                        <form action="{{ route('project.update', $project->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
@@ -257,7 +308,9 @@
                 </div>
             </div>
         @endforeach
+    @endsection
 
+    @push('scripts')
         <script>
             document.querySelectorAll('.filter-card').forEach(card => {
                 card.addEventListener('click', function() {
@@ -334,4 +387,4 @@
                 return statusMap[status] || status;
             }
         </script>
-    @endsection
+    @endpush

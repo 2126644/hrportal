@@ -28,9 +28,9 @@
                                     </button>
 
                                     <button
-                                        class="btn btn-outline-primary {{ request()->routeIs('projects.index') ? 'active disabled' : '' }}"
-                                        onclick="window.location='{{ route('employee.project') }}'"
-                                        {{ request()->routeIs('employee.project') ? 'disabled' : '' }}>
+                                        class="btn btn-outline-primary {{ request()->routeIs('project.index.employee') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('project.index.employee') }}'"
+                                        {{ request()->routeIs('project.index.employee') ? 'disabled' : '' }}>
                                         Projects
                                     </button>
                                 </div>
@@ -44,6 +44,78 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('task.index.employee') }}">
+                <input type="hidden" name="status" id="filterStatusInput" value="{{ request('status') }}">
+                <div class="row g-2 align-items-end">
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Search Task</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Task name or ID...">
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Project</label>
+                        <select name="project_id" class="form-control">
+                            <option value="">All Projects</option>
+                            @foreach ($projects as $project)
+                                <option value="{{ $project->id }}"
+                                    {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                                    {{ $project->project_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Created By</label>
+                        <select name="created_by" class="form-control">
+                            <option value="">All Employees</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->employee_id }}"
+                                    {{ request('created_by') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ $employee->full_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Assigned To</label>
+                        <select name="assigned_to" class="form-control">
+                            <option value="">All Employees</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->employee_id }}"
+                                    {{ request('assigned_to') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ $employee->full_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" name="due_date" value="{{ request('due_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <a href="{{ route('task.index.employee') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 

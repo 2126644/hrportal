@@ -11,6 +11,7 @@
     --success-color: #28a745;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
+    --info-color: #17a2b8;
 }
 
 * {
@@ -378,8 +379,6 @@ footer {
 .event-item:hover {
     background-color: #f8f9fa;
     border-radius: 6px;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
 }
 
 .event-item:last-child {
@@ -684,13 +683,13 @@ footer {
     color: var(--danger-color);
 }
 .filter-card[data-status="in-progress"] i {
-    color: var(--warning-color);
+    color: var(--info-color);
 }
 .filter-card[data-status="in-review"] i {
-    color: var(--warning-color);
+    color: var(--primary-color);
 }
 .filter-card[data-status="to-review"] i {
-    color: var(--danger-color);
+    color: var(--warning-color);
 }
 .filter-card[data-status="completed"] i {
     color: var(--success-color);
@@ -704,22 +703,22 @@ footer {
 }
 
 .stat-number.all {
-    color: #3498db;
+    color: var(--primary-color);
 }
 .stat-number.to-do {
-    color: #dc3545;
+    color: var(--danger-color);
 }
 .stat-number.in-progress {
-    color: #ffc107;
+    color: var(--info-color);
 }
 .stat-number.in-review {
-    color: #ffc107;
+    color: var(--primary-color);
 }
 .stat-number.to-review {
-    color: #dc3545;
+    color: var(--warning-color);
 }
 .stat-number.completed {
-    color: #28a745;
+    color: var(--success-color);
 }
 
 .task-item {
@@ -740,7 +739,7 @@ footer {
 }
 
 .task-item[data-status="in-progress"] {
-    border-left-color: var(--warning-color);
+    border-left-color: var(--info-color);
 }
 
 .task-item[data-status="in-review"] {
@@ -748,7 +747,7 @@ footer {
 }
 
 .task-item[data-status="to-review"] {
-    border-left-color: var(--primary-color);
+    border-left-color: var(--warning-color);
 }
 
 .task-item[data-status="completed"] {
@@ -797,40 +796,64 @@ footer {
 }
 
 /* =============================
-   PROJECT PAGE
+   TASK/PROJECT PAGE
 ============================= */
 
 .filter-card[data-status="all"] i {
     color: var(--secondary-color);
 }
-.filter-card[data-status="not-started"] i {
+.filter-card[data-status="to-do"] i {
     color: var(--danger-color);
 }
 .filter-card[data-status="in-progress"] i {
-    color: var(--warning-color);
+    color: var(--info-color);
 }
-.filter-card[data-status="on-hold"] i {
+.filter-card[data-status="in-review"] i {
     color: var(--primary-color);
+}
+.filter-card[data-status="to-review"] i {
+    color: var(--warning-color);
 }
 .filter-card[data-status="completed"] i {
     color: var(--success-color);
 }
 
-.stat-number.all {
-    color: #0056b3;
+.filter-card[data-status="not-started"] i {
+    color: var(--danger-color);
 }
-.stat-number.not-started {
-    color: #dc3545;
+.filter-card[data-status="on-hold"] i {
+    color: var(--warning-color);
+}
+
+.stat-number.all {
+    color: var(--secondary-color);
+}
+.stat-number.to-do {
+    color: var(--danger-color);
 }
 .stat-number.in-progress {
-    color: #ffc107;
+    color: var(--info-color);
 }
-.stat-number.on-hold {
-    color: #3498db;
+.stat-number.in-review {
+    color: var(--primary-color);
+}
+.stat-number.to-review {
+    color: var(--warning-color);
 }
 .stat-number.completed {
-    color: #28a745;
+    color: var(--success-color);
 }
+
+.stat-number.not-started {
+    color: var(--danger-color);
+}
+.stat-number.on-hold {
+    color: var(--warning-color);
+}
+
+/* =============================
+   PROJECT PAGE
+============================= */
 
 .project-item {
     transition: all 0.3s ease;
@@ -850,11 +873,11 @@ footer {
 }
 
 .project-item[data-status="in-progress"] {
-    border-left-color: var(--warning-color);
+    border-left-color: var(--info-color);
 }
 
 .project-item[data-status="on-hold"] {
-    border-left-color: var(--primary-color);
+    border-left-color: var(--warning-color);
 }
 
 .project-item[data-status="completed"] {

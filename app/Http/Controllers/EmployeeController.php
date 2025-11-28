@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Leave;
+use App\Models\Announcement;
 
 class EmployeeController extends Controller
 {
@@ -28,7 +29,7 @@ class EmployeeController extends Controller
         // Fetch upcoming events (adjust your table column names)
         $upcomingEvents = Event::where('event_date', '>=', now())
             ->orderBy('event_date', 'asc')
-            ->take(5)
+            ->take(3)
             ->get();
 
         // Attendance Summary Card
@@ -44,26 +45,72 @@ class EmployeeController extends Controller
             'last_punch_in' => $lastPunchIn ? $lastPunchIn->format('d M Y h:i A') : '-',
         ];
 
-        $todayAttendance = Attendance::where('employee_id', $employee->employee_id)->whereDate('date', Carbon::today())->first();
-
         // Task Summary Card
         $taskRecords = Task::where('assigned_to', $employee->employee_id)->get();
 
-        $pendingTask = optional($taskRecords->whereIn('task_status', ['to-do', 'in-progress', 'in-review']))->count();
+        $pendingTask = optional($taskRecords->whereIn('task_status', ['to-do', 'in-progress', 'in-review', 'to-review']))->count();
         $completedTask  = $taskRecords->where('task_status', 'completed')->count();
         $overdueTask = $taskRecords->where('task_status', '!=', 'completed')->where('due_date', '<', now())->count();
+        $totalTask = $taskRecords->where('assigned_to', $employee->employee_id)->count();
 
         $task = [
             'pending_task' => $pendingTask,
             'completed_task' => $completedTask,
-            'overdue_task' => $overdueTask
+            'overdue_task' => $overdueTask,
+            'total_task' => $totalTask,
         ];
 
-        $tasksByStatus = Task::where('assigned_to', $employee->employee_id)
-            ->get()
-            ->groupBy('task_status');
+        $todayAttendance = Attendance::where('employee_id', $employee->employee_id)->whereDate('date', Carbon::today())->first();
 
-        return view('employee.employee-dashboard', compact('employee', 'upcomingEvents', 'todayAttendance', 'attendance', 'task', 'tasksByStatus'));
+        // Leave Summary Card
+        $leaveRecords = Leave::where('employee_id', $employee->employee_id)->get();
+
+        // Pending leave requests
+        $pendingLeave = $leaveRecords->where('status', 'pending')->count();
+
+        // Upcoming approved leave
+        $upcomingLeaveRecords = Leave::where('employee_id', $employee->employee_id)
+            ->where('status', 'approved')
+            ->where('start_date', '>=', now())
+            ->orderBy('start_date', 'asc')
+            ->get();
+
+        $upcomingLeaveCount = $upcomingLeaveRecords->count();
+
+        // Get the next leave date (if any)
+        $nextLeaveDate = $upcomingLeaveRecords->first()->start_date ?? null;
+
+        $leave = [
+            'pending_leave' => $pendingLeave,
+            'upcoming_leave' => $upcomingLeaveCount,
+            'next_leave_date' => $nextLeaveDate
+                ? Carbon::parse($nextLeaveDate)->format('d M Y')
+                : '-',
+        ];
+
+        // Profile Summary
+        $profile = [
+            'full_name' => $employee->full_name,
+            'employee_id' => $employee->employee_id,
+            'position' => $employee->position->position ?? 'N/A',
+            'company_branch' => $employee->employment->company_branch ?? 'N/A',
+        ];
+
+        // recent announcements (latest 5)
+        $announcements = Announcement::orderBy('created_at', 'desc')->take(3)->get();
+
+        return view('employee.employee-dashboard', compact(
+                'employee',
+                'upcomingEvents',
+                'todayAttendance',
+                'attendance',
+                'task',
+                'taskRecords',
+                'leave',
+                'profile',
+                'announcements'
+            )
+        );
     }
 
     /**
@@ -227,7 +274,7 @@ class EmployeeController extends Controller
     public function requests()
     {
         $employee = Auth::user()->employee;
-        
+
         // --- Leave Requests ---
         $pendingLeaves = Leave::with('$employee_id')
             ->where('employee_id', $employee->employee_id)
