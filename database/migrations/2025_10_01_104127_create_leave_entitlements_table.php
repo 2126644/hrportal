@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('leave_entitlements', function (Blueprint $table) {
             $table->id();
-            $table->enum('leave_type', ['annual_leave', 'medical_leave', 'emergency_leave', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid_leave', 'marriage']);
+            $table->enum('leave_type', ['annual', 'medical', 'emergency', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid', 'marriage']);
             $table->decimal('full_entitlement', 5, 2);
             $table->timestamps();
         });

@@ -88,11 +88,13 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $employee = Auth::user()->employee;
+        if (! $employee) {
+            return redirect()->back()->with('error', 'No employee profile found for this user.');
+        }
 
         $request->validate([
             'project_name'       => 'required|string|max:255',
             'project_desc'       => 'nullable|string',
-            'created_by'         => 'required|string|max:255',
             'start_date'         => 'nullable|date',
             'end_date'           => 'nullable|date',
             'project_status'     => 'required|in:not-started,in-progress,on-hold,completed',
@@ -108,7 +110,7 @@ class ProjectController extends Controller
         
         $project->save();
 
-        return redirect()->route('project.create')->with('success', 'Project created successfully!');
+        return redirect()->route('project.index.employee')->with('success', 'Project created successfully!');
     }
 
     // Mark project as completed

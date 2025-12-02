@@ -132,7 +132,10 @@ class TaskController extends Controller
     public function create()
     {
         $role_id = Auth::user()->role_id;
-        return view('employee.createtask', compact('role_id'));
+        $employees = Employee::orderBy('full_name')->get();
+        $projects = Project::orderBy('project_name')->get();
+
+        return view('employee.createtask', compact('role_id', 'employees', 'projects'));
     }
 
     /**
@@ -142,30 +145,34 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $employee = Auth::user()->employee;
+        if (! $employee) {
+            return redirect()->back()->with('error', 'No employee profile found for this user.');
+        }
 
         $request->validate([
+            'project_id'    => 'nullable|exists:projects,id',
             'task_name'     => 'required|string|max:255',
             'task_desc'     => 'nullable|string',
-            'assigned_to'   => 'required|string|max:255',
-            'assigned_by'   => 'required|string|max:255',
-            'task_status'   => 'required|in:to-do,in-progress,in-review,completed',
+            // ensure assigned_to maps to an existing employee.employee_id
+            'assigned_to'   => 'required|string|exists:employees,employee_id',
+            'task_status'   => 'required|in:to-do,in-progress,in-review,to-review,completed',
             'notes'         => 'nullable|string',
             'due_date'      => 'nullable|date',
         ]);
 
         $task = new Task();
         $task->created_by   = $employee->employee_id;
+        $task->project_id   = $request->project_id;
         $task->task_name    = $request->task_name;
         $task->task_desc    = $request->task_desc;
         $task->assigned_to  = $request->assigned_to;
-        $task->assigned_by  = $employee->employee_id; // Assuming the assigner is the logged-in employee
         $task->task_status  = $request->task_status;
         $task->notes        = $request->notes;
         $task->due_date     = $request->due_date;
 
         $task->save();
 
-        return redirect()->route('task.create')->with('success', 'Task created successfully!');
+        return redirect()->route('task.index.employee')->with('success', 'Task created successfully!');
     }
 
     // Mark task as completed
@@ -198,14 +205,31 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        // simple authorization: admin or owner
+        if ($user->role_id !== 2 && $task->created_by !== ($employee->employee_id ?? null)) {
+            abort(403, 'Unauthorized.');
+        }
+
         $request->validate([
-            'task_status' => 'required|in:to-do,in-progress,in-review,completed',
+            'task_name' => 'required|string|max:255',
+            'task_desc' => 'nullable|string',
+            'project_id' => 'nullable|exists:projects,id',
+            'task_status' => 'required|in:to-do,in-progress,in-review,to-review,completed',
             'due_date' => 'nullable|date',
+            'notes' => 'nullable|string'
         ]);
 
-        $task->task_status = $request->task_status;
-        $task->due_date = $request->due_date;
-        $task->save();
+        $task->update([
+            'task_name' => $request->task_name,
+            'task_desc' => $request->task_desc,
+            'project_id' => $request->project_id,
+            'task_status' => $request->task_status,
+            'due_date' => $request->due_date,
+            'notes' => $request->notes,
+        ]);
 
         return redirect()->back()->with('success', 'Task updated successfully.');
     }

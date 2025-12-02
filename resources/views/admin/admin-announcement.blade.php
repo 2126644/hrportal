@@ -84,7 +84,7 @@
                                     @endswitch
 
                                     <h5 class="fw-bold mb-2 text-dark">{{ $announcement->title }}</h5>
-                                    <p class="text-muted mb-3">{{ Str::limit($announcement->description, 150) }}</p>
+                                    <p class="text-muted mb-3">{{ $announcement->description }}</p>
                                 </div>
 
                                 <div class="announcement-meta mb-1">

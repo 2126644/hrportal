@@ -25,7 +25,6 @@ class TaskFactory extends Factory
             'task_name'     => fake()->sentence(4),
             'task_desc'     => fake()->optional()->paragraph(),
             'assigned_to'   => Employee::inRandomOrder()->value('employee_id'),
-            'assigned_by'   => Employee::inRandomOrder()->value('employee_id'),
             'task_status'   => fake()->randomElement(['to-do', 'in-progress', 'in-review', 'to-review', 'completed']),
             'notes'         => fake()->optional()->sentence(),
             'due_date'      => fake()->optional()->dateTimeBetween('now', '+2 months')?->format('Y-m-d'),

@@ -187,7 +187,7 @@
                         <i class="bi bi-airplane"></i>
                         <span>Leave</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('task*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('task*', 'project*') ? 'active' : '' }}"
                         href="{{ route('task.index.employee') }}">
                         <i class="bi bi-ui-checks"></i>
                         <span>Task & Project</span>

@@ -16,18 +16,14 @@ class Task extends Model
         'task_name',
         'task_desc',
         'assigned_to',
-        'assigned_by',
         'task_status',
         'notes',
         'due_date',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'due_date' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'due_date' => 'date',
+    ];
 
     public function project()
     {
@@ -41,11 +37,6 @@ class Task extends Model
 
     public function assignedTo()
     {
-        return $this->belongsTo(Employee::class, 'assigned_to');
-    }
-
-    public function assignedBy()
-    {
-        return $this->belongsTo(User::class, 'assigned_by');
+        return $this->belongsTo(Employee::class, 'assigned_to', 'employee_id');
     }
 }

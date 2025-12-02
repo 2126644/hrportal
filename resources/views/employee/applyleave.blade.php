@@ -105,7 +105,7 @@
                                 <option value="" disabled selected>Select Type</option>
                                 @foreach ($leaveTypeEnum as $type)
                                     <option value="{{ $type }}" {{ old('leave_type') == $type ? 'selected' : '' }}>
-                                        {{ ucfirst($type) }}
+                                        {{ ucfirst($type) }} Leave
                                     </option>
                                 @endforeach
                             </select>
@@ -115,11 +115,13 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="leave_length" class="form-label">Leave Length <span class="text-danger">*</span></label>
+                            <label for="leave_length" class="form-label">Leave Length <span
+                                    class="text-danger">*</span></label>
                             <select id="leave_length" name="leave_length" class="form-select" required>
                                 <option value="" disabled selected>Select Length</option>
                                 @foreach ($leaveLengthEnum as $length)
-                                    <option value="{{ $length }}" {{ old('leave_length') == $length ? 'selected' : '' }}>
+                                    <option value="{{ $length }}"
+                                        {{ old('leave_length') == $length ? 'selected' : '' }}>
                                         {{ ucfirst(str_replace('_', ' ', $length)) }}
                                     </option>
                                 @endforeach
@@ -169,11 +171,14 @@
                             @enderror
                         </div>
 
-
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary px-4">Submit Application</button>
+                            <a href="{{ route('leave.index.employee') }}" class="btn btn-secondary me-2">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Submit Application
+                            </button>
                         </div>
-
                     </form>
                 </div>
             </div>

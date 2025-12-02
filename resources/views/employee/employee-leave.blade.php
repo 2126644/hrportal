@@ -169,20 +169,23 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Type</th>
+                                            <th>Applied Date</th>
+                                            <th>Leave Type</th>
                                             <th>Start Date</th>
                                             <th>End Date</th>
+                                            <th>Duration</th>
                                             <th>Reason</th>
                                             <th>Status</th>
-                                            <th>Applied</th>
                                         </tr>
                                     </thead>
                                     <tbody id="leavesTable">
                                         @foreach ($leaves as $leave)
                                             <tr data-status="{{ $leave->status }}">
+                                                <td>{{ $leave->created_at->format('d M Y') }}</td>
                                                 <td>{{ ucfirst($leave->leave_type) }} Leave</td>
-                                                <td>{{ $leave->start_date }}</td>
-                                                <td>{{ $leave->end_date }}</td>
+                                                <td>{{ $leave->start_date->format('d M Y') }}</td>
+                                                <td>{{ $leave->end_date->format('d M Y') }}</td>
+                                                <td>{{ $leave->days }} days</td>
                                                 <td>{{ $leave->reason }}</td>
                                                 <td>
                                                     @if ($leave->status === 'approved')
@@ -193,7 +196,6 @@
                                                         <span class="badge bg-warning text-dark">Pending</span>
                                                     @endif
                                                 </td>
-                                                <td>{{ $leave->created_at->format('d M Y') }}</td>
                                             </tr>
                                         @endforeach
 

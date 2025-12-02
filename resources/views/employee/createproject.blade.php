@@ -59,7 +59,7 @@
                         <div class="mb-3">
                             <label for="project_status" class="form-label">Project Status <span
                                     class="text-danger">*</span></label>
-                            <select id="project_status"name="project_status" class="form-select" required>
+                            <select id="project_status" name="project_status" class="form-select" required>
                                 <option value="" disabled {{ old('project_status') ? '' : 'selected' }}>
                                     Select Status</option>
                                 <option value="not-started" {{ old('project_status') === 'not-started' ? 'selected' : '' }}>
