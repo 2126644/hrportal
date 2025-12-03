@@ -36,7 +36,7 @@
                                 </div>
 
                                 <!-- New Project Button -->
-                                <button class="d-flex btn-new" onclick="window.location='{{ route('project.create') }}'">
+                                <button class="btn-new" onclick="window.location='{{ route('project.create') }}'">
                                     New Project
                                 </button>
                             </div>
@@ -158,7 +158,7 @@
     <div id="projectsCard">
         <div class="row">
             @forelse ($projects as $project)
-                <div class="col-md-6 mb-3 project-item" data-status="{{ $project->project_status }}">
+                <div class="col-md-12 mb-3 project-item" data-status="{{ $project->project_status }}">
                     <div class="card h-100" data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
                         style="cursor:pointer;">
 
@@ -204,11 +204,11 @@
 
                                     <div>
                                         <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>Start:</strong> {{ $project->start_date }}
+                                        <strong>Start:</strong> {{ $project->start_date->format('d M Y') }}
                                     </div>
                                     <div>
                                         <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>End:</strong> {{ $project->end_date }}
+                                        <strong>End:</strong> {{ $project->end_date->format('d M Y') }}
                                     </div>
                                 </div>
                             </div>
@@ -242,11 +242,22 @@
                                 <table class="table table-sm">
                                     <tr>
                                         <th>Project Name</th>
-                                        <td>{{ $project->project_name }}</td>
+                                        <td>
+                                            <input type="text" name="project_name" class="form-control"
+                                                value="{{ old('project_name', $project->project_name) }}" required>
+                                            @error('project_name')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Description</th>
-                                        <td>{{ $project->project_desc }}</td>
+                                        <td>
+                                            <textarea name="project_desc" class="form-control">{{ old('project_desc', $project->project_desc) }}</textarea>
+                                            @error('project_desc')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Created by</th>
@@ -289,13 +300,12 @@
                                         <th>End Date</th>
                                         <td>
                                             <input type="date" name="end_date" class="form-control"
-                                                value="{{ old('end_date', $project->end_date ? \Carbon\Carbon::parse($project->end_date)->format('Y-m-d') : '') }}">
+                                                value="{{ old('end_date', $project->end_date ? $project->end_date->format('Y-m-d') : '') }}">
                                             @error('end_date')
                                                 <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </td>
                                     </tr>
-
                                 </table>
                             </div>
 

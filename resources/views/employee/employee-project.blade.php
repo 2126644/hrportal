@@ -28,9 +28,9 @@
                                     </button>
 
                                     <button
-                                        class="btn btn-outline-primary {{ request()->routeIs('project.index.admin') ? 'active disabled' : '' }}"
-                                        onclick="window.location='{{ route('project.index.admin') }}'"
-                                        {{ request()->routeIs('project.index.admin') ? 'disabled' : '' }}>
+                                        class="btn btn-outline-primary {{ request()->routeIs('project.index.employee') ? 'active disabled' : '' }}"
+                                        onclick="window.location='{{ route('project.index.employee') }}'"
+                                        {{ request()->routeIs('project.index.employee') ? 'disabled' : '' }}>
                                         Projects
                                     </button>
                                 </div>
@@ -153,82 +153,74 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card" id="projectsCard">
-                <div class="card-body">
-                    <h4 class="card-title mb-3 ">Projects</h4>
+    <div id="projectsCard">
+        <div class="row">
+            @forelse ($projects as $project)
+                <div class="col-md-12 mb-3 project-item" data-status="{{ $project->project_status }}">
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
+                        style="cursor:pointer;">
 
-                    @forelse ($projects as $project)
-                        <div class="card project-item mb-3" data-status="{{ $project->project_status }}"
-                            data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
-                            style="cursor:pointer;">
-                            <div class="card-body">
-                                <div class="row">
-                                    <!-- Left side: Project details -->
-                                    <div class="col-md-8">
-                                        <h5 class="fw-bold mb-2 text-dark">{{ $project->project_name }}</h5>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Left side: Project details -->
+                                <div class="col-8">
+                                    <h5 class="fw-bold mb-2 text-dark">{{ $project->project_name }}</h5>
+                                    <p class="text-muted mb-3">{{ $project->project_desc }}</p>
 
-                                        <p class="text-muted mb-3">{{ $project->project_desc }}</p>
-
-                                        <div class="task-meta">
-                                            <div class="mb-1">
-                                                <i class="bi bi-person-fill me-1 text-secondary"></i>
-                                                <strong>Created By:</strong> {{ $project->created_by }}
-                                            </div>
-                                        </div>
-
-                                        <small class="text-muted">
-                                            <i class="bi bi-clock-history me-1"></i>
-                                            Created: {{ $project->created_at->format('d M Y') }} |
-                                            Updated: {{ $project->updated_at->format('d M Y') }}
-                                        </small>
+                                    <div class="task-meta mb-1">
+                                        <i class="bi bi-person-fill me-1 text-secondary"></i>
+                                        <strong>Created By:</strong> {{ $project->created_by }}
                                     </div>
 
-                                    <!-- Right side: Status & Due date -->
-                                    <div class="col-md-4 text-md-end">
-                                        <!-- Status Badge -->
-                                        @switch($project->project_status)
-                                            @case('not-started')
-                                                <span class="badge bg-danger mb-3">Not-Started</span>
-                                            @break
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock-history me-1"></i>
+                                        Created: {{ $project->created_at->format('d M Y') }} |
+                                        Updated: {{ $project->updated_at->format('d M Y') }}
+                                    </small>
+                                </div>
 
-                                            @case('in-progress')
-                                                <span class="badge bg-info mb-3">In-Progress</span>
-                                            @break
+                                <!-- Right side: Status & Dates -->
+                                <div class="col-md-4 text-md-end">
+                                    <!-- Status Badge -->
+                                    @switch($project->project_status)
+                                        @case('not-started')
+                                            <span class="badge bg-danger mb-3">Not-Started</span>
+                                        @break
 
-                                            @case('on-hold')
-                                                <span class="badge bg-warning mb-3">On-Hold</span>
-                                            @break
+                                        @case('in-progress')
+                                            <span class="badge bg-info text-dark mb-3">In-Progress</span>
+                                        @break
 
-                                            @case('completed')
-                                                <span class="badge bg-success mb-3">Completed</span>
-                                            @break
-                                        @endswitch
+                                        @case('on-hold')
+                                            <span class="badge bg-warning mb-3">On-Hold</span>
+                                        @break
 
-                                        <div class="start-date">
-                                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                            <strong>Start:</strong> {{ $project->start_date->format('d M Y') }}
-                                        </div>
-                                        <div class="end-date">
-                                            <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                            <strong>End:</strong> {{ $project->end_date->format('d M Y') }}
-                                        </div>
+                                        @case('completed')
+                                            <span class="badge bg-success mb-3">Completed</span>
+                                        @break
+                                    @endswitch
+
+                                    <div>
+                                        <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                                        <strong>Start:</strong> {{ $project->start_date->format('d M Y') }}
+                                    </div>
+                                    <div>
+                                        <i class="bi bi-calendar-event me-1 text-secondary"></i>
+                                        <strong>End:</strong> {{ $project->end_date->format('d M Y') }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        @empty
-                            <div class="text-center py-4 text-muted no-projects-static">
-                                <i class="bi bi-inbox display-6 mb-2"></i>
-                                <p class="mb-0">No projects found</p>
-                            </div>
-                        @endforelse
                     </div>
                 </div>
+                @empty
+                    <div class="text-center py-4 text-muted no-projects-static">
+                        <i class="bi bi-inbox display-6 mb-2"></i>
+                        <p class="mb-0">No projects found</p>
+                    </div>
+                @endforelse
             </div>
         </div>
 
@@ -237,7 +229,7 @@
             <div class="modal fade" id="projectModal{{ $project->id }}" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <form action="{{ route('task.update', $project->id) }}" method="POST">
+                        <form action="{{ route('project.update', $project->id) }}" method="POST">
                             @csrf
                             @method('PUT')
 
@@ -314,7 +306,6 @@
                                             @enderror
                                         </td>
                                     </tr>
-
                                 </table>
                             </div>
 
@@ -327,7 +318,9 @@
                 </div>
             </div>
         @endforeach
+    @endsection
 
+    @push('scripts')
         <script>
             document.querySelectorAll('.filter-card').forEach(card => {
                 card.addEventListener('click', function() {
@@ -379,9 +372,9 @@
                             noProjectsMessage.id = 'noProjectsMessage';
                             noProjectsMessage.className = 'text-center py-4 text-muted no-projects-dynamic';
                             noProjectsMessage.innerHTML = `
-                    <i class="bi bi-inbox display-6 mb-2"></i>
-                    <p class="mb-0">No ${getProjectStatusText(status).toLowerCase()} projects found</p>
-                `;
+                            <i class="bi bi-inbox display-6 mb-2"></i>
+                            <p class="mb-0">No ${getProjectStatusText(status).toLowerCase()} projects found</p>
+                            `;
                             document.querySelector('#projectsCard .card-body').appendChild(noProjectsMessage);
                         }
                     } else {
@@ -396,12 +389,12 @@
             function getProjectStatusText(status) {
                 const statusMap = {
                     'all': 'all',
-                    'not-started': 'not started',
-                    'in-progress': 'in progress',
-                    'on-hold': 'on hold',
+                    'not-started': 'not-started',
+                    'in-progress': 'in-progress',
+                    'on-hold': 'on-hold',
                     'completed': 'completed'
                 };
                 return statusMap[status] || status;
             }
         </script>
-    @endsection
+    @endpush

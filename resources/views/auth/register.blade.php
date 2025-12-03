@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -57,10 +59,11 @@
 
         .card {
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
+
 <body>
     <div class="login-wrapper">
         <div class="container">
@@ -69,7 +72,8 @@
                     <div class="card border-0 shadow-sm">
                         <div class="card-body p-5">
                             <div class="text-center mb-4">
-                                <img class="img-fluid mb-3" src="assets/img/ahglogobg.png" alt="Logo" style="max-height: 100px;">
+                                <img class="img-fluid mb-3" src="assets/img/ahglogobg.png" alt="Logo"
+                                    style="max-height: 100px;">
                                 <h2 class="fw-bold text-primary">
                                     <i class="bi bi-person-plus-fill me-2"></i>Register
                                 </h2>
@@ -87,16 +91,10 @@
                                     <label for="employee_id" class="form-label">
                                         <i class="bi bi-person-badge me-2"></i>Employee ID
                                     </label>
-                                    <input 
-                                        id="employee_id" 
-                                        class="form-control @error('employee_id') is-invalid @enderror" 
-                                        type="text" 
-                                        name="employee_id" 
-                                        value="{{ old('employee_id') }}" 
-                                        required 
-                                        autofocus 
-                                        autocomplete="employee_id"
-                                    >
+                                    <input id="employee_id"
+                                        class="form-control @error('employee_id') is-invalid @enderror" type="text"
+                                        name="employee_id" value="{{ old('employee_id') }}" required autofocus
+                                        autocomplete="employee_id">
                                     @error('employee_id')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -109,15 +107,9 @@
                                     <label for="name" class="form-label">
                                         <i class="bi bi-person me-2"></i>Name
                                     </label>
-                                    <input 
-                                        id="name" 
-                                        class="form-control @error('name') is-invalid @enderror" 
-                                        type="text" 
-                                        name="name" 
-                                        value="{{ old('name') }}" 
-                                        required 
-                                        autocomplete="name"
-                                    >
+                                    <input id="name" class="form-control @error('name') is-invalid @enderror"
+                                        type="text" name="name" value="{{ old('name') }}" required
+                                        autocomplete="name">
                                     @error('name')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -130,15 +122,9 @@
                                     <label for="email" class="form-label">
                                         <i class="bi bi-envelope me-2"></i>Email Address
                                     </label>
-                                    <input 
-                                        id="email" 
-                                        class="form-control @error('email') is-invalid @enderror" 
-                                        type="email" 
-                                        name="email" 
-                                        value="{{ old('email') }}" 
-                                        required 
-                                        autocomplete="username"
-                                    >
+                                    <input id="email" class="form-control @error('email') is-invalid @enderror"
+                                        type="email" name="email" value="{{ old('email') }}" required
+                                        autocomplete="username">
                                     @error('email')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -151,14 +137,15 @@
                                     <label for="password" class="form-label">
                                         <i class="bi bi-lock me-2"></i>Password
                                     </label>
-                                    <input 
-                                        id="password" 
-                                        class="form-control @error('password') is-invalid @enderror" 
-                                        type="password" 
-                                        name="password" 
-                                        required 
-                                        autocomplete="new-password"
-                                    >
+                                    <div class="input-group">
+                                        <input id="password"
+                                            class="form-control @error('password') is-invalid @enderror" type="password"
+                                            name="password" required autocomplete="new-password">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                            aria-pressed="false" aria-label="Show password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     @error('password')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -171,14 +158,10 @@
                                     <label for="password_confirmation" class="form-label">
                                         <i class="bi bi-lock-fill me-2"></i>Confirm Password
                                     </label>
-                                    <input 
-                                        id="password_confirmation" 
-                                        class="form-control @error('password_confirmation') is-invalid @enderror" 
-                                        type="password" 
-                                        name="password_confirmation" 
-                                        required 
-                                        autocomplete="new-password"
-                                    >
+                                    <input id="password_confirmation"
+                                        class="form-control @error('password_confirmation') is-invalid @enderror"
+                                        type="password" name="password_confirmation" required
+                                        autocomplete="new-password">
                                     @error('password_confirmation')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -191,11 +174,22 @@
                                     <div class="mb-3">
                                         <label for="terms" class="form-label">
                                             <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" name="terms" id="terms" required>
+                                                <input type="checkbox" class="form-check-input" name="terms"
+                                                    id="terms" required>
                                                 <label class="form-check-label" for="terms">
                                                     {!! __('I agree to the :terms_of_service and :privacy_policy', [
-                                                        'terms_of_service' => '<a target="_blank" href="'.route('terms.show').'" class="underline text-primary">'.__('Terms of Service').'</a>',
-                                                        'privacy_policy' => '<a target="_blank" href="'.route('policy.show').'" class="underline text-primary">'.__('Privacy Policy').'</a>',
+                                                        'terms_of_service' =>
+                                                            '<a target="_blank" href="' .
+                                                            route('terms.show') .
+                                                            '" class="underline text-primary">' .
+                                                            __('Terms of Service') .
+                                                            '</a>',
+                                                        'privacy_policy' =>
+                                                            '<a target="_blank" href="' .
+                                                            route('policy.show') .
+                                                            '" class="underline text-primary">' .
+                                                            __('Privacy Policy') .
+                                                            '</a>',
                                                     ]) !!}
                                                 </label>
                                             </div>
@@ -227,7 +221,26 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.querySelector('#togglePassword');
+            const passwordInput = document.querySelector('#password');
+
+            if (!toggleBtn || !passwordInput) return;
+
+            toggleBtn.addEventListener('click', function() {
+                const isText = passwordInput.type === 'text';
+                passwordInput.type = isText ? 'password' : 'text';
+                const icon = this.querySelector('i');
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
+                this.setAttribute('aria-pressed', (!isText).toString());
+                this.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+            });
+        });
+    </script>
 </body>
+
 </html>
 
 {{-- <x-guest-layout>

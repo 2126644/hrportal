@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +11,13 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -57,11 +59,12 @@
 
         .card {
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
         }
     </style>
 </head>
+
 <body>
     <div class="login-wrapper">
         <div class="container">
@@ -70,7 +73,8 @@
                     <div class="card border-0 shadow-sm">
                         <div class="card-body p-5">
                             <div class="text-center mb-4">
-                                <img class="img-fluid mb-3" src="assets/img/ahglogobg.png" alt="Logo" style="max-height: 100px;">
+                                <img class="img-fluid mb-3" src="assets/img/ahglogobg.png" alt="Logo"
+                                    style="max-height: 100px;">
                                 <h2 class="fw-bold text-primary">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>Login
                                 </h2>
@@ -80,21 +84,14 @@
                             <!-- Login Form -->
                             <form method="POST" action="{{ route('login') }}">
                                 @csrf
-                                
+
                                 <!-- Email Input -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">
                                         <i class="bi bi-envelope me-2"></i>Email Address
                                     </label>
-                                    <input 
-                                        type="email" 
-                                        class="form-control @error('email') is-invalid @enderror" 
-                                        id="email" 
-                                        name="email" 
-                                        value="{{ old('email') }}" 
-                                        required 
-                                        autofocus
-                                    >
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                        id="email" name="email" value="{{ old('email') }}" required autofocus>
                                     @error('email')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -107,13 +104,15 @@
                                     <label for="password" class="form-label">
                                         <i class="bi bi-lock me-2"></i>Password
                                     </label>
-                                    <input 
-                                        type="password" 
-                                        class="form-control @error('password') is-invalid @enderror" 
-                                        id="password" 
-                                        name="password" 
-                                        required
-                                    >
+                                    <div class="input-group">
+                                        <input type="password"
+                                            class="form-control @error('password') is-invalid @enderror" id="password"
+                                            name="password" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                            aria-pressed="false" aria-label="Show password">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     @error('password')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -124,13 +123,8 @@
                                 <!-- Remember Me and Forgot Password -->
                                 <div class="d-flex justify-content-between mb-3">
                                     <div class="form-check">
-                                        <input 
-                                            type="checkbox" 
-                                            class="form-check-input" 
-                                            id="remember" 
-                                            name="remember"
-                                            {{ old('remember') ? 'checked' : '' }}
-                                        >
+                                        <input type="checkbox" class="form-check-input" id="remember" name="remember"
+                                            {{ old('remember') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="remember">
                                             Remember Me
                                         </label>
@@ -150,7 +144,7 @@
 
                             <!-- Register Link -->
                             <div class="text-center mt-3">
-                                Don't have an account? 
+                                Don't have an account?
                                 <a href="{{ route('register') }}" class="text-primary">
                                     Sign Up
                                 </a>
@@ -164,7 +158,27 @@
 
     <!-- Bootstrap JS (optional, for future interactions) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.querySelector('#togglePassword');
+            const passwordInput = document.querySelector('#password');
+
+            if (!toggleBtn || !passwordInput) return;
+
+            toggleBtn.addEventListener('click', function() {
+                const isText = passwordInput.type === 'text';
+                passwordInput.type = isText ? 'password' : 'text';
+                const icon = this.querySelector('i');
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
+                this.setAttribute('aria-pressed', (!isText).toString());
+                this.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+            });
+        });
+    </script>
 </body>
+
 </html>
 
 {{-- <x-guest-layout>

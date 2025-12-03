@@ -21,21 +21,15 @@ class ProjectController extends Controller
         $projects = Project::orderBy('project_name')->get();
         $employees = Employee::orderBy('full_name')->get();
 
-        $query = Project::orderBy('created_at', 'desc');
+        $query = Project::with(['tasks', 'createdBy'])->orderBy('created_at', 'desc');
 
-        // Only apply filters if the inputs exist
-        if ($user->role_id === 2) {
-            if ($request->filled('status')) {
-                 $query->where('project_status', $request->status);
-            }
-            // Search — Project name OR ID
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('project_name', 'like', '%' . $search . '%')
-                        ->orWhere('id', $search);
-                });
-            }
+        // Filter by task name or ID
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('project_name', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
+            });
         }
 
         if ($request->filled('created_by')) {
@@ -48,6 +42,10 @@ class ProjectController extends Controller
 
         if ($request->filled('end_date')) {
             $query->where('end_date', $request->end_date);
+        }
+
+        if ($request->filled('project_status')) {
+            $query->where('project_status', $request->project_status);
         }
 
         // Finally fetch results

@@ -22,84 +22,45 @@ class TaskController extends Controller
         $projects = Project::orderBy('project_name')->get();
         $employees = Employee::orderBy('full_name')->get();
 
-        $query = Task::orderBy('created_at', 'desc');
+        // query model with relationships
+        $query = Task::with(['project', 'assignedTo', 'createdBy'])->orderBy('created_at', 'desc');
 
-        // --- Scope to employee when not admin ---
-        if ($user->role_id !== 2) {
-            if ($employee) {
-                $query->where('assigned_to', $employee->employee_id)
-                    ->orWhere('created_by', $employee->employee_id);
-            }
+        // Employee — only see their own tasks
+        if ($user->role_id === 3) {
+            $query->where('assigned_to', $employee->employee_id);
         }
 
-        // --- Admin filters ---
-        if ($user->role_id === 2) {
-            // status filter: server-side
-            if ($request->filled('status')) {
-                $query->where('task_status', $request->status);
-            }
-            // Search — Task name OR ID
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('task_name', 'like', '%' . $search . '%')
-                        ->orWhere('id', $search);
-                });
-            }
-
-            // project filter
-            if ($request->filled('project_id')) {
-                $query->where('project_id', $request->project_id);
-            }
-
-            // created_by filter (accepts either numeric id or employee_id string)
-            if ($request->filled('created_by')) {
-                $createdByInput = $request->created_by;
-                $createdByEmployee = Employee::where('id', $createdByInput)
-                    ->orWhere('employee_id', $createdByInput)
-                    ->first();
-                if ($createdByEmployee) {
-                    $query->where('created_by', $createdByEmployee->employee_id);
-                } else {
-                    // if a raw employee_id string was passed
-                    $query->where('created_by', $createdByInput);
-                }
-            }
-
-            // assigned_to filter
-            if ($request->filled('assigned_to')) {
-                $assignedToInput = $request->assigned_to;
-                $assignedToEmployee = Employee::where('id', $assignedToInput)
-                    ->orWhere('employee_id', $assignedToInput)
-                    ->first();
-                if ($assignedToEmployee) {
-                    $query->where('assigned_to', $assignedToEmployee->employee_id);
-                } else {
-                    $query->where('assigned_to', $assignedToInput);
-                }
-            }
-
-            // assigned_by filter
-            if ($request->filled('assigned_by')) {
-                $assignedByInput = $request->assigned_by;
-                $assignedByEmployee = Employee::where('id', $assignedByInput)
-                    ->orWhere('employee_id', $assignedByInput)
-                    ->first();
-                if ($assignedByEmployee) {
-                    $query->where('assigned_by', $assignedByEmployee->employee_id);
-                } else {
-                    $query->where('assigned_by', $assignedByInput);
-                }
-            }
+        // Filter by task name or ID
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('task_name', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
+            });
         }
 
-        // --- Common filters ---
-        if ($request->filled('task_name')) {
-            $query->where('task_name', 'like', '%' . $request->task_name . '%');
+        // Filter by created by
+        if ($request->filled('created_by')) {
+            $query->where('created_by', $request->created_by);
         }
 
+        if ($request->filled('assigned_to')) {
+            $query->where('assigned_to', $request->assigned_to);
+        }
+
+        // Filter by project
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+
+        // Filter by task status
+        if ($request->filled('task_status')) {
+            $query->where('task_status', $request->task_status);
+        }
+
+        // Filter by due date
         if ($request->filled('due_date')) {
-            $query->whereDate('due_date', $request->due_date);
+            $query->where('due_date', $request->due_date);
         }
 
         $tasks = $query->get();
