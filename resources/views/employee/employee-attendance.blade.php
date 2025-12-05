@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    
+
     <!-- Filters and Search -->
     <div class="card mb-4">
         <div class="card-body">
@@ -39,28 +39,33 @@
                         <label class="form-label">Status Time In</label>
                         <select name="status_time_in" class="form-select">
                             <option value="">All Statuses</option>
-                            @foreach($statusTimeInOptions as $status)
-                                <option value="{{ $status }}" {{ request('status_time_in') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                            @foreach ($statusTimeInOptions as $status)
+                                <option value="{{ $status }}"
+                                    {{ request('status_time_in') == $status ? 'selected' : '' }}>{{ $status }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status Time Out</label>
                         <select name="status_time_out" class="form-select">
-+                            <option value="">All Statuses</option>
-+                            @foreach($statusTimeOutOptions as $status)
-                                <option value="{{ $status }}" {{ request('status_time_out') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                            <option value="">All Statuses</option>
+                            @foreach ($statusTimeOutOptions as $status)
+                                <option value="{{ $status }}"
+                                    {{ request('status_time_out') == $status ? 'selected' : '' }}>{{ $status }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select">
-+                            <option value="">All Statuses</option>
-+                            @foreach($statusOptions as $status)
-+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
-+                            @endforeach
-+                        </select>
+                            <option value="">All Statuses</option>
+                            @foreach ($statusOptions as $status)
+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                    {{ $status }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
                         <button class="btn btn-primary w-100">
@@ -113,26 +118,66 @@
                                 {{ $todayAttendance?->time_out?->format('g:i:s A') ?? '—' }}
                             </span>
                         </h5>
-
                     </div>
 
                     <div id="punchContainer">
-                        @if (!$todayAttendance)
-                            <button class="btn btn-punch mb-2" id="punchInBtn">
-                                <i class="bi bi-hand-index-thumb me-1"></i> Punch In
-                            </button>
-                        @elseif ($todayAttendance && !$todayAttendance->time_out)
+                        @php
+                            $attendance = $todayAttendance;
+                            $hasSlip = $attendance?->time_slip_start && $attendance?->time_slip_end;
+                            $slipStatus = $attendance?->time_slip_status;
+                        @endphp
+
+                        {{-- =============================
+                            CASE 1: No Attendance Today
+                        ============================= --}}
+                        @if (!$attendance)
+                            @if ($hasSlip && $slipStatus === 'pending')
+                                <div class="mb-2">
+                                    <span class="badge bg-warning text-dark">Time slip pending</span>
+                                    <small class="text-muted ms-2">Cannot punch in while request is pending.</small>
+                                </div>
+                            @elseif (!$hasSlip)
+                                {{-- Normal Punch In --}}
+                                <button class="btn btn-punch mb-2" id="punchInBtn">
+                                    <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch In
+                                </button>
+                            @endif
+
+                        {{-- =============================
+                            CASE 2: Attendance exists
+                        ============================= --}}
+                        @elseif ($attendance->time_in && !$attendance->time_out)
+                            {{-- Punched in only → punch out --}}
                             <button class="btn btn-punch mb-2" id="punchOutBtn">
                                 <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
                             </button>
-                        @else
+
+                        {{-- =============================
+                            CASE 3: Fully Completed
+                        ============================= --}}
+                        @elseif ($attendance->time_in && $attendance->time_out)
                             <span class="text-success mb-2 d-block">
-                                <i class="bi bi-check-circle-fill me-1"></i>You have punched out for today.
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                You have punched out for today.
                             </span>
+
                         @endif
-                        <button class="btn btn-punch" data-bs-toggle="modal" data-bs-target="#timeSlipModal">
-                            <i class="bi bi-receipt me-1"></i> Request Time Slip
-                        </button>
+
+                        @if ($hasSlip && $slipStatus === 'pending')
+                            {{-- Employee can cancel slip --}}
+                            <form action="{{ route('timeslip.destroy.employee', $attendance->id) }}" method="POST"
+                                onsubmit="return confirm('Cancel time slip request?');">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger">Cancel Slip</button>
+                            </form>
+
+                            {{-- Time Slip Request Button --}}
+                        @else
+                            <button class="btn btn-punch" data-bs-toggle="modal" data-bs-target="#timeSlipModal">
+                                <i class="bi bi-receipt me-1"></i> Request Time Slip
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -197,7 +242,8 @@
 
                                         <td>
                                             @if ($attendance->time_slip_start && $attendance->time_slip_end)
-                                                {{ $attendance->time_slip_start }} - {{ $attendance->time_slip_end }}
+                                                {{ $attendance->time_slip_start->format('g:i A') }} -
+                                                {{ $attendance->time_slip_end->format('g:i A') }}
                                             @else
                                                 <span class="text-muted">N/A</span>
                                             @endif
@@ -206,11 +252,14 @@
                                         <td>
                                             @if ($attendance->time_slip_status)
                                                 @if ($attendance->time_slip_status === 'pending')
-                                                    <span class="badge bg-warning">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                    <span
+                                                        class="badge bg-warning">{{ ucfirst($attendance->time_slip_status) }}</span>
                                                 @elseif ($attendance->ime_slip_status === 'rejected')
-                                                    <span class="badge bg-danger">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                    <span
+                                                        class="badge bg-danger">{{ ucfirst($attendance->time_slip_status) }}</span>
                                                 @else
-                                                    <span class="badge bg-success">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                    <span
+                                                        class="badge bg-success">{{ ucfirst($attendance->time_slip_status) }}</span>
                                                 @endif
                                             @else
                                                 <span class="text-muted">N/A</span>
@@ -218,7 +267,8 @@
                                         </td>
 
                                         <td>
-                                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                            <a href="#" class="btn btn-sm btn-outline-primary"
+                                                data-bs-toggle="modal"
                                                 data-bs-target="#attendanceModal{{ $attendance->id }}"
                                                 title="View Details">
                                                 <i class="bi bi-pencil-square"></i>
@@ -249,7 +299,9 @@
                             @method('PUT')
 
                             <div class="modal-header">
-                                <h5 class="modal-title">Attendance Details ({{ $attendance->date?->format('d M Y') ?? '—' }})</h5>
+                                <h5 class="modal-title">Attendance Details
+                                    ({{ $attendance->date?->format('d M Y') ?? '—' }})
+                                </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
@@ -322,26 +374,38 @@
                     @csrf
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip ({{ $todayAttendance?->date?->format('d M Y') ?? now()->format('d M Y') }})</h5>
+                        <h5 class="modal-title" id="timeSlipModalLabel">Request Time Slip
+                            ({{ $todayAttendance?->date?->format('d M Y') ?? now()->format('d M Y') }})</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <div class="modal-body">
+
                         <div class="mb-3">
                             <label for="time_slip_start" class="form-label">Start Time</label>
                             <input type="time" name="time_slip_start" id="time_slip_start" class="form-control"
-                                required>
+                                required value="{{ old('time_slip_start', $todayAttendance->time_slip_start ?? '') }}">
+                            @error('time_slip_start')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="time_slip_end" class="form-label">End Time</label>
-                            <input type="time" name="time_slip_end" id="time_slip_end" class="form-control" required>
+                            <input type="time" name="time_slip_end" id="time_slip_end" class="form-control" required
+                                value="{{ old('time_slip_end', $todayAttendance->time_slip_end ?? '') }}">
+                            @error('time_slip_end')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         <div class="mb-3">
                             <label for="time_slip_reason" class="form-label">Reason</label>
                             <textarea name="time_slip_reason" id="time_slip_reason" class="form-control" rows="2"
-                                placeholder="Explain briefly (e.g. short errand, clinic visit)" required></textarea>
+                                placeholder="Explain briefly (e.g. short errand, clinic visit)" required>{{ old('time_slip_reason', $todayAttendance->time_slip_reason ?? '') }}</textarea>
+                            @error('time_slip_reason')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -565,6 +629,19 @@
             if (e.target && e.target.id === 'punchOutBtn') {
                 sendPunch("{{ route('attendance.punchOut') }}", "mapOut", "punched out");
             }
+        });
+    </script>
+
+    {{-- Re-open modal if there were validation errors for the time slip --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if ($errors->has('time_slip_start') || $errors->has('time_slip_end') || $errors->has('time_slip_reason'))
+                var slipModalEl = document.getElementById('timeSlipModal');
+                if (slipModalEl) {
+                    var slipModal = new bootstrap.Modal(slipModalEl);
+                    slipModal.show();
+                }
+            @endif
         });
     </script>
 @endsection

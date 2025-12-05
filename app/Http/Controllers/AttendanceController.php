@@ -64,8 +64,8 @@ class AttendanceController extends Controller
             ->orderBy('date', 'desc')
             ->orderBy('created_at', 'desc')
             ->first();
-        
-         // provide distinct status options to the view (move DB calls out of blade)
+
+        // provide distinct status options to the view (move DB calls out of blade)
         $statusTimeInOptions = Attendance::select('status_time_in')->distinct()->pluck('status_time_in')->filter()->values();
         $statusTimeOutOptions = Attendance::select('status_time_out')->distinct()->pluck('status_time_out')->filter()->values();
         $statusOptions = Attendance::select('status')->distinct()->pluck('status')->filter()->values();
@@ -88,10 +88,11 @@ class AttendanceController extends Controller
         // Office location
         $officeLat = 3.2017;
         $officeLng = 101.73256;
-        $maxDistance = 1.5; // km (radius)
 
         $lat = $request->latitude;
         $lng = $request->longitude;
+
+        $maxDistance = 1.5; // km (radius)
 
         //If within office radius → status = "on-site". Else "off-site"
         $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
@@ -105,22 +106,59 @@ class AttendanceController extends Controller
 
         $employment = $employee->employment;
 
-        // fallback if no employment record or times set
+        // normal work start time
         $workStart = $employment && $employment->work_start_time
             ? Carbon::parse($employment->work_start_time)
             : Carbon::createFromTime(8, 30, 0);
 
-        // Check if late
-        $statusTimeIn = $now->greaterThan($workStart) ? 'Late' : 'On Time';
+        // Get today's attendance record if exists (maybe time slip issued earlier)
+        $attendance = Attendance::where('employee_id', $employee->employee_id)
+            ->whereDate('date', $now->toDateString())
+            ->first();
 
-        $attendance = Attendance::create([
-            'employee_id'   => $employee->employee_id,
-            'date'          => $now->toDateString(),
-            'time_in'       => $now->toTimeString(),
-            'location'      => $lat . ',' . $lng,   //Saved in DB with location = "3.1400,101.6900" etc
-            'status'        => $status,
-            'status_time_in' => $statusTimeIn,
-        ]);
+        if (! $attendance) {
+            // No attendance → create fresh record (no slip)
+            $attendance = new Attendance();
+            $attendance->employee_id = $employee->employee_id;
+            $attendance->date = $now->toDateString();
+        }
+
+        $statusTimeIn = 'On Time';
+
+        if (
+            $attendance->time_slip_status &&
+            $attendance->time_slip_status === 'approved' &&
+            $attendance->time_slip_start &&
+            $attendance->time_slip_end
+        ) {
+
+            $slipStart = Carbon::parse($attendance->time_slip_start);
+            $slipEnd   = Carbon::parse($attendance->time_slip_end);
+
+            // Rule: If inside slip window → always On Time
+            if ($now->between($slipStart, $slipEnd)) {
+                $statusTimeIn = 'On Time';
+            }
+            // If after slip window → Late 
+            else if ($now->greaterThan($slipEnd)) {
+                $statusTimeIn = 'Late';
+            } // If before slip window → follow normal logic
+            else {
+                $statusTimeIn = $now->gt($workStart) ? 'Late' : 'On Time';
+            }
+        }
+        // No Slip → Normal Logic
+        else {
+            // Normal logic
+            $statusTimeIn = $now->greaterThan($workStart) ? 'Late' : 'On Time';
+        }
+
+        // Save punch in
+        $attendance->time_in = $now->toTimeString();
+        $attendance->location = $lat . ',' . $lng;
+        $attendance->status = $status;
+        $attendance->status_time_in = $statusTimeIn;
+        $attendance->save();
 
         return response()->json([
             'id'   => $attendance->id,
@@ -192,13 +230,32 @@ class AttendanceController extends Controller
 
         $employment = $employee->employment;
 
-        // fallback if no employment record or times set
         $workEnd = $employment && $employment->work_end_time
             ? Carbon::parse($employment->work_end_time)
             : Carbon::createFromTime(17, 30, 0);
 
-        // Check if early leave
-        $statusTimeOut = $now->lt($workEnd) ? 'Early Leave' : 'On Time';
+        $statusTimeOut = 'On Time';
+
+        // If has approved time slip
+        if (
+            $attendance->time_slip_status &&
+            $attendance->time_slip_status === 'approved' &&
+            $attendance->time_slip_start &&
+            $attendance->time_slip_end
+        ) {
+
+            $slipEnd = Carbon::parse($attendance->time_slip_end);
+
+            // If slip extends work end → treat slip end as the official end
+            if ($now->lt($slipEnd)) {
+                $statusTimeOut = 'Early Leave';
+            } else {
+                $statusTimeOut = 'On Time';
+            }
+        } else {
+            // Normal logic
+            $statusTimeOut = $now->lt($workEnd) ? 'Early Leave' : 'On Time';
+        }
 
         $attendance->update([
             'time_out'       => $now->toTimeString(),
@@ -299,14 +356,25 @@ class AttendanceController extends Controller
             return redirect()->back()->with('error', 'Only pending time slip requests can be cancelled.');
         }
 
-        // safer: cancel time slip fields instead of deleting attendance row
+        $now = Carbon::now();
+
+        // Find today's attendance
+        $attendance = Attendance::where('employee_id', $employee->employee_id)
+            ->whereDate('date', $now->toDateString())
+            ->first();
+
+        if ($attendance->time_in === null) {
+            $attendance->delete();
+        } elseif ($attendance->time_in) {
+            // Reset time slip fields only
         $attendance->update([
             'time_slip_start'  => null,
             'time_slip_end'    => null,
             'time_slip_reason' => null,
             'time_slip_status' => null,
         ]);
-
+        }
+        
         return redirect()->back()->with('success', 'Time slip request cancelled.');
     }
 
@@ -315,18 +383,33 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $employee = $user->employee;
 
+        // $timeSlipDuration_validation = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_end)
+        //     ->diffInMinutes(\Carbon\Carbon::createFromFormat('H:i', $request->time_slip_start));
+
         $request->validate([
             'time_slip_start' => 'required|date_format:H:i',
             'time_slip_end'   => 'required|date_format:H:i|after:time_slip_start',
             'time_slip_reason' => 'required|string|max:255',
         ]);
 
-        // Limit max duration to 2 hours
-        $start = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_start);
-        $end = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_end);
-        if ($end->diffInMinutes($start) > 120) {
-            return redirect()->back()->withErrors(['time_slip_end' => 'Time slip cannot exceed 2 hours']);
-        }
+        // $maxMinutes = 180;
+        // // Limit max duration to 2 hours
+        // $start = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_start);
+        // $end = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_end);
+
+        // // $request->validate([
+        // //     'time_slip_end' => function ($attribute, $value, $fail) use ($start, $end, $maxMinutes) {
+        // //         if ($end->diffInMinutes($start) > $maxMinutes) {
+        // //             $fail('Time slip cannot exceed ' . ($maxMinutes / 60) . ' hours.');
+        // //         }
+        // //     },
+        // // ]);
+
+        // if ($end->diffInMinutes($start) > $maxMinutes) {
+        //     return redirect()->back()
+        //         ->withErrors(['time_slip_end', 'time_slip_start' => 'Time slip cannot exceed ' . ($maxMinutes / 60) . ' hours.'])
+        //         ->withInput();
+        // }
 
         $todayAttendance = Attendance::firstOrCreate(
             ['employee_id' => $employee->employee_id, 'date' => now()->toDateString()]
@@ -339,7 +422,7 @@ class AttendanceController extends Controller
             'time_slip_status' => 'pending',
         ]);
 
-        return redirect()->back()->with('success', 'Time slip requested successfully.');
+        return redirect()->back()->with('success', 'Time slip request submitted.');
     }
 
     public function approveTimeSlip(Request $request, Attendance $attendance)
