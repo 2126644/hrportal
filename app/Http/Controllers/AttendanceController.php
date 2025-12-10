@@ -367,14 +367,14 @@ class AttendanceController extends Controller
             $attendance->delete();
         } elseif ($attendance->time_in) {
             // Reset time slip fields only
-        $attendance->update([
-            'time_slip_start'  => null,
-            'time_slip_end'    => null,
-            'time_slip_reason' => null,
-            'time_slip_status' => null,
-        ]);
+            $attendance->update([
+                'time_slip_start'  => null,
+                'time_slip_end'    => null,
+                'time_slip_reason' => null,
+                'time_slip_status' => null,
+            ]);
         }
-        
+
         return redirect()->back()->with('success', 'Time slip request cancelled.');
     }
 
@@ -383,33 +383,23 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $employee = $user->employee;
 
-        // $timeSlipDuration_validation = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_end)
-        //     ->diffInMinutes(\Carbon\Carbon::createFromFormat('H:i', $request->time_slip_start));
-
         $request->validate([
             'time_slip_start' => 'required|date_format:H:i',
             'time_slip_end'   => 'required|date_format:H:i|after:time_slip_start',
             'time_slip_reason' => 'required|string|max:255',
         ]);
 
-        // $maxMinutes = 180;
-        // // Limit max duration to 2 hours
-        // $start = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_start);
-        // $end = \Carbon\Carbon::createFromFormat('H:i', $request->time_slip_end);
+        // Calculate duration in minutes
+        $start = Carbon::createFromFormat('H:i', $request->time_slip_start);
+        $end = Carbon::createFromFormat('H:i', $request->time_slip_end);
+        $durationMinutes = $end->diffInMinutes($start);
 
-        // // $request->validate([
-        // //     'time_slip_end' => function ($attribute, $value, $fail) use ($start, $end, $maxMinutes) {
-        // //         if ($end->diffInMinutes($start) > $maxMinutes) {
-        // //             $fail('Time slip cannot exceed ' . ($maxMinutes / 60) . ' hours.');
-        // //         }
-        // //     },
-        // // ]);
-
-        // if ($end->diffInMinutes($start) > $maxMinutes) {
-        //     return redirect()->back()
-        //         ->withErrors(['time_slip_end', 'time_slip_start' => 'Time slip cannot exceed ' . ($maxMinutes / 60) . ' hours.'])
-        //         ->withInput();
-        // }
+        // Check if duration exceeds 3 hours (180 minutes)
+        if ($durationMinutes > 180) {
+            return redirect()->back()
+                ->withErrors(['time_slip_end' => 'Time slip cannot exceed 3 hours.'])
+                ->withInput();
+        }
 
         $todayAttendance = Attendance::firstOrCreate(
             ['employee_id' => $employee->employee_id, 'date' => now()->toDateString()]

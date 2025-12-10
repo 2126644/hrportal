@@ -143,7 +143,7 @@
                                 </button>
                             @endif
 
-                        {{-- =============================
+                            {{-- =============================
                             CASE 2: Attendance exists
                         ============================= --}}
                         @elseif ($attendance->time_in && !$attendance->time_out)
@@ -152,7 +152,7 @@
                                 <i class="bi bi-hand-index-thumb-fill me-1"></i> Punch Out
                             </button>
 
-                        {{-- =============================
+                            {{-- =============================
                             CASE 3: Fully Completed
                         ============================= --}}
                         @elseif ($attendance->time_in && $attendance->time_out)
@@ -160,7 +160,6 @@
                                 <i class="bi bi-check-circle-fill me-1"></i>
                                 You have punched out for today.
                             </span>
-
                         @endif
 
                         @if ($hasSlip && $slipStatus === 'pending')
@@ -224,6 +223,8 @@
                                                 <span class="badge bg-success">{{ $attendance->status_time_in }}</span>
                                             @elseif ($attendance->status_time_in === 'Late')
                                                 <span class="badge bg-danger">{{ $attendance->status_time_in }}</span>
+                                            @else
+                                                <span>-</span>
                                             @endif
                                         </td>
 
@@ -235,6 +236,8 @@
                                                 <span class="badge bg-success">{{ $attendance->status_time_out }}</span>
                                             @elseif ($attendance->status_time_out === 'Early Leave')
                                                 <span class="badge bg-danger">{{ $attendance->status_time_out }}</span>
+                                            @else
+                                                <span>-</span>
                                             @endif
                                         </td>
 
@@ -396,7 +399,11 @@
                                 value="{{ old('time_slip_end', $todayAttendance->time_slip_end ?? '') }}">
                             @error('time_slip_end')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
+                            @else
+                                <small class="text-muted">Maximum time slip duration is 3 hours</small>
                             @enderror
+                            <!-- Error container for JavaScript validation -->
+                            <div class="alert alert-danger mt-2 d-none" id="timeSlipError"></div>
                         </div>
 
                         <div class="mb-3">
@@ -642,6 +649,62 @@
                     slipModal.show();
                 }
             @endif
+        });
+    </script>
+
+    {{-- Add this script to your modal section --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timeSlipForm = document.querySelector('#timeSlipModal form');
+            const timeSlipStart = document.getElementById('time_slip_start');
+            const timeSlipEnd = document.getElementById('time_slip_end');
+            const errorContainer = document.getElementById('timeSlipError');
+
+            // No need to appendChild - element already exists
+            // Just ensure it starts hidden
+            errorContainer.classList.add('d-none');
+
+            // Validate time difference on form submit
+            timeSlipForm.addEventListener('submit', function(e) {
+                const startTime = timeSlipStart.value;
+                const endTime = timeSlipEnd.value;
+
+                if (startTime && endTime) {
+                    const start = new Date('2000-01-01T' + startTime + ':00');
+                    const end = new Date('2000-01-01T' + endTime + ':00');
+                    const diffMs = end - start;
+                    const diffHours = diffMs / (1000 * 60 * 60);
+
+                    if (diffHours > 3) {
+                        e.preventDefault();
+                        errorContainer.textContent = 'Time slip cannot exceed 3 hours.';
+                        errorContainer.classList.remove('d-none');
+                        timeSlipEnd.focus();
+                    } else {
+                        errorContainer.classList.add('d-none');
+                    }
+                }
+            });
+
+            // Also validate on input change for better UX
+            timeSlipEnd.addEventListener('change', function() {
+                const startTime = timeSlipStart.value;
+                const endTime = timeSlipEnd.value;
+
+                if (startTime && endTime) {
+                    const start = new Date('2000-01-01T' + startTime + ':00');
+                    const end = new Date('2000-01-01T' + endTime + ':00');
+                    const diffMs = end - start;
+                    const diffHours = diffMs / (1000 * 60 * 60);
+
+                    if (diffHours > 3) {
+                        errorContainer.textContent = 'Time slip cannot exceed 3 hours.';
+                        errorContainer.classList.remove('d-none');
+                    } else {
+                        errorContainer.classList.add('d-none');
+                    }
+                }
+            });
         });
     </script>
 @endsection

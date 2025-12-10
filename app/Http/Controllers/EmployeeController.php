@@ -48,6 +48,14 @@ class EmployeeController extends Controller
         // Task Summary Card
         $taskRecords = Task::where('assigned_to', $employee->employee_id)->get();
 
+        // Group tasks by status for display
+        $tasksByStatus = [
+            'to-do' => $taskRecords->where('task_status', 'to-do'),
+            'in-progress' => $taskRecords->where('task_status', 'in-progress'),
+            'in-review' => $taskRecords->where('task_status', 'in-review'),
+            'completed' => $taskRecords->where('task_status', 'completed'),
+        ];
+
         $pendingTask = optional($taskRecords->whereIn('task_status', ['to-do', 'in-progress', 'in-review', 'to-review']))->count();
         $completedTask  = $taskRecords->where('task_status', 'completed')->count();
         $overdueTask = $taskRecords->where('task_status', '!=', 'completed')->where('due_date', '<', now())->count();
@@ -106,6 +114,7 @@ class EmployeeController extends Controller
                 'attendance',
                 'task',
                 'taskRecords',
+                'tasksByStatus',
                 'leave',
                 'profile',
                 'announcements'

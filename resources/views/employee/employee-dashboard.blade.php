@@ -25,7 +25,7 @@
         <div class="row">
 
             <!-- Profile Summary -->
-            <div class="col-xl-3 col-md-6">
+            <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card stat-card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -33,7 +33,7 @@
                                 <h6 class="card-title text-muted">Profile Summary</h6>
                                 <h5>{{ $profile['full_name'] }}</h5>
 
-                                <small class="text-muted d-block mt-2">
+                                <small class="text-muted d-block">
                                     <i class="bi bi-person-badge me-2 fs-6"></i>Employee ID: {{ $profile['employee_id'] }}
                                 </small>
 
@@ -41,10 +41,10 @@
                                     <i class="bi bi-briefcase me-2 fs-6"></i>Position: {{ $profile['position'] }}
                                 </small>
 
-                                <small class="text-muted d-block">
+                                {{-- <small class="text-muted d-block">
                                     <i class="bi bi-buildings me-2 fs-6"></i>Company Branch:
                                     {{ $profile['company_branch'] }}
-                                </small>
+                                </small> --}}
                             </div>
                             <div class="stat-icon">
                                 <i class="bi bi-person-circle text-primary"></i>
@@ -122,25 +122,38 @@
                         {{-- Check if there are no tasks at all --}}
                         @if ($taskRecords->count() === 0)
                             <div class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size:2rem;"></i>
-                                <p class="mt-2">You have no tasks at the moment.</p>
+                                <i class="bi bi-inbox" style="font-size:4rem;"></i>
+                                <p>You have no tasks at the moment.</p>
                             </div>
                         @else
-                            @foreach (['to-do' => 'To-Do', 'in-progress' => 'In-Progress', 'in-review' => 'In-Review', 'completed' => 'Completed'] as $key => $label)
-                                @if (isset($tasksByStatus[$key]) && $tasksByStatus[$key]->count())
-                                    <h6 class="fw-bold mt-3">{{ $label }}</h6>
+                            @php
+                                // Define status groups in correct order
+                                $statusGroups = [
+                                    'to-do' => 'To-Do',
+                                    'in-progress' => 'In-Progress',
+                                    'in-review' => 'In-Review',
+                                    'completed' => 'Completed',
+                                ];
+                            @endphp
+
+                            @foreach ($statusGroups as $statusKey => $statusLabel)
+                                @if (isset($tasksByStatus[$statusKey]) && $tasksByStatus[$statusKey]->count() > 0)
+                                    <h6 class="fw-bold mt-3">{{ $statusLabel }}</h6>
                                     <ul class="list-unstyled mb-2">
-                                        @foreach ($tasksByStatus[$key] as $task)
+                                        @foreach ($tasksByStatus[$statusKey] as $taskItem)
                                             <li class="d-flex align-items-start mb-2">
                                                 <span class="me-2 mt-1 text-primary">
                                                     <i class="bi bi-circle-fill" style="font-size:0.5rem"></i>
                                                 </span>
                                                 <div>
-                                                    <strong>{{ $taskRecords->task_name }}</strong><br>
+                                                    <strong>{{ $taskItem->task_name }}</strong><br>
                                                     <small class="text-muted">
                                                         Due
-                                                        {{ optional($taskRecords->due_date)->format('d M Y h:i A') ?? '-' }}
+                                                        {{ optional($taskItem->due_date)->format('d M Y h:i A') ?? '-' }}
                                                     </small>
+                                                    @if ($taskItem->due_date && $taskItem->due_date < now() && $taskItem->task_status !== 'completed')
+                                                        <span class="badge bg-danger ms-2">Overdue</span>
+                                                    @endif
                                                 </div>
                                             </li>
                                         @endforeach
@@ -208,9 +221,9 @@
                                 </div>
 
                                 @if ($event->rsvp_required)
-                                <div class="text-end">
-                                    <span class="event-rsvp" title="RSVP Required">RSVP</span>
-                                </div>
+                                    <div class="text-end">
+                                        <span class="event-rsvp" title="RSVP Required">RSVP</span>
+                                    </div>
                                 @endif
 
                                 <span title="Date">📅 {{ $event->event_date->format('d F Y') }}</span>
