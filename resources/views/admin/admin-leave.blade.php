@@ -450,7 +450,7 @@
                         // Create new dynamic message
                         noDataRow = document.createElement('tr');
                         noDataRow.id = 'noDataMessage';
-                        noDataRow.innerHTML = `<td colspan="6" class="text-center py-4 text-muted">
+                        noDataRow.innerHTML = `<td colspan="9" class="text-center py-4 text-muted">
                     <i class="bi bi-inbox me-2"></i>No ${getStatusText(status).toLowerCase()} leave requests found
                 </td>`;
                         document.getElementById('leavesTable').appendChild(noDataRow);

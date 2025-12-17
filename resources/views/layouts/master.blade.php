@@ -64,7 +64,7 @@
                                 style="height: 45px; width: auto; margin-right: 10px;">
                             Al-Hidayah Group HR Portal
                         </a>
-                    @elseif(Auth::user()->role_id == '3')
+                    @else
                         <a class="navbar-brand" href="{{ route('employee.dashboard') }}">
                             <img src="{{ asset('assets/img/ahglogonobg.png') }}" alt="MySystem Logo"
                                 style="height: 45px; width: auto; margin-right: 10px;">
@@ -75,8 +75,36 @@
             </div>
 
             <div class="top-nav-items d-flex align-items-center">
+                {{-- Notification bell icon --}}
+                <div class="nav-item dropdown">
+                    <a class="nav-link" id="notificationBell" data-bs-toggle="dropdown" href="#">
+                        <i class="bi bi-bell fs-5"></i>
+
+                        @if (auth()->user()->unreadNotifications->count())
+                            <span class="badge bg-danger" id="notificationCount">
+                                {{ auth()->user()->unreadNotifications->count() }}
+                            </span>
+                        @endif
+                    </a>
+
+                    <div class="dropdown-menu dropdown-menu-end">
+                        @forelse(auth()->user()->unreadNotifications as $notification)
+                            <a href="{{ route('announcement.index.admin') }}"
+                                class="dropdown-item">
+                                <strong>{{ $notification->data['message'] }}</strong>
+                                <br>
+                                <small>{{ $notification->data['content'] }}</small>
+                                <br>
+                                <small>{{ $notification->created_at->diffForHumans() }}</small>
+                            </a>
+                        @empty
+                            <span class="dropdown-item text-muted">No notifications</span>
+                        @endforelse
+                    </div>
+                </div>
+
                 @auth
-                    @if (Auth::user()->role_id == 3)
+                    @if (Auth::user()->role_id !== 2)
                         <!-- Punch In / Out Link -->
                         <a href="#" id="punchLink" class="punch-link me-3"
                             data-punch-in-url="{{ route('attendance.punchIn') }}"
@@ -166,7 +194,7 @@
                     </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
-                @elseif (Auth::user()->role_id == '3')
+                @elseif (Auth::user()->role_id !== '2')
                     <a class="nav-link {{ request()->routeIs('employee.dashboard') ? 'active' : '' }}"
                         href="{{ route('employee.dashboard') }}">
                         <i class="bi bi-house-door"></i>
@@ -256,6 +284,28 @@
 <!-- C3 & D3 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const bell = document.getElementById('notificationBell');
+
+    if (bell) {
+        bell.addEventListener('show.bs.dropdown', function () {
+            fetch("{{ route('notifications.readAll') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Accept": "application/json"
+                }
+            });
+
+            // instantly hide badge (UX)
+            const badge = document.getElementById('notificationCount');
+            if (badge) badge.remove();
+        });
+    }
+});
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

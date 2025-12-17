@@ -26,7 +26,7 @@ class TaskController extends Controller
         $query = Task::with(['project', 'assignedTo', 'createdBy'])->orderBy('created_at', 'desc');
 
         // Employee — only see their own tasks
-        if ($user->role_id === 3) {
+        if ($user->role_id !== 2) { // employee roles
             $query->where('assigned_to', $employee->employee_id);
         }
 

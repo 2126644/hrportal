@@ -157,7 +157,7 @@
                                 <p class="event-description">{{ Str::limit($event->description, 140) }}</p>
 
                                 @if (!$isPast && $event->rsvp_required)
-                                    <a href="{{ route('event.show', $event->id) }}" class="btn-primary">Register Now</a>
+                                    <a href="{{ route('event.show', $event->id) }}" class="btn-primary">Join Now</a>
                                 @endif
                             </div>
                         </div>

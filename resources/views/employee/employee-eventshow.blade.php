@@ -287,7 +287,7 @@
                             <div class="action-buttons">
                                 @if ($event->event_status === 'upcoming')
                                     <button class="btn btn-rsvp flex-fill" id="rsvp-button">
-                                        <i class="bi bi-check-circle me-2"></i>Register Now
+                                        <i class="bi bi-check-circle me-2"></i>Join Now
                                     </button>
                                 @else
                                     <button class="btn btn-secondary flex-fill" disabled>

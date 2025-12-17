@@ -127,7 +127,7 @@
                                 <a href="{{ route('task.index.admin') }}" class="btn btn-secondary me-2">
                                     Cancel
                                 </a>
-                            @elseif ($role_id == 3)
+                            @else
                                 <a href="{{ route('task.index.employee') }}" class="btn btn-secondary me-2">
                                     Cancel
                                 </a>

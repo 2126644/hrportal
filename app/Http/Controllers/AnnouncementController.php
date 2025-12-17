@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Announcement;
+use App\Models\User;
+use App\Notifications\NewAnnouncement;
 
 class AnnouncementController extends Controller
 {
@@ -82,7 +84,7 @@ class AnnouncementController extends Controller
             'expires_date'  => 'nullable|date',
         ]);
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'title'         => $request->title,
             'description'   => $request->description,
             'category'      => $request->category,
@@ -91,7 +93,14 @@ class AnnouncementController extends Controller
             'created_by'    => Auth::id(),
         ]);
 
-        return redirect()->route('announcement.index.admin')->with('success', 'Announcement created successfully!');
+        // notify all users
+        $users = User::all();
+        
+        foreach ($users as $user) {
+            $user->notify(new NewAnnouncement($announcement));
+        }
+
+        return redirect()->route('announcement.index.admin')->with('success', 'Announcement posted!');
     }
 
 

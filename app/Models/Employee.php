@@ -26,11 +26,15 @@ class Employee extends Model
         'gender',
         'birthday',
         'nationality',
-        'emergency_contact'
+        'emergency_contact',
+        'highest_education',
+        'education_institution',
+        'graduation_year'
     ];
 
     protected $casts = [
         'birthday' => 'date',
+        'graduation_year' => 'integer',
     ];
 
     public function user()

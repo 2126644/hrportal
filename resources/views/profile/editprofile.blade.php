@@ -105,9 +105,10 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="birthday" class="form-label">Birthday</label>
+                                <label for="birthday" class="form-label">Birthday <span
+                                    class="text-danger">*</span></label>
                                 <input type="date" id="birthday" name="birthday" class="form-control"
-                                    value="{{ old('birthday', $employee->birthday?->format('Y-m-d')) }}">
+                                    value="{{ old('birthday', $employee->birthday?->format('Y-m-d')) }}" required>
                                 @error('birthday')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -167,10 +168,44 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="ic_number" class="form-label">IC Number</label>
+                            <label for="ic_number" class="form-label">IC Number <span
+                                    class="text-danger">*</span></label>
                             <input type="text" id="ic_number" name="ic_number" class="form-control"
-                                placeholder="Enter IC Number" value="{{ old('ic_number', $employee->ic_number) }}">
+                                placeholder="Enter IC Number" value="{{ old('ic_number', $employee->ic_number) }}" required>
                             @error('ic_number')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="highest_education" class="form-label">Highest Education <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="highest_education" name="highest_education" class="form-control"
+                                placeholder="Enter your highest education"
+                                value="{{ old('highest_education', $employee->highest_education) }}" required>
+                            @error('highest_education')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="education_institution" class="form-label">Education Institution <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="education_institution" name="education_institution"
+                                class="form-control" placeholder="Enter your education institution"
+                                value="{{ old('education_institution', $employee->education_institution) }}" required>
+                            @error('education_institution')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="graduation_year" class="form-label">Graduation Year <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" id="graduation_year" name="graduation_year" class="form-control"
+                                placeholder="Enter your graduation year"
+                                value="{{ old('graduation_year', $employee->graduation_year) }}" required>
+                            @error('graduation_year')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>

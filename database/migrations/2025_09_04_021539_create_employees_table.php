@@ -24,6 +24,9 @@ return new class extends Migration
             $table->date('birthday')->nullable();
             $table->string('nationality')->nullable();
             $table->string('emergency_contact')->nullable();
+            $table->string('highest_education')->nullable();
+            $table->string('education_institution', 255)->nullable();
+            $table->year('graduation_year')->nullable();
             $table->timestamps();
         });
     }

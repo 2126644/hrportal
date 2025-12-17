@@ -135,7 +135,7 @@ class LeaveController extends Controller
         // Filter by whatever year the user selected instead of always now()->year
 
         // only add the name condition if the user (admin) picked one
-        if ($user->role_id === 3) {
+        if ($user->role_id !== 2) { // employee roles
             $reportQuery->where('employees.employee_id', $employee->employee_id);
         } elseif ($selectedEmployeeName && $selectedEmployeeName !== 'all') {
             $reportQuery->where('employees.full_name', $selectedEmployeeName);

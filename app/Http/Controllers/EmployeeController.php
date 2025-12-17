@@ -218,6 +218,9 @@ class EmployeeController extends Controller
             'nationality'       => 'required|string|max:50',
             'emergency_contact' => 'required|string|max:255',
             'ic_number'         => 'required|string|max:20',
+            'highest_education' => 'required|string|max:100',
+            'education_institution' => 'required|string|max:255',
+            'graduation_year'   => 'required|integer|min:1900|max:' . date('Y'),
         ]);
 
         $employee->update($validated);

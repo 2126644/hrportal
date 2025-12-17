@@ -35,7 +35,7 @@ class UserFactory extends Factory
             'two_factor_secret'         => null,
             'two_factor_recovery_codes' => null,
             'remember_token'            => Str::random(10),
-            'role_id'                   => Role::inRandomOrder()->first()->id ?? 3, // fallback to Employee
+            'role_id'                   => Role::inRandomOrder()->first()->id ?? 3, // fallback to staff
         ];
     }
 

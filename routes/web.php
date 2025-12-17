@@ -15,6 +15,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnnouncementController;
 
 use App\Models\Employee;
+use App\Models\User;
 
 // Home page
 Route::get('/', function () {
@@ -48,6 +49,11 @@ Route::get('/dashboard', function () {
 Route::get('/two-factor-challenge', [TwoFactorController::class, 'index'])->name('two-factor.login');
 // Handle submitted code
 Route::post('/two-factor-challenge', [TwoFactorController::class, 'store'])->name('two-factor.store');
+
+Route::post('/notifications/read-all', function () {
+    Auth::user()->unreadNotifications->markAsRead();
+    return response()->json(['status' => 'ok']);
+})->middleware('auth')->name('notifications.readAll');
 
 //Route for employee
 Route::middleware(['auth'])->group(function () {

@@ -11,7 +11,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Profile</li>
                                     </ol>
                                 </nav>
@@ -229,14 +230,41 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-12">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Highest Education</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->highest_education) ? 'text-muted' : '' }}">
+                                            {{ $employee->highest_education ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Education Institution</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->education_institution) ? 'text-muted' : '' }}">
+                                            {{ $employee->education_institution ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="detail-item">
+                                        <div class="detail-label text-muted small">Graduation Year</div>
+                                        <div
+                                            class="detail-value fw-semibold {{ empty($employee->graduation_year) ? 'text-muted' : '' }}">
+                                            {{ $employee->graduation_year ?? '-' }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-primary"
-                            onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
-                            <i class="bi bi-pencil-square me-2"></i>Edit Details
-                        </button>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button class="btn btn-primary"
+                                onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
+                                <i class="bi bi-pencil-square me-2"></i>Edit Details
+                            </button>
+                        </div>
                     </div>
                 </div>
 

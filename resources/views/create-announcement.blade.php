@@ -13,7 +13,7 @@
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
                                         @if ($role_id == 2)
                                             <li class="breadcrumb-item"><a href="{{ route('announcement.index.admin') }}">Announcements</a></li>
-                                        @elseif ($role_id == 3)
+                                        @else
                                             <li class="breadcrumb-item"><a href="{{ route('announcement.index.employee') }}">Announcements</a></li>
                                         @endif
                                         <li class="breadcrumb-item active" aria-current="page">Make Announcement</li>
@@ -153,7 +153,7 @@
                                 <a href="{{ route('announcement.index.admin') }}" class="btn btn-secondary me-2">
                                     Cancel
                                 </a>
-                            @elseif ($role_id == 3)
+                            @else
                                 <a href="{{ route('announcement.index.employee') }}" class="btn btn-secondary me-2">
                                     Cancel
                                 </a>

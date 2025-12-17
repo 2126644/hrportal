@@ -10,7 +10,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Attendance</li>
                                     </ol>
                                 </nav>
@@ -47,28 +48,33 @@
                         <label class="form-label">Status Time In</label>
                         <select name="status_time_in" class="form-select">
                             <option value="">All Statuses</option>
-                            @foreach($statusTimeInOptions as $status)
-                                <option value="{{ $status }}" {{ request('status_time_in') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                            @foreach ($statusTimeInOptions as $status)
+                                <option value="{{ $status }}"
+                                    {{ request('status_time_in') == $status ? 'selected' : '' }}>{{ $status }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status Time Out</label>
                         <select name="status_time_out" class="form-select">
-+                            <option value="">All Statuses</option>
-+                            @foreach($statusTimeOutOptions as $status)
-                                <option value="{{ $status }}" {{ request('status_time_out') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                            <option value="">All Statuses</option>
+                            @foreach ($statusTimeOutOptions as $status)
+                                <option value="{{ $status }}"
+                                    {{ request('status_time_out') == $status ? 'selected' : '' }}>{{ $status }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-select">
-+                            <option value="">All Statuses</option>
-+                            @foreach($statusOptions as $status)
-+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
-+                            @endforeach
-+                        </select>
+                            <option value="">All Statuses</option>
+                            @foreach ($statusOptions as $status)
+                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
+                                    {{ $status }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
                         <button class="btn btn-primary w-100">
@@ -208,24 +214,12 @@
 
                                     <tr>
                                         <th>Late Reason</th>
-                                        <td>
-                                            @if ($attendance->status_time_in === 'Late')
-                                                <textarea name="late_reason" class="form-control" rows="1">{{ $attendance->late_reason }}</textarea>
-                                            @else
-                                                <span class="text-muted fst-italic">Not Applicable</span>
-                                            @endif
-                                        </td>
+                                        <td>{{ $attendance->late_reason }}</td>
                                     </tr>
 
                                     <tr class="early-leave-row">
                                         <th>Early Leave Reason</th>
-                                        <td>
-                                            @if ($attendance->status_time_out === 'Early Leave')
-                                                <textarea name="early_leave_reason" class="form-control" rows="1">{{ $attendance->early_leave_reason }}</textarea>
-                                            @else
-                                                <span class="text-muted fst-italic">Not Applicable</span>
-                                            @endif
-                                        </td>
+                                        <td>{{ $attendance->early_leave_reason }}</td>
                                     </tr>
                                 </table>
                             </div>
