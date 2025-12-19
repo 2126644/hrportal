@@ -253,8 +253,7 @@ class AdminController extends Controller
             });
         }
 
-        // Sort and paginate by name A-Z
-        $employees = $query->orderBy('full_name')->paginate(10);
+        $employees = $query->orderBy('full_name')->get();
 
         $totalEmployees = Employee::count();
         $activeToday = Attendance::whereDate('date', Carbon::today())->distinct('employee_id')->count();

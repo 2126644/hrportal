@@ -67,12 +67,24 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select">
-                            <option value="">All Statuses</option>
-                            @foreach ($statusOptions as $status)
-                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                                    {{ $status }}</option>
+                        <label class="form-label">Location In</label>
+                        <select name="location_in" class="form-select">
+                            <option value="">All Locations</option>
+                            @foreach ($locationInOptions as $location)
+                                <option value="{{ $location }}"
+                                    {{ request('location_in') == $location ? 'selected' : '' }}>
+                                    {{ $location }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Location Out</label>
+                        <select name="location_out" class="form-select">
+                            <option value="">All Locations</option>
+                            @foreach ($locationOutOptions as $location)
+                                <option value="{{ $location }}"
+                                    {{ request('location_out') == $location ? 'selected' : '' }}>
+                                    {{ $location }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -111,11 +123,11 @@
                                 <tr>
                                     <th>Employee</th>
                                     <th>Date</th>
-                                    <th>Time-In</th>
-                                    <th>Status Time-In</th>
-                                    <th>Time-Out</th>
-                                    <th>Status Time-Out</th>
-                                    <th>Status</th>
+                                    <th>Time In</th>
+                                    <th>Location In</th>
+                                    <th>Time Out</th>
+                                    <th>Location Out</th>
+                                    <th>Time Slip</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -123,31 +135,52 @@
                                 @foreach ($attendances as $attendance)
                                     <tr>
                                         <td>{{ $attendance->employee->full_name }}</td>
-                                        <td>{{ $attendance->date->format('d M Y') }}</td>
+                                        <td>{{ $attendance->date->format('d M Y') ?? '—' }}</td>
 
-                                        <td>{{ $attendance->time_in->format('g:i:s A') }}</td>
-
-                                        {{-- Status Time In with color --}}
-                                        <td>
+                                        <td>{{ $attendance->time_in->format('g:i:s A') ?? '-' }}
                                             @if ($attendance->status_time_in === 'On Time')
-                                                <span class="badge bg-success">{{ $attendance->status_time_in }}</span>
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_in }}</span>
                                             @elseif ($attendance->status_time_in === 'Late')
-                                                <span class="badge bg-danger">{{ $attendance->status_time_in }}</span>
+                                                <span class="badge bg-danger ms-2">{{ $attendance->status_time_in }}</span>
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->time_out?->format('g:i:s A') }}</td>
+                                        <td>{{ $attendance->location_in ?? '-' }}</td>
 
-                                        {{-- Status Time Out with color --}}
-                                        <td>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}
                                             @if ($attendance->status_time_out === 'On Time')
-                                                <span class="badge bg-success">{{ $attendance->status_time_out }}</span>
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_out }}</span>
                                             @elseif ($attendance->status_time_out === 'Early Leave')
-                                                <span class="badge bg-danger">{{ $attendance->status_time_out }}</span>
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_out }}</span>
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->status }}</td>
+                                        <td>{{ $attendance->location_out ?? '-' }}</td>
+
+                                        <td>
+                                            @if ($attendance->time_slip_start && $attendance->time_slip_end)
+                                                {{ $attendance->time_slip_start->format('g:i A') }} -
+                                                {{ $attendance->time_slip_end->format('g:i A') }}
+                                            @else
+                                                <span class="text-muted">N/A</span>
+                                            @endif
+
+                                            @if ($attendance->time_slip_status)
+                                                @if ($attendance->time_slip_status === 'pending')
+                                                    <span
+                                                        class="badge bg-warning ms-2">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @elseif ($attendance->time_slip_status === 'rejected')
+                                                    <span
+                                                        class="badge bg-danger ms-2">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @else
+                                                    <span
+                                                        class="badge bg-success ms-2">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @endif
+                                            @endif
+                                        </td>
 
                                         <td>
                                             <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
@@ -158,13 +191,16 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                                <!-- No data message row -->
+                                @if ($attendances->count() == 0)
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">
+                                            <i class="bi bi-inbox me-2"></i>No attendance record found
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $attendances->links() }}
                     </div>
                 </div>
             </div>
@@ -181,7 +217,9 @@
                             @method('PUT')
 
                             <div class="modal-header">
-                                <h5 class="modal-title">Attendance Details ({{ $attendance->date->format('d M Y') }})</h5>
+                                <h5 class="modal-title">Attendance Details
+                                    ({{ $attendance->date->format('d M Y') }})
+                                </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
 
@@ -189,38 +227,87 @@
                                 <table class="table table-sm">
                                     <tr>
                                         <th>Date</th>
-                                        <td>{{ $attendance->date->format('d M Y') }}</td>
+                                        <td>{{ $attendance->date->format('d M Y') ?? '—' }}</td>
                                     </tr>
+
                                     <tr>
                                         <th>Time In</th>
-                                        <td>{{ $attendance->time_in->format('g:i:s A') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status In</th>
-                                        <td>{{ $attendance->status_time_in }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Time Out</th>
-                                        <td>{{ $attendance->time_out?->format('g:i:s A') }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status Out</th>
-                                        <td>{{ $attendance->status_time_out }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status</th>
-                                        <td>{{ $attendance->status }}</td>
+                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}
+                                            @if ($attendance->status_time_in === 'On Time')
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_in }}</span>
+                                            @elseif ($attendance->status_time_in === 'Late')
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_in }}</span>
+                                            @endif
+                                        </td>
                                     </tr>
 
                                     <tr>
                                         <th>Late Reason</th>
-                                        <td>{{ $attendance->late_reason }}</td>
+                                        <td>
+                                            @if ($attendance->status_time_in === 'Late')
+                                                <textarea name="late_reason" class="form-control" rows="1"
+                                                    placeholder="Please provide a reason for being late">{{ $attendance->late_reason }}</textarea>
+                                            @else
+                                                <span class="text-muted fst-italic">N/A</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Location In</th>
+                                        <td>{{ $attendance->location_in ?? '-' }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Punch In Location</th>
+                                        <td>
+                                            <div id="map-in-{{ $attendance->id }}"
+                                                data-lat="{{ $attendance->time_in_lat }}"
+                                                data-lng="{{ $attendance->time_in_lng }}" style="height:250px; width: 100%; border-radius: 8px;"></div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Time Out</th>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}
+                                            @if ($attendance->status_time_out === 'On Time')
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_out }}</span>
+                                            @elseif ($attendance->status_time_out === 'Early Leave')
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_out }}</span>
+                                            @endif
+                                        </td>
                                     </tr>
 
                                     <tr class="early-leave-row">
                                         <th>Early Leave Reason</th>
-                                        <td>{{ $attendance->early_leave_reason }}</td>
+                                        <td>
+                                            @if ($attendance->status_time_out === 'Early Leave')
+                                                <textarea name="early_leave_reason" class="form-control" rows="1"
+                                                    placeholder="Please provide a reason for leaving early">{{ $attendance->early_leave_reason }}</textarea>
+                                            @else
+                                                <span class="text-muted fst-italic">N/A</span>
+                                            @endif
+                                        </td>
                                     </tr>
+
+                                    <tr>
+                                        <th>Location Out</th>
+                                        <td>{{ $attendance->location_out ?? '-' }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Punch Out Location</th>
+                                        <td>
+                                            <div id="map-out-{{ $attendance->id }}"
+                                                data-lat="{{ $attendance->time_out_lat }}"
+                                                data-lng="{{ $attendance->time_out_lng }}" style="height:250px; width: 100%; border-radius: 8px;"></div>
+                                        </td>
+                                    </tr>
+
                                 </table>
                             </div>
 
@@ -234,6 +321,9 @@
             </div>
         @endforeach
     </div>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.googlemaps.key') }}"></script>
 
     <script>
         function updateDateTime() {
@@ -448,4 +538,38 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener('shown.bs.modal', function(event) {
+            const modal = event.target;
+
+            modal.querySelectorAll('[id^="map-"]').forEach(el => {
+                const lat = parseFloat(el.dataset.lat);
+                const lng = parseFloat(el.dataset.lng);
+
+                if (!lat || !lng) {
+                    el.innerHTML = '<span class="text-muted">Location not available</span>';
+                    return;
+                }
+
+                const map = new google.maps.Map(el, {
+                    zoom: 16,
+                    center: {
+                        lat,
+                        lng
+                    }
+                });
+
+                new google.maps.Marker({
+                    position: {
+                        lat,
+                        lng
+                    },
+                    map,
+                    title: el.id.includes('map-in') ? 'Punch In' : 'Punch Out'
+                });
+            });
+        });
+    </script>
+
 @endsection

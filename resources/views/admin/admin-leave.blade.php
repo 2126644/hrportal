@@ -199,17 +199,20 @@
                                                     </td>
                                                     <td>
                                                         <div class="btn-group">
-                                                            <button class="btn btn-sm btn-outline-primary"
-                                                                onclick="window.location='{{ route('admin.dashboard', $leave->id) }}'">
-                                                                <i class="bi bi-pencil"></i>
-                                                            </button>
                                                             <button class="btn btn-sm btn-outline-info"
-                                                                onclick="window.location='{{ route('admin.dashboard', $leave->id) }}'">
+                                                                onclick="window.location='{{ route('admin.request') }}'">
                                                                 <i class="bi bi-eye"></i>
                                                             </button>
-                                                            <button class="btn btn-sm btn-outline-danger">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
+                                                            <form
+                                                                action="{{ route('leave.destroy.admin', $leave->id) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to delete this leave record?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button class="btn btn-sm btn-outline-danger"
+                                                                    type="submit">
+                                                                    <i class="bi bi-trash"></i></button>
+                                                            </form>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -218,18 +221,13 @@
                                             <!-- No data message row -->
                                             @if ($leaves->count() == 0)
                                                 <tr>
-                                                    <td colspan="8" class="text-center py-4 text-muted">
-                                                        <i class="bi bi-inbox me-2"></i>No leave requests found
+                                                    <td colspan="9" class="text-center py-4 text-muted">
+                                                        <i class="bi bi-inbox me-2"></i>No leave record found
                                                     </td>
                                                 </tr>
                                             @endif
                                         </tbody>
                                     </table>
-                                </div>
-
-                                <!-- Pagination -->
-                                <div class="d-flex justify-content-center mt-4">
-                                    {{ $leaves->links() }}
                                 </div>
                             </div>
                         </div>

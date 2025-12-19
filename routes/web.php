@@ -111,7 +111,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/requests', [EmployeeController::class, 'requests'])->name('employee.requests');
 
-    Route::delete('/employee/leave/{leave}', [LeaveController::class, 'destroy'])->name('leave.destroy.employee');
+    Route::delete('/employee/leave/{leave}', [LeaveController::class, 'cancel'])->name('leave.cancel.employee');
     Route::delete('/employee/timeslip/{attendance}', [AttendanceController::class, 'destroyTimeSlip'])->name('timeslip.destroy.employee');
 });
 
@@ -146,6 +146,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Leave approval
     Route::post('/leaves/{leave}/update-status', [LeaveController::class, 'approveLeave'])->name('leave.updateStatus');
+
+    Route::delete('/admin/leave/{leave}', [LeaveController::class, 'destroy'])->name('leave.destroy.admin');
 
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

@@ -203,7 +203,7 @@
                                         @if ($leaves->count() == 0)
                                             <tr>
                                                 <td colspan="7" class="text-center py-4 text-muted">
-                                                    <i class="bi bi-inbox me-2"></i>No leave requests found
+                                                    <i class="bi bi-inbox me-2"></i>No leave record found
                                                 </td>
                                             </tr>
                                         @endif

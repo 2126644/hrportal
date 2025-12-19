@@ -272,24 +272,12 @@
                                                 onclick="window.location='{{ route('profile.show', $employee->employee_id) }}'">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-
-                <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div class="text-muted">
-                        Showing {{ $employees->firstItem() }} to {{ $employees->lastItem() }} of
-                        {{ $employees->total() }} entries
-                    </div>
-                    {{ $employees->links() }}
                 </div>
             </div>
         </div>

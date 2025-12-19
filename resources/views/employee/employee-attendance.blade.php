@@ -29,7 +29,7 @@
     <!-- Filters and Search -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.attendance') }}">
+            <form method="GET" action="{{ route('employee.attendance') }}">
                 <div class="row g-3">
                     <div class="col-md-2">
                         <label class="form-label">Date</label>
@@ -58,12 +58,24 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select">
-                            <option value="">All Statuses</option>
-                            @foreach ($statusOptions as $status)
-                                <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>
-                                    {{ $status }}</option>
+                        <label class="form-label">Location In</label>
+                        <select name="location_in" class="form-select">
+                            <option value="">All Locations</option>
+                            @foreach ($locationInOptions as $location)
+                                <option value="{{ $location }}"
+                                    {{ request('location_in') == $location ? 'selected' : '' }}>
+                                    {{ $location }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Location Out</label>
+                        <select name="location_out" class="form-select">
+                            <option value="">All Locations</option>
+                            @foreach ($locationOutOptions as $location)
+                                <option value="{{ $location }}"
+                                    {{ request('location_out') == $location ? 'selected' : '' }}>
+                                    {{ $location }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -73,7 +85,7 @@
                         </button>
                     </div>
                     <div class="col-md-1 d-flex align-items-end">
-                        <a href="{{ route('admin.attendance') }}" class="btn btn-secondary w-100">
+                        <a href="{{ route('employee.attendance') }}" class="btn btn-secondary w-100">
                             <i class="bi bi-arrow-clockwise me-2"></i>Reset
                         </a>
                     </div>
@@ -178,6 +190,12 @@
                             </button>
                         @endif
                     </div>
+
+                    <small class="mt-4">Your current location:</small>
+                    {{-- Google Maps Container --}}
+                    <div id="attendanceMap" style="height: 250px; width: 100%; border-radius: 8px;" class="mt-3">
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -200,13 +218,11 @@
                             <thead>
                                 <tr>
                                     <th>Date</th>
-                                    <th>Time-In</th>
-                                    <th>Status Time-In</th>
-                                    <th>Time-Out</th>
-                                    <th>Status Time-Out</th>
-                                    <th>Status</th>
+                                    <th>Time In</th>
+                                    <th>Location In</th>
+                                    <th>Time Out</th>
+                                    <th>Location Out</th>
                                     <th>Time Slip</th>
-                                    <th>Time Slip Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -215,33 +231,29 @@
                                     <tr>
                                         <td>{{ $attendance->date?->format('d M Y') ?? '—' }}</td>
 
-                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}</td>
-
-                                        {{-- Status Time In with color --}}
-                                        <td>
+                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}
                                             @if ($attendance->status_time_in === 'On Time')
-                                                <span class="badge bg-success">{{ $attendance->status_time_in }}</span>
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_in }}</span>
                                             @elseif ($attendance->status_time_in === 'Late')
-                                                <span class="badge bg-danger">{{ $attendance->status_time_in }}</span>
-                                            @else
-                                                <span>-</span>
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_in }}</span>
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}</td>
+                                        <td>{{ $attendance->location_in ?? '-' }}</td>
 
-                                        {{-- Status Time Out with color --}}
-                                        <td>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}
                                             @if ($attendance->status_time_out === 'On Time')
-                                                <span class="badge bg-success">{{ $attendance->status_time_out }}</span>
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_out }}</span>
                                             @elseif ($attendance->status_time_out === 'Early Leave')
-                                                <span class="badge bg-danger">{{ $attendance->status_time_out }}</span>
-                                            @else
-                                                <span>-</span>
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_out }}</span>
                                             @endif
                                         </td>
 
-                                        <td>{{ $attendance->status }}</td>
+                                        <td>{{ $attendance->location_out ?? '-' }}</td>
 
                                         <td>
                                             @if ($attendance->time_slip_start && $attendance->time_slip_end)
@@ -250,22 +262,18 @@
                                             @else
                                                 <span class="text-muted">N/A</span>
                                             @endif
-                                        </td>
 
-                                        <td>
                                             @if ($attendance->time_slip_status)
                                                 @if ($attendance->time_slip_status === 'pending')
                                                     <span
-                                                        class="badge bg-warning">{{ ucfirst($attendance->time_slip_status) }}</span>
-                                                @elseif ($attendance->ime_slip_status === 'rejected')
+                                                        class="badge bg-warning ms-2">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                @elseif ($attendance->time_slip_status === 'rejected')
                                                     <span
-                                                        class="badge bg-danger">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                        class="badge bg-danger ms-2">{{ ucfirst($attendance->time_slip_status) }}</span>
                                                 @else
                                                     <span
-                                                        class="badge bg-success">{{ ucfirst($attendance->time_slip_status) }}</span>
+                                                        class="badge bg-success ms-2">{{ ucfirst($attendance->time_slip_status) }}</span>
                                                 @endif
-                                            @else
-                                                <span class="text-muted">N/A</span>
                                             @endif
                                         </td>
 
@@ -279,13 +287,16 @@
                                         </td>
                                     </tr>
                                 @endforeach
+                                <!-- No data message row -->
+                                @if ($attendances->count() == 0)
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <i class="bi bi-inbox me-2"></i>No attendance record found
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-center mt-4">
-                        {{ $attendances->links() }}
                     </div>
                 </div>
             </div>
@@ -303,7 +314,7 @@
 
                             <div class="modal-header">
                                 <h5 class="modal-title">Attendance Details
-                                    ({{ $attendance->date?->format('d M Y') ?? '—' }})
+                                    ({{ $attendance->date?->format('d M Y') }})
                                 </h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
@@ -314,34 +325,56 @@
                                         <th>Date</th>
                                         <td>{{ $attendance->date?->format('d M Y') ?? '—' }}</td>
                                     </tr>
+
                                     <tr>
                                         <th>Time In</th>
-                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status In</th>
-                                        <td>{{ $attendance->status_time_in }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Time Out</th>
-                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status Out</th>
-                                        <td>{{ $attendance->status_time_out }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status</th>
-                                        <td>{{ $attendance->status }}</td>
+                                        <td>{{ $attendance->time_in?->format('g:i:s A') ?? '-' }}
+                                            @if ($attendance->status_time_in === 'On Time')
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_in }}</span>
+                                            @elseif ($attendance->status_time_in === 'Late')
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_in }}</span>
+                                            @endif
+                                        </td>
                                     </tr>
 
                                     <tr>
                                         <th>Late Reason</th>
                                         <td>
                                             @if ($attendance->status_time_in === 'Late')
-                                                <textarea name="late_reason" class="form-control" rows="1">{{ $attendance->late_reason }}</textarea>
+                                                <textarea name="late_reason" class="form-control" rows="1"
+                                                    placeholder="Please provide a reason for being late">{{ $attendance->late_reason }}</textarea>
                                             @else
-                                                <span class="text-muted fst-italic">Not Applicable</span>
+                                                <span class="text-muted fst-italic">N/A</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Location In</th>
+                                        <td>{{ $attendance->location_in ?? '-' }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Punch In Location</th>
+                                        <td>
+                                            <div id="map-in-{{ $attendance->id }}"
+                                                data-lat="{{ $attendance->time_in_lat }}"
+                                                data-lng="{{ $attendance->time_in_lng }}"
+                                                style="height:250px; width: 100%; border-radius: 8px;"></div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Time Out</th>
+                                        <td>{{ $attendance->time_out?->format('g:i:s A') ?? '-' }}
+                                            @if ($attendance->status_time_out === 'On Time')
+                                                <span
+                                                    class="badge bg-success ms-2">{{ $attendance->status_time_out }}</span>
+                                            @elseif ($attendance->status_time_out === 'Early Leave')
+                                                <span
+                                                    class="badge bg-danger ms-2">{{ $attendance->status_time_out }}</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -350,12 +383,29 @@
                                         <th>Early Leave Reason</th>
                                         <td>
                                             @if ($attendance->status_time_out === 'Early Leave')
-                                                <textarea name="early_leave_reason" class="form-control" rows="1">{{ $attendance->early_leave_reason }}</textarea>
+                                                <textarea name="early_leave_reason" class="form-control" rows="1"
+                                                    placeholder="Please provide a reason for leaving early">{{ $attendance->early_leave_reason }}</textarea>
                                             @else
-                                                <span class="text-muted fst-italic">Not Applicable</span>
+                                                <span class="text-muted fst-italic">N/A</span>
                                             @endif
                                         </td>
                                     </tr>
+
+                                    <tr>
+                                        <th>Location Out</th>
+                                        <td>{{ $attendance->location_out ?? '-' }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Punch Out Location</th>
+                                        <td>
+                                            <div id="map-out-{{ $attendance->id }}"
+                                                data-lat="{{ $attendance->time_out_lat }}"
+                                                data-lng="{{ $attendance->time_out_lng }}"
+                                                style="height:250px; width: 100%; border-radius: 8px;"></div>
+                                        </td>
+                                    </tr>
+
                                 </table>
                             </div>
 
@@ -425,6 +475,10 @@
         </div>
     </div>
 
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.googlemaps.key') }}"></script>
+
+    {{-- Real-time Date & Time Script --}}
     <script>
         function updateDateTime() {
             const now = new Date();
@@ -652,7 +706,6 @@
         });
     </script>
 
-    {{-- Add this script to your modal section --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const timeSlipForm = document.querySelector('#timeSlipModal form');
@@ -675,9 +728,9 @@
                     const diffMs = end - start;
                     const diffHours = diffMs / (1000 * 60 * 60);
 
-                    if (diffHours > 3) {
+                    if (diffHours > 24) {
                         e.preventDefault();
-                        errorContainer.textContent = 'Time slip cannot exceed 3 hours.';
+                        errorContainer.textContent = 'Time slip cannot exceed 24 hours.';
                         errorContainer.classList.remove('d-none');
                         timeSlipEnd.focus();
                     } else {
@@ -697,8 +750,8 @@
                     const diffMs = end - start;
                     const diffHours = diffMs / (1000 * 60 * 60);
 
-                    if (diffHours > 3) {
-                        errorContainer.textContent = 'Time slip cannot exceed 3 hours.';
+                    if (diffHours > 24) {
+                        errorContainer.textContent = 'Time slip cannot exceed 24 hours.';
                         errorContainer.classList.remove('d-none');
                     } else {
                         errorContainer.classList.add('d-none');
@@ -707,4 +760,75 @@
             });
         });
     </script>
+
+    <script>
+        document.addEventListener('shown.bs.modal', function(event) {
+            const modal = event.target;
+
+            modal.querySelectorAll('[id^="map-"]').forEach(el => {
+                const lat = parseFloat(el.dataset.lat);
+                const lng = parseFloat(el.dataset.lng);
+
+                if (!lat || !lng) {
+                    el.innerHTML = '<span class="text-muted">Location not available</span>';
+                    return;
+                }
+
+                const map = new google.maps.Map(el, {
+                    zoom: 16,
+                    center: {
+                        lat,
+                        lng
+                    }
+                });
+
+                new google.maps.Marker({
+                    position: {
+                        lat,
+                        lng
+                    },
+                    map,
+                    title: el.id.includes('map-in') ? 'Punch In' : 'Punch Out'
+                });
+            });
+        });
+    </script>
+
+    <script>
+        let map, marker;
+
+        function initAttendanceMap(lat, lng) {
+            const userLocation = {
+                lat: lat,
+                lng: lng
+            };
+
+            map = new google.maps.Map(document.getElementById("attendanceMap"), {
+                zoom: 16,
+                center: userLocation,
+            });
+
+            marker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                title: "Your location",
+            });
+        }
+
+        // Load map on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        initAttendanceMap(
+                            position.coords.latitude,
+                            position.coords.longitude
+                        );
+                    },
+                    () => alert("Location permission required for attendance.")
+                );
+            }
+        });
+    </script>
+
 @endsection

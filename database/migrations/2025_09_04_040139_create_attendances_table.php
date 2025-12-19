@@ -16,13 +16,17 @@ return new class extends Migration
             $table->string('employee_id');  // add foreign key column
             $table->date('date');
             $table->time('time_in')->nullable();
-            $table->string('location')->nullable();
+            $table->decimal('time_in_lat', 10, 7)->nullable();
+            $table->decimal('time_in_lng', 10, 7)->nullable();
+            $table->string('location_in')->nullable();
             $table->time('time_out')->nullable();
+            $table->decimal('time_out_lat', 10, 7)->nullable();
+            $table->decimal('time_out_lng', 10, 7)->nullable();
+            $table->string('location_out')->nullable();
             $table->string('status_time_in')->nullable();  // on-time, late
             $table->string('status_time_out')->nullable(); // early, normal
             $table->string('late_reason')->nullable();
             $table->string('early_leave_reason')->nullable();
-            $table->enum('status', ['on-site', 'off-site', 'leave'])->default('on-site');
             $table->time('time_slip_start')->nullable();
             $table->time('time_slip_end')->nullable();
             $table->string('time_slip_reason')->nullable();

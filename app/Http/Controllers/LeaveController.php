@@ -99,14 +99,20 @@ class LeaveController extends Controller
             $query->whereDate('created_at', $request->created_at);
         }
 
-        // Finally fetch results
-        $leaves = $query->paginate(10)->withQueryString();
+        // Clone query BEFORE pagination (use code clone for pagination here, but apply later when stable)
+        $summaryQuery = clone $query;
 
-        $totalRequests  = $leaves->count();
-        $approvedLeaves = $leaves->where('status', 'approved')->count();
-        $pendingLeaves  = $leaves->where('status', 'pending')->count();
-        $rejectedLeaves = $leaves->where('status', 'rejected')->count();
-        $usedDays       = $leaves->where('status', 'approved')->sum('days');
+        $totalRequests  = $summaryQuery->count();
+
+        $approvedLeaves = (clone $summaryQuery)->where('status', 'approved')->count();
+        $pendingLeaves  = (clone $summaryQuery)->where('status', 'pending')->count();
+        $rejectedLeaves = (clone $summaryQuery)->where('status', 'rejected')->count();
+
+        $usedDays = (clone $summaryQuery)
+            ->where('status', 'approved')
+            ->sum('days');
+
+        $leaves = $query->get();
 
         // FOR LEAVE REPORT TAB
 
@@ -302,7 +308,7 @@ class LeaveController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Leave $leave)
+    public function cancel(Leave $leave)
     {
         $employee = Auth::user()->employee;
         if (! $employee || $leave->employee_id !== $employee->employee_id) {
@@ -317,6 +323,20 @@ class LeaveController extends Controller
         $leave->delete();   // or $leave->update(['status' => 'cancelled']) for history
 
         return redirect()->back()->with('success', 'Leave request cancelled.');
+    }
+
+    public function destroy(Leave $leave)
+    {
+        $employee = Auth::user()->employee;
+        $role_id = Auth::user()->role_id;
+
+        if ($role_id !== 2 && $leave->employee_id !== $employee->employee_id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        $leave->delete();
+
+        return redirect()->back()->with('success', 'Leave record deleted.');
     }
 
     public function approveLeave(Request $request, Leave $leave)

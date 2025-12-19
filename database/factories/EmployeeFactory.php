@@ -33,7 +33,7 @@ class EmployeeFactory extends Factory
             'birthday'          => fake()->dateTimeBetween('-50 years', '-20 years'),
             'nationality'       => fake()->country(),
             'emergency_contact' => fake()->phoneNumber(),
-            'highest_education' => fake()->randomElement(['High School', 'Bachelor', 'Master', 'PhD']),
+            'highest_education' => fake()->randomElement(['High School', 'Diploma', 'Bachelor', 'Master', 'PhD']),
             'education_institution' => fake()->company(),
             'graduation_year'   => fake()->year(),
         ];

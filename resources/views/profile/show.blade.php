@@ -260,10 +260,12 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-end mt-3">
-                            <button class="btn btn-primary"
-                                onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
-                                <i class="bi bi-pencil-square me-2"></i>Edit Details
-                            </button>
+                            @if (Auth::user()->role_id !== 2)
+                                <button class="btn btn-primary"
+                                    onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
+                                    <i class="bi bi-pencil-square me-2"></i>Edit Personal Details
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -418,26 +420,14 @@
                         </div>
                     </div>
 
-                    {{-- <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-info border-0">
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-info-circle me-3 fs-4"></i>
-                                    <div>
-                                        <h5 class="alert-heading mb-2">Employment Module</h5>
-                                        <p class="mb-0">Employment information system is currently in development.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        @if (Auth::user()->role_id == 2)
+                            <button class="btn btn-primary"
+                                onclick="window.location='{{ route('profile.editEmployment', $employee->employee_id) }}'">
+                                <i class="bi bi-pencil-square me-2"></i>Edit Employment Details
+                            </button>
+                        @endif
                     </div>
-
-                    <div class="text-center py-4">
-                        <i class="bi bi-tools display-4 text-muted mb-3"></i>
-                        <h5 class="text-muted mb-2">Employment Details Coming Soon</h5>
-                        <p class="text-muted">Salary information, employment history, and contract details will be
-                            available here.</p>
-                    </div> --}}
                 </div>
             </div>
         </div>

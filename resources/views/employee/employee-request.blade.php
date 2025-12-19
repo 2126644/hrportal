@@ -74,7 +74,7 @@
                                         data-bs-target="#leaveModal{{ $leave->id }}" title="View Details">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <form action="{{ route('leave.destroy.employee', $leave->id) }}" method="POST"
+                                    <form action="{{ route('leave.cancel.employee', $leave->id) }}" method="POST"
                                         onsubmit="return confirm('Are you sure you want to cancel this leave request?');">
                                         @csrf
                                         @method('DELETE')

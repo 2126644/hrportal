@@ -1,5 +1,3 @@
-<!-- created automatically by running: php artisan notifications:table -->
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;

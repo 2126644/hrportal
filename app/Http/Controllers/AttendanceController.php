@@ -43,10 +43,6 @@ class AttendanceController extends Controller
             $query->whereDate('date', $request->date);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
         if ($request->filled('status_time_in')) {
             $query->where('status_time_in', $request->status_time_in);
         }
@@ -55,8 +51,16 @@ class AttendanceController extends Controller
             $query->where('status_time_out', $request->status_time_out);
         }
 
+        if ($request->filled('location_in')) {
+            $query->where('location_in', $request->location_in);
+        }
+
+        if ($request->filled('location_out')) {
+            $query->where('location_out', $request->location_out);
+        }
+
         // Finally fetch results
-        $attendances = $query->paginate(10)->withQueryString();
+        $attendances = $query->get();
 
         // Latest record (also filter by today)
         $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
@@ -68,11 +72,12 @@ class AttendanceController extends Controller
         // provide distinct status options to the view (move DB calls out of blade)
         $statusTimeInOptions = Attendance::select('status_time_in')->distinct()->pluck('status_time_in')->filter()->values();
         $statusTimeOutOptions = Attendance::select('status_time_out')->distinct()->pluck('status_time_out')->filter()->values();
-        $statusOptions = Attendance::select('status')->distinct()->pluck('status')->filter()->values();
+        $locationInOptions = Attendance::select('location_in')->distinct()->pluck('location_in')->filter()->values();
+        $locationOutOptions = Attendance::select('location_out')->distinct()->pluck('location_out')->filter()->values();
 
         $view = $user->role_id == 2 ? 'admin.admin-attendance' : 'employee.employee-attendance';
 
-        return view($view, compact('attendances', 'todayAttendance', 'statusTimeInOptions', 'statusTimeOutOptions', 'statusOptions'));
+        return view($view, compact('attendances', 'todayAttendance', 'statusTimeInOptions', 'statusTimeOutOptions', 'locationInOptions', 'locationOutOptions'));
     }
 
     // Punch in (mark attendance)
@@ -96,7 +101,7 @@ class AttendanceController extends Controller
 
         //If within office radius → status = "on-site". Else "off-site"
         $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
-        $status = $distance <= $maxDistance ? 'on-site' : 'off-site';
+        $location_in = $distance <= $maxDistance ? 'On-site' : 'Off-site';
 
         $now = Carbon::now();
 
@@ -155,8 +160,9 @@ class AttendanceController extends Controller
 
         // Save punch in
         $attendance->time_in = $now->toTimeString();
-        $attendance->location = $lat . ',' . $lng;
-        $attendance->status = $status;
+        $attendance->time_in_lat = $lat;
+        $attendance->time_in_lng = $lng;
+        $attendance->location_in = $location_in;
         $attendance->status_time_in = $statusTimeIn;
         $attendance->save();
 
@@ -164,7 +170,7 @@ class AttendanceController extends Controller
             'id'   => $attendance->id,
             'time' => $attendance->date . ' ' . $attendance->time_in,  //show both date and time
             'status_time_in' => $statusTimeIn,
-            'status'  => $status,
+            'location_in'  => $location_in,
             //to differentiate punch in and punch out:
             'success' => true,
             'action'  => 'punchIn'
@@ -198,7 +204,28 @@ class AttendanceController extends Controller
         }
         // just use this doesnt work: $employee = Auth::user()->employee;
 
+        // Check location again
+        $officeLat = 3.2017;
+        $officeLng = 101.73256;
+        $maxDistance = 1.5; // km
+
+        $lat = $request->latitude;
+        $lng = $request->longitude;
+
+        $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
+        $location_out = $distance <= $maxDistance ? 'On-site' : 'Off-site';
+        
         $now = Carbon::now();
+
+        // Punch Out (before 5:30pm) → ❌ Early Leave
+        // Punch Out (5:30pm) → ✅ Normal
+        // Punch Out (after 5:30pm) → ⭐ Overtime
+
+        $employment = $employee->employment;
+
+        $workEnd = $employment && $employment->work_end_time
+            ? Carbon::parse($employment->work_end_time)
+            : Carbon::createFromTime(17, 30, 0);
 
         // Find today's attendance
         $attendance = Attendance::where('employee_id', $employee->employee_id)
@@ -212,27 +239,6 @@ class AttendanceController extends Controller
         if ($attendance->time_out) {
             return response()->json(['success' => false, 'message' => 'You already punched out today.']);
         }
-
-        // // Check location again
-        // $officeLat = 3.2017;
-        // $officeLng = 101.73256;
-        // $maxDistance = 1; // km
-
-        // $lat = $request->latitude;
-        // $lng = $request->longitude;
-
-        // $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
-        // $status = $distance <= $maxDistance ? 'on-site' : 'off-site';
-
-        // Punch Out (before 5:30pm) → ❌ Early Leave
-        // Punch Out (5:30pm) → ✅ Normal
-        // Punch Out (after 5:30pm) → ⭐ Overtime
-
-        $employment = $employee->employment;
-
-        $workEnd = $employment && $employment->work_end_time
-            ? Carbon::parse($employment->work_end_time)
-            : Carbon::createFromTime(17, 30, 0);
 
         $statusTimeOut = 'On Time';
 
@@ -257,10 +263,13 @@ class AttendanceController extends Controller
             $statusTimeOut = $now->lt($workEnd) ? 'Early Leave' : 'On Time';
         }
 
+        // Save punch out
         $attendance->update([
             'time_out'       => $now->toTimeString(),
+            'time_out_lat'   => $lat,
+            'time_out_lng'   => $lng,
+            'location_out'   => $location_out,
             'status_time_out' => $statusTimeOut
-            // 'status'         => $status, // override with punch out location
         ]);
 
         return response()->json([
@@ -394,10 +403,10 @@ class AttendanceController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->time_slip_end);
         $durationMinutes = $end->diffInMinutes($start);
 
-        // Check if duration exceeds 3 hours (180 minutes)
-        if ($durationMinutes > 180) {
+        // Check if duration exceeds 24 hours (1440 minutes)
+        if ($durationMinutes > 1440) {
             return redirect()->back()
-                ->withErrors(['time_slip_end' => 'Time slip cannot exceed 3 hours.'])
+                ->withErrors(['time_slip_end' => 'Time slip cannot exceed 24 hours.'])
                 ->withInput();
         }
 

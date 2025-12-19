@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
  */
 class AttendanceFactory extends Factory
 {
+    protected $model = Attendance::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,42 +21,55 @@ class AttendanceFactory extends Factory
      */
     public function definition(): array
     {
-        // pick a random workday in the past month
-        $date = $this->faker->dateTimeBetween('-1 month', 'now');
-        $timeIn = Carbon::instance($date)->setTime($this->faker->numberBetween(7, 10), $this->faker->numberBetween(0, 59));
-        $workStart = Carbon::instance($date)->setTime(8, 30);
+        $date = fake()->dateTimeBetween('-1 month', 'now');
 
-        $statusTimeIn = $timeIn->greaterThan($workStart) ? 'Late' : 'On Time';
-        $status = $this->faker->randomElement(['on-site', 'off-site']);
+        $timeIn = Carbon::instance($date)->setTime(fake()->numberBetween(7, 10), fake()->numberBetween(0, 59));
+
+        $workStart = fake()->randomElement(['8:30', '9:00']);
+
+        $statusTimeIn = $timeIn->greaterThan(Carbon::instance($date)->setTime(...explode(':', $workStart))) ? 'Late' : 'On Time';
 
         // 70% chance employee punched out
-        $timeOut = $this->faker->boolean(70)
-            ? Carbon::instance($date)->setTime($this->faker->numberBetween(16, 19), $this->faker->numberBetween(0, 59))
+        $timeOut = fake()->boolean(70)
+            ? Carbon::instance($date)->setTime(fake()->numberBetween(16, 19), fake()->numberBetween(0, 59))
             : null;
+
+        $workEnd = fake()->randomElement(['17:30', '18:00']);
 
         $statusTimeOut = $timeOut
-            ? ($timeOut->lt(Carbon::instance($date)->setTime(17, 30)) ? 'Early Leave' : 'On Time')
+            ? ($timeOut->greaterThan(Carbon::instance($date)->setTime(...explode(':', $workEnd))) ? 'On Time' : 'Early Leave')
             : null;
 
-        $hasTimeSlip = $this->faker->boolean(30); // 30% chance to have a slip
-        $timeSlipStart = $hasTimeSlip ? Carbon::instance($date)->setTime(14, 0) : null;
-        $timeSlipEnd = $hasTimeSlip ? Carbon::instance($date)->setTime(15, 0) : null;
+        // 30% chance employee has a time slip
+        $hasTimeSlip = fake()->boolean(30);
+        $timeSlipStart = $hasTimeSlip ? Carbon::instance($date)->setTime(fake()->numberBetween(8, 17), fake()->numberBetween(0, 59)) : null;
+        $timeSlipEnd = $hasTimeSlip ? Carbon::instance($date)->setTime(fake()->numberBetween(8, 17), fake()->numberBetween(0, 59)) : null;
 
         return [
             // Randomly decide if the employee is present, absent, or on leave
             'employee_id'        => Employee::inRandomOrder()->value('employee_id'),
             'date'               => $timeIn->toDateString(),
+
             'time_in'            => $timeIn->toTimeString(),
+            'time_in_lat'       => fake()->latitude(3.10, 3.30),
+            'time_in_lng'       => fake()->longitude(101.60, 101.80),
+            'location_in'       => fake()->randomElement(['On-site', 'Off-site']),
+
             'time_out'           => $timeOut?->toTimeString(),
-            'location'           => $this->faker->latitude(3.0, 3.3) . ',' . $this->faker->longitude(101.6, 101.8),
-            'status'             => $status,
+            'time_out_lat'      => $timeOut ? fake()->latitude(3.10, 3.30) : null,
+            'time_out_lng'      => $timeOut ? fake()->longitude(101.60, 101.80) : null,
+            'location_out'      => $timeOut ? fake()->randomElement(['On-site', 'Off-site']) : null,
+
             'status_time_in'     => $statusTimeIn,
             'status_time_out'    => $statusTimeOut,
-            'late_reason'        => fake()->optional()->sentence(),
-            'early_leave_reason' => fake()->optional()->sentence(),
+
+            'late_reason'        => $statusTimeIn === 'Late' ? fake()->sentence() : null,
+            'early_leave_reason' => $statusTimeOut === 'Early Leave' ? fake()->sentence() : null,
+
             'time_slip_start'    => $timeSlipStart?->toTimeString(),
             'time_slip_end'      => $timeSlipEnd?->toTimeString(),
-            'time_slip_reason'   => $hasTimeSlip ? $this->faker->sentence() : null,
+            'time_slip_reason'   => $hasTimeSlip ? fake()->sentence() : null,
+            'time_slip_status'   => $hasTimeSlip ? fake()->randomElement(['pending', 'approved', 'rejected']) : null,
         ];
     }
 }
