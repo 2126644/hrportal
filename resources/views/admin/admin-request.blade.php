@@ -16,7 +16,7 @@
                                     </ol>
                                 </nav>
                                 <h3 class="page-title"><br>Leave & Time Slip Requests</h3>
-                                <p class="text-muted">Approve or reject employee leave and time slip requests.</p>
+                                <p class="text-muted">Notes pending leave and time slip requests.</p>
                             </div>
                         </div>
                     </div>
@@ -25,11 +25,11 @@
         </div>
     </div>
 
-    <!-- Tabs -->
+    <!-- Tabs navigation -->
     <ul class="nav nav-tabs" id="requestTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="leave-request-tab" data-bs-toggle="tab" data-bs-target="#leave-request"
-                type="button" role="tab" aria-controls="leave-request" aria-selected="false">
+            <button class="nav-link active" id="leave-request-tab" data-bs-toggle="tab" data-bs-target="#leave-request"
+                type="button" role="tab" aria-controls="leave-request" aria-selected="true">
                 Leave Requests
             </button>
         </li>
@@ -41,11 +41,71 @@
         </li>
     </ul>
 
+    <!-- Tabs content -->
     <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="requestTabsContent"
         style="min-height: 500px;">
-        <div class="tab-pane fade show active" id="leave-request" role="tabpanel" aria-labelledby="leave-request-tab">
 
-            <div class="card-title">Pending Leave Requests</div>
+        <!-- Leave Request Tab -->
+        <div class="tab-pane fade show active" id="leave-request" role="tabpanel" aria-labelledby="leave-request-tab">
+            <!-- Filters and Search -->
+            <form method="GET" action="{{ route('admin.request') }}">
+                <input type="hidden" name="tab" class="active-tab-input" value="leave-request">
+                <div class="row g-2 align-items-end">
+                    @if (auth()->user()->role_id === 2)
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label">Search Employees</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                    placeholder="Name or ID...">
+                            </div>
+                        </div>
+                    @endif
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Leave Type</label>
+                        <select name="leave_type" class="form-control">
+                            <option value="">All Leave Types</option>
+                            @foreach ($leaveTypes as $type)
+                                <option value="{{ $type }}" {{ request('leave_type') == $type ? 'selected' : '' }}>
+                                    {{ ucfirst($type) }} Leave
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Applied Date</label>
+                        <input type="date" name="created_at" value="{{ request('created_at') }}" class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <a href="{{ route('admin.request') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            {{-- <div class="col-md-6 mt-4">
+                <div class="alert alert-info mb-0" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Approving a leave request will automatically adjust the employee's leave balance.
+                </div>
+            </div> --}}
+            <div class="card-title mt-4">Pending Leave Requests</div>
 
             <div class="table-responsive">
                 <table class="table text-center align-middle">
@@ -72,17 +132,37 @@
                                 <td>{{ $leave->reason }}</td>
 
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                        data-bs-target="#leaveModal{{ $leave->id }}" title="View Details">
-                                        <i class="bi bi-eye"></i> View
-                                    </a>
-                                    <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST">
-                                        @csrf
-                                        <button name="action" value="approved" class="btn btn-success btn-sm">
-                                            <i class="bi bi-check-circle"></i> Approve</button>
-                                        <button name="action" value="rejected" class="btn btn-outline-danger btn-sm">
-                                            <i class="bi bi-x-circle"></i> Reject</button>
-                                    </form>
+                                    <div class="btn-group" role="group" aria-label="Leave actions">
+                                        <!-- View Button: Opens modal (client-side, no form needed) -->
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                            data-bs-target="#leaveModal{{ $leave->id }}" title="View Details"
+                                            type="button">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <!-- Delete Button: Server-side action (wrapped in form) -->
+                                        <form action="{{ route('leave.destroy.admin', $leave->id) }}" method="POST"
+                                            style="display: inline;"
+                                            onsubmit="return confirm('Are you sure you want to delete this leave record?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-outline-danger" type="submit"
+                                                title="Delete Record">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                        <!-- Approve Button: Server-side action (wrapped in form) -->
+                                        @if ($leave->status === 'pending')
+                                            <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
+                                                style="display: inline;"
+                                                onsubmit="return confirm('Are you sure you want to approve this leave request?');">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-success" type="submit"
+                                                    name="action" value="approved" title="Approve Leave">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -97,8 +177,41 @@
 
         <!-- Time Slip Tab -->
         <div class="tab-pane fade" id="timeslip-request" role="tabpanel" aria-labelledby="timeslip-request-tab">
+            <!-- Filters and Search -->
+            <form method="GET" action="{{ route('admin.request') }}">
+                <input type="hidden" name="tab" class="active-tab-input" value="timeslip-request">
+                <div class="row g-2 align-items-end">
+                    @if (auth()->user()->role_id === 2)
+                        <div class="col-12 col-sm-6 col-lg-2">
+                            <label class="form-label">Search Employees</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" name="search" value="{{ request('search') }}"
+                                    class="form-control" placeholder="Name or ID...">
+                            </div>
+                        </div>
+                    @endif
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Date</label>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}"
+                            class="form-control">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel me-2"></i>Filter
+                        </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-1">
+                        <a href="{{ route('admin.request') }}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Reset
+                        </a>
+                    </div>
+                </div>
+            </form>
 
-            <div class="card-title">Pending Time Slip Requests</div>
+            <div class="card-title mt-4">Pending Time Slip Requests</div>
             <div class="table-responsive">
                 <table class="table text-center align-middle">
                     <thead class="table-light">
@@ -123,17 +236,47 @@
                                 <td>{{ $timeSlip->time_slip_reason }}</td>
 
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                        data-bs-target="#timeSlipModal{{ $timeSlip->id }}" title="View Details">
-                                        <i class="bi bi-eye"></i> View
-                                    </a>
-                                    <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST">
-                                        @csrf
-                                        <button name="action" value="approved" class="btn btn-success btn-sm">
-                                            <i class="bi bi-check-circle"></i> Approve</button>
-                                        <button name="action" value="rejected" class="btn btn-outline-danger btn-sm">
-                                            <i class="bi bi-x-circle"></i> Reject</button>
-                                    </form>
+                                    <div class="btn-group" role="group" aria-label="Leave actions">
+                                        <!-- View Button: Opens modal (client-side, no form needed) -->
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                            data-bs-target="#timeSlipModal{{ $timeSlip->id }}" title="View Details"
+                                            type="button">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <!-- Delete Button: Server-side action (wrapped in form) -->
+                                        <form action="{{ route('timeslip.destroy', $timeSlip->id) }}" method="POST"
+                                            style="display: inline;"
+                                            onsubmit="return confirm('Are you sure you want to delete this time slip record?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-outline-danger" type="submit"
+                                                title="Delete Record">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                        <!-- Approve Button: Server-side action (wrapped in form) -->
+                                        @if ($timeSlip->time_slip_status === 'pending')
+                                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}"
+                                                method="POST" style="display: inline;"
+                                                onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-success" type="submit"
+                                                    name="action" value="approved" title="Approve Time Slip">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </button>
+                                            </form>
+
+                                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}"
+                                                method="POST" style="display: inline;"
+                                                onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-danger" type="submit"
+                                                    name="action" value="rejected" title="Reject Time Slip">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -192,10 +335,20 @@
                     </div>
 
                     <div class="modal-footer">
-                        <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST">
+                        @if ($leave->status === 'pending')
+                            <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to approve this leave request?');">
+                                @csrf
+                                <button class="btn btn-success" type="submit" name="action" value="approved"
+                                    title="Approve">Approve</button>
+                            </form>
+                        @endif
+
+                        <form action="{{ route('leave.destroy.admin', $leave->id) }}" method="POST"
+                            onsubmit="return confirm('Are you sure you want to delete this leave record?');">
                             @csrf
-                            <button name="action" value="approved" class="btn btn-success">Approve</button>
-                            <button name="action" value="rejected" class="btn btn-danger">Reject</button>
+                            @method('DELETE')
+                            <button class="btn btn-danger" type="submit" title="Delete Record">Delete</button>
                         </form>
                     </div>
 
@@ -203,7 +356,6 @@
             </div>
         </div>
     @endforeach
-
 
     @foreach ($pendingTimeSlips as $timeSlip)
         <div class="modal fade" id="timeSlipModal{{ $timeSlip->id }}" tabindex="-1">
@@ -245,10 +397,25 @@
                     </div>
 
                     <div class="modal-footer">
-                        <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST">
+                        @if ($timeSlip->time_slip_status === 'pending')
+                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
+                                @csrf
+                                <button class="btn btn-success" type="submit" name="action" value="approved">Approve</button>
+                            </form>
+
+                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
+                                onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
+                                @csrf
+                                <button class="btn btn-danger" type="submit" name="action" value="rejected">Reject</button>
+                            </form>
+                        @endif
+
+                        <form action="{{ route('timeslip.destroy', $timeSlip->id) }}" method="POST"
+                            onsubmit="return confirm('Are you sure you want to delete this time slip record?');">
                             @csrf
-                            <button name="action" value="approved" class="btn btn-success">Approve</button>
-                            <button name="action" value="rejected" class="btn btn-danger">Reject</button>
+                            @method('DELETE')
+                            <button class="btn btn-danger" type="submit" title="Delete Record">Delete</button>
                         </form>
                     </div>
 

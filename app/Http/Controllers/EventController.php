@@ -49,12 +49,35 @@ class EventController extends Controller
         // Finally fetch results
         $events = $query->get();
 
-        // FOR CALENDAR
-        $calendarEvents = $events->map(function ($event) {
+        // FOR CALENDAR TAB
+        $colors = [
+            '#f87171', // red
+            '#60a5fa', // blue
+            '#34d399', // green
+            '#fbbf24', // yellow
+            '#a78bfa', // purple
+            '#f472b6', // pink
+            '#38bdf8', // sky
+            '#fde047', // amber
+            '#80d0b0', // light green
+            '#fca5a5', // light red
+            '#93c5fd', // light blue
+        ];
+
+        $eventColorMap = [];
+        $colorIndex = 0;
+
+        $calendarEvents = $events->map(function ($event) use (&$eventColorMap, &$colorIndex, $colors) {
+            $eventName = $event->event_name;
+            // Assign color if employee has no color yet
+            if (!isset($eventColorMap[$eventName])) {
+                $eventColorMap[$eventName] = $colors[$colorIndex % count($colors)];
+                $colorIndex++;
+            }
             return [
                 'title'         => $event->event_name,
                 'start'         => Carbon::parse($event->event_date)->toDateString(),
-                'color'         => '#71b0f8ff',
+                'color'          => $eventColorMap[$eventName],
                 'url'           => route('event.show', $event->id),
             ];
         });

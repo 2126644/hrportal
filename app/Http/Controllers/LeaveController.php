@@ -108,9 +108,7 @@ class LeaveController extends Controller
         $pendingLeaves  = (clone $summaryQuery)->where('status', 'pending')->count();
         $rejectedLeaves = (clone $summaryQuery)->where('status', 'rejected')->count();
 
-        $usedDays = (clone $summaryQuery)
-            ->where('status', 'approved')
-            ->sum('days');
+        $usedDays = (clone $summaryQuery)->where('status', 'approved')->sum('days');
 
         $leaves = $query->get();
 

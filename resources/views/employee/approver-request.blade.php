@@ -16,7 +16,7 @@
                                     </ol>
                                 </nav>
                                 <h3 class="page-title"><br>Leave & Time Slip Requests</h3>
-                                <p class="text-muted">Notes pending leave and time slip requests.</p>
+                                <p class="text-muted">Approve/reject pending leave and time slip requests.</p>
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
         <!-- Leave Request Tab -->
         <div class="tab-pane fade show active" id="leave-request" role="tabpanel" aria-labelledby="leave-request-tab">
             <!-- Filters and Search -->
-            <form method="GET" action="{{ route('employee.myrequests') }}">
+            <form method="GET" action="{{ route('employee.requests') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="leave-request">
                 <div class="row g-2 align-items-end">
                     @if (auth()->user()->role_id === 2)
@@ -92,7 +92,7 @@
                         </button>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-1">
-                        <a href="{{ route('employee.myrequests') }}" class="btn btn-secondary w-100">
+                        <a href="{{ route('employee.requests') }}" class="btn btn-secondary w-100">
                             <i class="bi bi-arrow-clockwise me-2"></i>Reset
                         </a>
                     </div>
@@ -178,7 +178,7 @@
         <!-- Time Slip Tab -->
         <div class="tab-pane fade" id="timeslip-request" role="tabpanel" aria-labelledby="timeslip-request-tab">
             <!-- Filters and Search -->
-            <form method="GET" action="{{ route('employee.myrequests') }}">
+            <form method="GET" action="{{ route('employee.requests') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="timeslip-request">
                 <div class="row g-2 align-items-end">
                     @if (auth()->user()->role_id === 2)
@@ -195,7 +195,8 @@
                     @endif
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label class="form-label">Date</label>
-                        <input type="date" name="date" value="{{ request('date') }}" class="form-control">
+                        <input type="date" name="start_date" value="{{ request('start_date') }}"
+                            class="form-control">
                     </div>
                     <div class="col-12 col-sm-6 col-lg-1">
                         <button type="submit" class="btn btn-primary w-100">
@@ -203,7 +204,7 @@
                         </button>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-1">
-                        <a href="{{ route('employee.myrequests') }}" class="btn btn-secondary w-100">
+                        <a href="{{ route('employee.requests') }}" class="btn btn-secondary w-100">
                             <i class="bi bi-arrow-clockwise me-2"></i>Reset
                         </a>
                     </div>
@@ -235,7 +236,7 @@
                                 <td>{{ $timeSlip->time_slip_reason }}</td>
 
                                 <td>
-                                    <div class="btn-group" role="group" aria-label="Time slip actions">
+                                    <div class="btn-group" role="group" aria-label="Leave actions">
                                         <!-- View Button: Opens modal (client-side, no form needed) -->
                                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                                             data-bs-target="#timeSlipModal{{ $timeSlip->id }}" title="View Details"
@@ -400,15 +401,13 @@
                             <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
                                 @csrf
-                                <button class="btn btn-success" type="submit" name="action"
-                                    value="approved">Approve</button>
+                                <button class="btn btn-success" type="submit" name="action" value="approved">Approve</button>
                             </form>
 
                             <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
                                 @csrf
-                                <button class="btn btn-danger" type="submit" name="action"
-                                    value="rejected">Reject</button>
+                                <button class="btn btn-danger" type="submit" name="action" value="rejected">Reject</button>
                             </form>
                         @endif
 

@@ -70,7 +70,7 @@
                             <div class="detail-row d-flex justify-content-between align-items-center mb-2">
                                 <span class="detail-label text-muted">User ID:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $employment->user_id ?? '-' }}
+                                    {{ $employee->user_id ?? '-' }}
                                 </span>
                             </div>
 
@@ -78,6 +78,13 @@
                                 <span class="detail-label text-muted">Employment Status:</span>
                                 <span class="detail-value fw-semibold">
                                     {{ $employment->employment_status ?? '-' }}
+                                </span>
+                            </div>
+
+                            <div class="detail-row d-flex justify-content-between align-items-center">
+                                <span class="detail-label text-muted">Role:</span>
+                                <span class="detail-value fw-semibold">
+                                    {{ $user->role_id ?? '-' }}
                                 </span>
                             </div>
                         </div>
@@ -190,7 +197,7 @@
                                         <div class="detail-label text-muted small">Birthday</div>
                                         <div
                                             class="detail-value fw-semibold {{ empty($employee->birthday) ? 'text-muted' : '' }}">
-                                            {{ $employee->birthday ? \Carbon\Carbon::parse($employee->birthday)->format('F j, Y') : '-' }}
+                                            {{ $employee->birthday ? $employee->birthday->format('d M Y') : '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -282,72 +289,67 @@
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Employment Type</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->employment_type) ? 'text-muted' : '' }}">
-                                            {{ $employee->employment_type ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ ucwords(str_replace('_', ' ', $employment->employment_type ?? '-')) }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Date Joined</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->date_joined) ? 'text-muted' : '' }}">
-                                            {{ $employee->date_joined ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->date_joined ? $employment->date_joined->format('d M Y') : '-' }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Company Branch</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->company_branch) ? 'text-muted' : '' }}">
-                                            {{ $employee->company_branch ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->company_branch ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Report To</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->report_to) ? 'text-muted' : '' }}">
-                                            {{ $employee->report_to ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->reportToEmployee->full_name ?? '-' }}
+                                            <span class="text-muted small">
+                                                ({{ $employment->reportToEmployee->employment->position ?? 'N/A' }})
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Department</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->department) ? 'text-muted' : '' }}">
-                                            {{ $employee->department ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->department ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Position</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->position) ? 'text-muted' : '' }}">
-                                            {{ $employee->position ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->position ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Work Start</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->work_start_time) ? 'text-muted' : '' }}">
-                                            {{ $employee->work_start_time ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->work_start_time->format('g:i A') ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Work End</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->work_end_time) ? 'text-muted' : '' }}">
-                                            {{ $employee->work_end_time ?? '-' }}
+                                        <div class="detail-value fw-semibold">
+                                            {{ $employment->work_end_time->format('g:i A') ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -366,8 +368,8 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Probation Start</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->probation_start) ? 'text-muted' : '' }}">
-                                            {{ $employee->probation_start ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employment->probation_start) ? 'text-muted' : '' }}">
+                                            {{ $employment->probation_start ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -375,8 +377,8 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Probation End</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->probation_end) ? 'text-muted' : '' }}">
-                                            {{ $employee->probation_end ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employment->probation_end) ? 'text-muted' : '' }}">
+                                            {{ $employment->probation_end ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -384,8 +386,8 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Suspended Start</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->suspended_start) ? 'text-muted' : '' }}">
-                                            {{ $employee->suspended_start ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employment->suspended_start) ? 'text-muted' : '' }}">
+                                            {{ $employment->suspended_start ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -393,8 +395,8 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Suspended End</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->suspended_end) ? 'text-muted' : '' }}">
-                                            {{ $employee->suspended_end ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employment->suspended_end) ? 'text-muted' : '' }}">
+                                            {{ $employment->suspended_end ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -402,8 +404,8 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Resigned Date</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->resigned_date) ? 'text-muted' : '' }}">
-                                            {{ $employee->resigned_date ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employment->resigned_date) ? 'text-muted' : '' }}">
+                                            {{ $employment->resigned_date ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -411,8 +413,8 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Termination Date</div>
                                         <div
-                                            class="detail-value fw-semibold {{ empty($employee->termination_date) ? 'text-muted' : '' }}">
-                                            {{ $employee->termination_date ?? '-' }}
+                                            class="detail-value fw-semibold {{ empty($employment->termination_date) ? 'text-muted' : '' }}">
+                                            {{ $employment->termination_date ?? '-' }}
                                         </div>
                                     </div>
                                 </div>

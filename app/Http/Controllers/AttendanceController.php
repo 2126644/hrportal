@@ -23,7 +23,7 @@ class AttendanceController extends Controller
         $employee = $user->employee; // null for admin if no employee record
         $query = Attendance::with('employee')->orderBy('created_at', 'desc');
 
-        // 🔹 Admin: view all attendance
+        // Admin: view all attendance
         if ($user->role_id == 2) {
 
             if ($request->filled('search')) {

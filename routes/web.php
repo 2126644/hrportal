@@ -13,9 +13,11 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\RequestController;
 
 use App\Models\Employee;
 use App\Models\User;
+use Termwind\Components\Raw;
 
 // Home page
 Route::get('/', function () {
@@ -109,10 +111,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/attendance/time-slip', [AttendanceController::class, 'requestTimeSlip'])->name('attendance.time-slip');
 
-    Route::get('/requests', [EmployeeController::class, 'requests'])->name('employee.requests');
+    Route::get('/requests', [RequestController::class, 'requests'])->name('employee.requests');
+    Route::get('/myrequests', [RequestController::class, 'myRequests'])->name('employee.myrequests');
 
     Route::delete('/employee/leave/{leave}', [LeaveController::class, 'cancel'])->name('leave.cancel.employee');
-    Route::delete('/employee/timeslip/{attendance}', [AttendanceController::class, 'destroyTimeSlip'])->name('timeslip.destroy.employee');
+    Route::delete('/employee/timeslip/{attendance}', [AttendanceController::class, 'destroyTimeSlip'])->name('timeslip.destroy');
 });
 
 //Route for admin
@@ -139,7 +142,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('project.index.admin');
 
-    Route::get('/admin/requests', [AdminController::class, 'requests'])->name('admin.request');
+    Route::get('/admin/requests', [RequestController::class, 'adminRequests'])->name('admin.request');
 
     // Time slip approval
     Route::post('/timeslip/{attendance}/update-status', [AttendanceController::class, 'approveTimeSlip'])->name('timeslip.updateStatus');

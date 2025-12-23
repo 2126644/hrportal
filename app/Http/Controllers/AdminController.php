@@ -192,27 +192,6 @@ class AdminController extends Controller
         return array_slice($activities, 0, 8);
     }
 
-    public function requests()
-    {
-        // --- Leave Requests ---
-        $pendingLeaves = Leave::with('employee')
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // --- Time Slip Requests ---
-        $pendingTimeSlips = Attendance::with('employee')
-            ->whereNotNull('time_slip_start')
-            ->where('time_slip_status', 'pending')
-            ->orderBy('date', 'desc')
-            ->get();
-
-        return view('admin.admin-request', compact(
-            'pendingLeaves',
-            'pendingTimeSlips'
-        ));
-    }
-
     public function employee(Request $request)
     {
         $query = Employee::with('employment');

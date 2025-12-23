@@ -89,8 +89,7 @@
 
                     <div class="dropdown-menu dropdown-menu-end">
                         @forelse(auth()->user()->unreadNotifications as $notification)
-                            <a href="{{ route('announcement.index.admin') }}"
-                                class="dropdown-item">
+                            <a href="{{ route('announcement.index.admin') }}" class="dropdown-item">
                                 <strong>{{ $notification->data['message'] }}</strong>
                                 <br>
                                 <small>{{ $notification->data['content'] }}</small>
@@ -225,11 +224,18 @@
                         <i class="bi bi-calendar3"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('employee.requests*') ? 'active' : '' }}"
-                        href="{{ route('employee.requests') }}">
+                    <a class="nav-link {{ request()->routeIs('myrequests*') ? 'active' : '' }}"
+                        href="{{ route('employee.myrequests') }}">
                         <i class="bi bi-clipboard"></i>
-                        <span>Requests</span>
+                        <span>My Requests</span>
                     </a>
+                    @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
+                        <a class="nav-link {{ request()->routeIs('requests*') ? 'active' : '' }}"
+                            href="{{ route('employee.requests') }}">
+                            <i class="bi bi-clipboard"></i>
+                            <span>Requests</span>
+                        </a>
+                    @endif
                     <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
                         href="{{ route('profile.show') }}">
                         <i class="bi bi-person-circle"></i>
@@ -286,25 +292,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const bell = document.getElementById('notificationBell');
+    document.addEventListener('DOMContentLoaded', function() {
+        const bell = document.getElementById('notificationBell');
 
-    if (bell) {
-        bell.addEventListener('show.bs.dropdown', function () {
-            fetch("{{ route('notifications.readAll') }}", {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Accept": "application/json"
-                }
+        if (bell) {
+            bell.addEventListener('show.bs.dropdown', function() {
+                fetch("{{ route('notifications.readAll') }}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    }
+                });
+
+                // instantly hide badge (UX)
+                const badge = document.getElementById('notificationCount');
+                if (badge) badge.remove();
             });
-
-            // instantly hide badge (UX)
-            const badge = document.getElementById('notificationCount');
-            if (badge) badge.remove();
-        });
-    }
-});
+        }
+    });
 </script>
 
 <script>

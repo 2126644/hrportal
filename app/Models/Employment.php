@@ -45,4 +45,9 @@ class Employment extends Model
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
     }
+
+    public function reportToEmployee()
+    {
+        return $this->belongsTo(Employee::class, 'report_to', 'employee_id');
+    }
 }

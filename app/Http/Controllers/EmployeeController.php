@@ -107,7 +107,9 @@ class EmployeeController extends Controller
         // recent announcements (latest 5)
         $announcements = Announcement::orderBy('created_at', 'desc')->take(3)->get();
 
-        return view('employee.employee-dashboard', compact(
+        return view(
+            'employee.employee-dashboard',
+            compact(
                 'employee',
                 'upcomingEvents',
                 'todayAttendance',
@@ -152,22 +154,31 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee = null)
     {
+        $user = Auth::user();
+        // $role_id = $user->role_id;
+
+        // $employment = $employee->employment()
+        //     ->with('reportToEmployee')
+        //     ->first();
+
         // If no employee param provided, use the logged in user's employee
         if (! $employee) {
-            $employee = Auth::user()->employee;
+            $employee = $user->employee;
             if (! $employee) {
                 abort(404);
             }
         }
 
         // Admin can view anyone; regular employee can only view their own profile
-        if (Auth::user()->role_id !== 2) {
-            if ($employee->employee_id != Auth::user()->employee->employee_id) {
+        if ($user->role_id !== 2) {
+            if ($employee->employee_id != $user->employee->employee_id) {
                 abort(403, 'Unauthorized action.');
             }
         }
 
-        $employment = $employee->employment;
+        $employment = $employee->employment()
+            ->with('reportToEmployee')
+            ->first();
 
         return view('profile.show', compact('employee', 'employment'));
     }
@@ -234,8 +245,10 @@ class EmployeeController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $employment = $employee->employment ?? new Employment(['employee_id' => $employee->employee_id]);
-
+        $employment = Employment::firstOrCreate(
+            ['employee_id' => $employee->employee_id],
+            ['employee_id' => $employee->employee_id]
+        );
         return view('profile.editemployment', compact('employee', 'employment'));
     }
 
@@ -249,10 +262,7 @@ class EmployeeController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $employment = $employee->employment;
-
         $validated = $request->validate([
-            'employee_id'        => 'required|exists:employees,employee_id',
             'employment_type'    => 'required|string|max:100',
             'employment_status'  => 'required|string|max:100',
             'company_branch'     => 'required|string|max:100',
@@ -270,7 +280,10 @@ class EmployeeController extends Controller
             'work_end_time'      => 'nullable|date_format:H:i',
         ]);
 
-        $employment->update($validated);
+        Employment::updateOrCreate(
+            ['employee_id' => $employee->employee_id],
+            $validated
+        );
 
         return redirect()->route('profile.show', $employee->employee_id)->with('success', 'Employment details updated successfully!');
     }
@@ -281,30 +294,5 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-
-    public function requests()
-    {
-        $employee = Auth::user()->employee;
-
-        // --- Leave Requests ---
-        $pendingLeaves = Leave::with('$employee_id')
-            ->where('employee_id', $employee->employee_id)
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // --- Time Slip Requests ---
-        $pendingTimeSlips = Attendance::with('employee')
-            ->where('employee_id', $employee->employee_id)
-            ->whereNotNull('time_slip_start')
-            ->where('time_slip_status', 'pending')
-            ->orderBy('date', 'desc')
-            ->get();
-
-        return view('employee.employee-request', compact(
-            'pendingLeaves',
-            'pendingTimeSlips'
-        ));
     }
 }

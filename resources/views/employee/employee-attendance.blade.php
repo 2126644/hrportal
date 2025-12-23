@@ -176,7 +176,7 @@
 
                         @if ($hasSlip && $slipStatus === 'pending')
                             {{-- Employee can cancel slip --}}
-                            <form action="{{ route('timeslip.destroy.employee', $attendance->id) }}" method="POST"
+                            <form action="{{ route('timeslip.destroy', $attendance->id) }}" method="POST"
                                 onsubmit="return confirm('Cancel time slip request?');">
                                 @csrf
                                 @method('DELETE')

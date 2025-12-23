@@ -234,19 +234,19 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label for="suspension_start" class="form-label">Suspension Start</label>
-                                <input type="date" id="suspension_start" name="suspension_start" class="form-control"
-                                    value="{{ old('suspension_start', $employment->suspension_start) }}">
-                                @error('suspension_start')
+                                <label for="suspended_start" class="form-label">Suspended Start</label>
+                                <input type="date" id="suspended_start" name="suspended_start" class="form-control"
+                                    value="{{ old('suspended_start', $employment->suspended_start) }}">
+                                @error('suspended_start')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="suspension_end" class="form-label">Suspension End</label>
-                                <input type="date" id="suspension_end" name="suspension_end" class="form-control"
-                                    value="{{ old('suspension_end', $employment->suspension_end) }}">
-                                @error('suspension_end')
+                                <label for="suspended_end" class="form-label">Suspended End</label>
+                                <input type="date" id="suspended_end" name="suspended_end" class="form-control"
+                                    value="{{ old('suspended_end', $employment->suspended_end) }}">
+                                @error('suspended_end')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
