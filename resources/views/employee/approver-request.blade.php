@@ -51,18 +51,16 @@
             <form method="GET" action="{{ route('employee.requests') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="leave-request">
                 <div class="row g-2 align-items-end">
-                    @if (auth()->user()->role_id === 2)
-                        <div class="col-12 col-sm-6 col-lg-2">
-                            <label class="form-label">Search Employees</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-search"></i>
-                                </span>
-                                <input type="text" name="search" value="{{ request('search') }}" class="form-control"
-                                    placeholder="Name or ID...">
-                            </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Search Employees</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Name or ID...">
                         </div>
-                    @endif
+                    </div>
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label class="form-label">Leave Type</label>
                         <select name="leave_type" class="form-control">
@@ -181,18 +179,16 @@
             <form method="GET" action="{{ route('employee.requests') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="timeslip-request">
                 <div class="row g-2 align-items-end">
-                    @if (auth()->user()->role_id === 2)
-                        <div class="col-12 col-sm-6 col-lg-2">
-                            <label class="form-label">Search Employees</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="bi bi-search"></i>
-                                </span>
-                                <input type="text" name="search" value="{{ request('search') }}"
-                                    class="form-control" placeholder="Name or ID...">
-                            </div>
+                    <div class="col-12 col-sm-6 col-lg-2">
+                        <label class="form-label">Search Employees</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" class="form-control"
+                                placeholder="Name or ID...">
                         </div>
-                    @endif
+                    </div>
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label class="form-label">Date</label>
                         <input type="date" name="start_date" value="{{ request('start_date') }}"
@@ -401,13 +397,15 @@
                             <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
                                 @csrf
-                                <button class="btn btn-success" type="submit" name="action" value="approved">Approve</button>
+                                <button class="btn btn-success" type="submit" name="action"
+                                    value="approved">Approve</button>
                             </form>
 
                             <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
                                 @csrf
-                                <button class="btn btn-danger" type="submit" name="action" value="rejected">Reject</button>
+                                <button class="btn btn-danger" type="submit" name="action"
+                                    value="rejected">Reject</button>
                             </form>
                         @endif
 

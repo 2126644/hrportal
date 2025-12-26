@@ -12,7 +12,8 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.employee') }}">Employees</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.employee') }}">Employees</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Edit Employment</li>
                                     </ol>
                                 </nav>
@@ -58,7 +59,7 @@
                             </label>
                             <select id="employment_type" name="employment_type" class="form-select" required>
                                 <option value="" disabled
-                                    {{ old('employment_type', $employment?->employment_type) ? '' : 'selected' }}>
+                                    {{ old('employment_type') ? '' : 'selected' }}>
                                     Select type
                                 </option>
                                 @php
@@ -80,7 +81,7 @@
                             <label for="employment_status" class="form-label">Employment Status <span
                                     class="text-danger">*</span></label>
                             <select id="employment_status" name="employment_status" class="form-select" required>
-                                <option value="" disabled {{ old('employment_status') ? '' : 'selected' }}>Select
+                                <option value="" disabled{{ old('employment_status') ? '' : 'selected' }}>Select
                                     status
                                 </option>
                                 @php
@@ -94,7 +95,7 @@
                                 @endphp
                                 @foreach ($employment_statuses as $status)
                                     <option value="{{ $status }}"
-                                        {{ old('employment_status', $employment->employment_status) === $status ? 'selected' : '' }}>
+                                        {{ old('employment_status', $employment?->employment_status) === $status ? 'selected' : '' }}>
                                         {{ ucfirst($status) }}</option>
                                 @endforeach
                             </select>
@@ -115,7 +116,7 @@
                                 @endphp
                                 @foreach ($company_branches as $branch)
                                     <option value="{{ $branch }}"
-                                        {{ old('company_branch', $employment->company_branch) === $branch ? 'selected' : '' }}>
+                                        {{ old('company_branch', $employment?->company_branch) === $branch ? 'selected' : '' }}>
                                         {{ ucfirst($branch) }}</option>
                                 @endforeach
                             </select>
@@ -139,7 +140,7 @@
                                 @endphp
                                 @foreach ($employees as $emp)
                                     <option value="{{ $emp->employee_id }}"
-                                        {{ old('report_to', $employment->report_to) === $emp->employee_id ? 'selected' : '' }}>
+                                        {{ old('report_to', $employment?->report_to) === $emp->employee_id ? 'selected' : '' }}>
                                         {{ ucfirst($emp->full_name) }}</option>
                                 @endforeach
                             </select>
@@ -159,7 +160,7 @@
                                 @endphp
                                 @foreach ($departments as $branch)
                                     <option value="{{ $branch }}"
-                                        {{ old('department', $employment->department) === $branch ? 'selected' : '' }}>
+                                        {{ old('department', $employment?->department) === $branch ? 'selected' : '' }}>
                                         {{ ucfirst($branch) }}</option>
                                 @endforeach
                             </select>
@@ -193,7 +194,7 @@
                                 <label for="work_start_time" class="form-label">Work Start Time <span
                                         class="text-danger">*</span></label>
                                 <input type="time" id="work_start_time" name="work_start_time" class="form-control"
-                                    value="{{ old('work_start_time', $employment->work_start_time ? $employment->work_start_time->format('H:i') : '') }}"
+                                    value="{{ old('work_start_time', $employment?->work_start_time?->format('H:i')) }}"
                                     required>
                                 @error('work_start_time')
                                     <div class="text-danger small">{{ $message }}</div>
@@ -204,7 +205,7 @@
                                 <label for="work_end_time" class="form-label">Work End Time <span
                                         class="text-danger">*</span></label>
                                 <input type="time" id="work_end_time" name="work_end_time" class="form-control"
-                                    value="{{ old('work_end_time', $employment->work_end_time ? $employment->work_end_time->format('H:i') : '') }}"
+                                    value="{{ old('work_end_time', $employment?->work_end_time?->format('H:i')) }}"
                                     required>
                                 @error('work_end_time')
                                     <div class="text-danger small">{{ $message }}</div>
@@ -225,7 +226,7 @@
                             <div class="col-md-6">
                                 <label for="probation_end" class="form-label">Probation End</label>
                                 <input type="date" id="probation_end" name="probation_end" class="form-control"
-                                    value="{{ old('probation_end', $employment->probation_end) }}">
+                                    value="{{ old('probation_end', $employment?->probation_end) }}">
                                 @error('probation_end')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -236,7 +237,7 @@
                             <div class="col-md-6">
                                 <label for="suspended_start" class="form-label">Suspended Start</label>
                                 <input type="date" id="suspended_start" name="suspended_start" class="form-control"
-                                    value="{{ old('suspended_start', $employment->suspended_start) }}">
+                                    value="{{ old('suspended_start', $employment?->suspended_start) }}">
                                 @error('suspended_start')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -245,7 +246,7 @@
                             <div class="col-md-6">
                                 <label for="suspended_end" class="form-label">Suspended End</label>
                                 <input type="date" id="suspended_end" name="suspended_end" class="form-control"
-                                    value="{{ old('suspended_end', $employment->suspended_end) }}">
+                                    value="{{ old('suspended_end', $employment?->suspended_end) }}">
                                 @error('suspended_end')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -256,7 +257,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="resigned_date" class="form-label">Resigned Date</label>
                                 <input type="date" id="resigned_date" name="resigned_date" class="form-control"
-                                    value="{{ old('resigned_date', $employment->resigned_date) }}">
+                                    value="{{ old('resigned_date', $employment?->resigned_date) }}">
                                 @error('resigned_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -265,7 +266,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="termination_date" class="form-label">Termination Date</label>
                                 <input type="date" id="termination_date" name="termination_date" class="form-control"
-                                    value="{{ old('termination_date', $employment->termination_date) }}">
+                                    value="{{ old('termination_date', $employment?->termination_date) }}">
                                 @error('termination_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -282,6 +283,50 @@
                             </button>
                         </div>
                     </form>
+
+                    <form method="POST" action="{{ route('employees.approvers.store', $employee) }}">
+                        @csrf
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Level 1 Approver</label>
+                                <select name="approvers[0][id]" class="form-control">
+                                    @foreach ($approverCandidates as $approver)
+                                        <option value="{{ $approver->employee_id }}">
+                                            {{ $approver->full_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <input type="hidden" name="approvers[0][level]" value="1">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>Level 2 Approver</label>
+                                <select name="approvers[1][id]" class="form-control">
+                                    <option value="">— Optional —</option>
+                                    @foreach ($approverCandidates as $approver)
+                                        <option value="{{ $approver->employee_id }}">
+                                            {{ $approver->full_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <input type="hidden" name="approvers[1][level]" value="2">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ route('profile.show', $employee->employee_id) }}" class="btn btn-secondary me-2">
+                                Cancel
+                            </a>
+                            {{-- later add if/else for employee/admin --}}
+                            <button type="submit" class="btn btn-primary">
+                                Update Approvers
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>

@@ -224,13 +224,13 @@
                         <i class="bi bi-calendar3"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('myrequests*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('employee.myrequests*') ? 'active' : '' }}"
                         href="{{ route('employee.myrequests') }}">
                         <i class="bi bi-clipboard"></i>
                         <span>My Requests</span>
                     </a>
                     @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
-                        <a class="nav-link {{ request()->routeIs('requests*') ? 'active' : '' }}"
+                        <a class="nav-link {{ request()->routeIs('employee.requests*') ? 'active' : '' }}"
                             href="{{ route('employee.requests') }}">
                             <i class="bi bi-clipboard"></i>
                             <span>Requests</span>

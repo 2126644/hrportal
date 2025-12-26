@@ -84,7 +84,7 @@
                             <div class="detail-row d-flex justify-content-between align-items-center">
                                 <span class="detail-label text-muted">Role:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $user->role_id ?? '-' }}
+                                    {{ $user?->role?->role_name ?? '-' }}
                                 </span>
                             </div>
                         </div>
@@ -298,7 +298,7 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Date Joined</div>
                                         <div class="detail-value fw-semibold">
-                                            {{ $employment->date_joined ? $employment->date_joined->format('d M Y') : '-' }}
+                                            {{ $employment?->date_joined?->format('d M Y') ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -314,9 +314,9 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Report To</div>
                                         <div class="detail-value fw-semibold">
-                                            {{ $employment->reportToEmployee->full_name ?? '-' }}
+                                            {{ $employment?->reportToEmployee?->full_name ?? '-' }}
                                             <span class="text-muted small">
-                                                ({{ $employment->reportToEmployee->employment->position ?? 'N/A' }})
+                                                ({{ $employment?->reportToEmployee?->employment?->position ?? 'N/A' }})
                                             </span>
                                         </div>
                                     </div>
@@ -341,7 +341,7 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Work Start</div>
                                         <div class="detail-value fw-semibold">
-                                            {{ $employment->work_start_time->format('g:i A') ?? '-' }}
+                                            {{ $employment?->work_start_time?->format('g:i A') ?? '-' }}
                                         </div>
                                     </div>
                                 </div>
@@ -349,7 +349,7 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Work End</div>
                                         <div class="detail-value fw-semibold">
-                                            {{ $employment->work_end_time->format('g:i A') ?? '-' }}
+                                            {{ $employment?->work_end_time?->format('g:i A') ?? '-' }}
                                         </div>
                                     </div>
                                 </div>

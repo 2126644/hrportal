@@ -180,7 +180,9 @@ class EmployeeController extends Controller
             ->with('reportToEmployee')
             ->first();
 
-        return view('profile.show', compact('employee', 'employment'));
+        $user = Auth::user()->load('role');
+
+        return view('profile.show', compact('employee', 'employment', 'user'));
     }
 
     /**
@@ -245,11 +247,21 @@ class EmployeeController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $employment = Employment::firstOrCreate(
-            ['employee_id' => $employee->employee_id],
-            ['employee_id' => $employee->employee_id]
-        );
-        return view('profile.editemployment', compact('employee', 'employment'));
+        $employment = Employment::where('employee_id', $employee->employee_id)->first();
+
+        $currentEmployeeId = $employee->employee_id;
+        $adminEmployeeId   = optional(Auth::user()->employee)->employee_id;
+
+        $approverCandidates = Employee::query()
+            ->where('employee_id', '!=', $currentEmployeeId) // emp cannot approve self
+            ->when(
+                $adminEmployeeId,
+                fn($q) =>
+                $q->where('employee_id', '!=', $adminEmployeeId) // admin not selectable
+            )
+            ->get();
+
+        return view('profile.editemployment', compact('employee', 'employment', 'approverCandidates'));
     }
 
     /**

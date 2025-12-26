@@ -70,15 +70,17 @@ class RequestController extends Controller
         $user = Auth::user();
         $employee = $user->employee; // null for admin if no employee record
 
-        $leaveTypes = Leave::select('leave_type')->distinct()->pluck('leave_type');
+        $employeeId = optional(Auth::user()->employee)->employee_id;
 
-        // Get all subordinates (direct and indirect) via report_to
-        $subordinateIds = $this->getAllSubordinateIds($employee->employee_id);
+        $leaveTypes = Leave::select('leave_type')->distinct()->pluck('leave_type');
 
         // --- Leave Requests with filters ---
         $leavesQuery = Leave::with('employee')
-            ->where('employee_id', $subordinateIds)
             ->where('status', 'pending')
+            ->whereHas('employee.approvers', function ($q) use ($employeeId) {
+                $q->where('approver_id', $employeeId)
+                    ->whereColumn('employment_approvers.level', 'leaves.approval_level');
+            })
             ->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
@@ -109,9 +111,11 @@ class RequestController extends Controller
 
         // --- Time Slip Requests with filters ---
         $timeSlipsQuery = Attendance::with('employee')
-            ->where('employee_id', $subordinateIds)
             ->whereNotNull('time_slip_start')
             ->where('time_slip_status', 'pending')
+            ->whereHas('employee.approvers', function ($q) use ($employeeId) {
+                $q->where('approver_id', $employeeId);
+            })
             ->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
@@ -133,23 +137,6 @@ class RequestController extends Controller
             'pendingLeaves',
             'pendingTimeSlips'
         ));
-    }
-
-    // Helper to get all subordinate IDs recursively
-    private function getAllSubordinateIds($employeeId)
-    {
-        $ids = [];
-        $this->collectSubordinates($employeeId, $ids);
-        return $ids;
-    }
-    
-    private function collectSubordinates($employeeId, &$ids)
-    {
-        $subordinates = \App\Models\Employment::where('report_to', $employeeId)->pluck('employee_id');
-        foreach ($subordinates as $subId) {
-            $ids[] = $subId;
-            $this->collectSubordinates($subId, $ids); // Recursive
-        }
     }
 
     public function myRequests(Request $request)

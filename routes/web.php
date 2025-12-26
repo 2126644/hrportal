@@ -14,6 +14,7 @@ use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\EmploymentApproversController;
 
 use App\Models\Employee;
 use App\Models\User;
@@ -62,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
 
     Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
-    
+
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('employee.attendance');
     Route::post('/attendance/punch-in', [AttendanceController::class, 'punchIn'])->name('attendance.punchIn');
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
@@ -151,6 +152,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/leaves/{leave}/update-status', [LeaveController::class, 'approveLeave'])->name('leave.updateStatus');
 
     Route::delete('/admin/leave/{leave}', [LeaveController::class, 'destroy'])->name('leave.destroy.admin');
+
+    Route::post('/employees/{employee}/approvers', [EmploymentApproversController::class, 'store'])->name('employees.approvers.store');
 
     // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
 });

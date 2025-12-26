@@ -11,6 +11,7 @@ use App\Exports\LeavesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LeaveEntitlement;
 use App\Models\Employee;
+use App\Models\EmploymentApprovers;
 
 class LeaveController extends Controller
 {
@@ -341,6 +342,41 @@ class LeaveController extends Controller
     {
         $request->validate([
             'action' => 'required|in:approved,rejected'
+        ]);
+
+        $userEmployee = Auth::user()->employee;
+
+        $currentApprover = EmploymentApprovers::where('employee_id', $leave->employee_id)
+            ->where('level', $leave->approval_level)
+            ->firstOrFail();
+
+        // Ensure correct approver
+        abort_if($currentApprover->approver_id !== $userEmployee->employee_id, 403);
+
+        if ($request->action === 'rejected') {
+            $leave->update([
+                'status' => 'rejected',
+                'approved_by' => $userEmployee->employee_id,
+                'approved_at' => now(),
+            ]);
+            return back()->with('error', 'Leave rejected');
+        }
+
+        // Next level?
+        $nextLevelExists = EmploymentApprovers::where('employee_id', $leave->employee_id)
+            ->where('level', '>', $leave->approval_level)
+            ->exists();
+
+        if ($nextLevelExists) {
+            $leave->increment('approval_level');
+            return back()->with('success', 'Forwarded to next approver');
+        }
+
+        // Final approval
+        $leave->update([
+            'status' => 'approved',
+            'approved_by' => $userEmployee->employee_id,
+            'approved_at' => now(),
         ]);
 
         $leave->status = $request->action;
