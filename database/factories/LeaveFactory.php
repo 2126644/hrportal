@@ -28,7 +28,9 @@ class LeaveFactory extends Factory
             'end_date'      => fake()->dateTimeBetween($start, '+1 month')->format('Y-m-d'),
             'days'          => fake()->numberBetween(1, 10),
             'attachment'    => null,
-            'approved_by'   => fake()->boolean(60) ? User::inRandomOrder()->first()?->id : null,
+            'approved_by'   => fake()->optional()->randomElement(Employee::pluck('employee_id')->toArray()),
+            'approval_level'=> fake()->numberBetween(0, 3),
+            'approved_at'   => fake()->optional()->dateTimeBetween('now', '+1 month'),
             'status'        => fake()->randomElement(['pending', 'approved', 'rejected']),
             'reject_reason' => fake()->optional()->sentence(),
         ];

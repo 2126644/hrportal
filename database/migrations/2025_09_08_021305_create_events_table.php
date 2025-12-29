@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('event_date');
             $table->time('event_time');
             $table->string('event_location');
-            $table->enum('category', ['meeting', 'conference', 'workshop', 'networking', 'webinar', 'social', 'other'])->default('other');
+            $table->string('event_category')->default('other');
             $table->integer('capacity');
             $table->integer('attendees')->default(0);
             $table->decimal('price', 8, 2)->default(0);

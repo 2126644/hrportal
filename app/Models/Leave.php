@@ -20,7 +20,7 @@ class Leave extends Model
         'days',
         'attachment',
         'approved_by',
-        'status', // pending, approved, rejected
+        'status',
         'reject_reason',
     ];
 

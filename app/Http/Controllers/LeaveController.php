@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LeaveEntitlement;
 use App\Models\Employee;
 use App\Models\EmploymentApprovers;
+use Illuminate\Validation\Rule;
 
 class LeaveController extends Controller
 {
@@ -226,8 +227,8 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        $leaveTypeEnum     = Leave::select('leave_type')->distinct()->pluck('leave_type');
-        $leaveLengthEnum     = Leave::select('leave_length')->distinct()->pluck('leave_length');
+        $leaveTypeEnum = setting('leave_types');
+        $leaveLengthEnum = ['full_day', 'AM', 'PM'];
 
         return view('employee.applyleave', compact('leaveTypeEnum', 'leaveLengthEnum'));
     }
@@ -241,7 +242,7 @@ class LeaveController extends Controller
         $employee = Auth::user()->employee;
 
         $request->validate([
-            'leave_type'    => 'required|string|max:50',
+            'leave_type'    => ['required', Rule::in(setting('leave_types'))],
             'start_date'    => 'required|date',
             'end_date'      => 'required|date|after_or_equal:start_date',
             'reason'        => 'required|string|max:255',
@@ -277,7 +278,7 @@ class LeaveController extends Controller
         $leave->status = 'pending';
         $leave->save();
 
-        return redirect()->route('leave.create')->with('success', 'Leave request submitted successfully!');
+        return redirect()->route('leave.index.employee')->with('success', 'Leave request submitted successfully!');
     }
 
     /**
@@ -344,25 +345,53 @@ class LeaveController extends Controller
             'action' => 'required|in:approved,rejected'
         ]);
 
-        $userEmployee = Auth::user()->employee;
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        /**
+         * STEP 1: ADMIN APPROVAL (LEVEL 0)
+         */
+        if ($leave->approval_level === 0) {
+
+            abort_if($user->role_id !== 2, 403);
+
+            // if rejected, then done
+            if ($request->action === 'rejected') {
+                $leave->update([
+                    'status' => 'rejected',
+                    'approved_by' => $employee->employee_id,
+                    'approved_at' => now(),
+                ]);
+                return back()->with('error', 'Leave rejected by admin');
+            }
+
+            // if not rejected, then moved to next level
+            $leave->increment('approval_level');
+
+            return back()->with('success', 'Approved by admin. Assigned to next approver.');
+        }
+
+        /**
+         * STEP 2: NORMAL APPROVER FLOW
+         */
 
         $currentApprover = EmploymentApprovers::where('employee_id', $leave->employee_id)
             ->where('level', $leave->approval_level)
             ->firstOrFail();
 
         // Ensure correct approver
-        abort_if($currentApprover->approver_id !== $userEmployee->employee_id, 403);
+        abort_if($currentApprover->approver_id !== $employee->employee_id, 403);
 
         if ($request->action === 'rejected') {
             $leave->update([
                 'status' => 'rejected',
-                'approved_by' => $userEmployee->employee_id,
+                'approved_by' => $employee->employee_id,
                 'approved_at' => now(),
             ]);
             return back()->with('error', 'Leave rejected');
         }
 
-        // Next level?
+        // Check next level
         $nextLevelExists = EmploymentApprovers::where('employee_id', $leave->employee_id)
             ->where('level', '>', $leave->approval_level)
             ->exists();
@@ -375,12 +404,9 @@ class LeaveController extends Controller
         // Final approval
         $leave->update([
             'status' => 'approved',
-            'approved_by' => $userEmployee->employee_id,
+            'approved_by' => $employee->employee_id,
             'approved_at' => now(),
         ]);
-
-        $leave->status = $request->action;
-        $leave->save();
 
         return redirect()->back()->with('success', 'Leave has been approved.');
     }

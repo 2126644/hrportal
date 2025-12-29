@@ -339,8 +339,8 @@
                             <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this leave request?');">
                                 @csrf
-                                <button class="btn btn-success" type="submit" name="action" value="approved"
-                                    title="Approve">Approve</button>
+                                <button class="btn btn-success" type="submit" name="action"
+                                    value="approved">Approve</button>
                             </form>
                         @endif
 
@@ -348,7 +348,7 @@
                             onsubmit="return confirm('Are you sure you want to delete this leave record?');">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-danger" type="submit" title="Delete Record">Delete</button>
+                            <button class="btn btn-danger" type="submit">Delete</button>
                         </form>
                     </div>
 
@@ -401,13 +401,15 @@
                             <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
                                 @csrf
-                                <button class="btn btn-success" type="submit" name="action" value="approved">Approve</button>
+                                <button class="btn btn-success" type="submit" name="action"
+                                    value="approved">Approve</button>
                             </form>
 
                             <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
                                 @csrf
-                                <button class="btn btn-danger" type="submit" name="action" value="rejected">Reject</button>
+                                <button class="btn btn-danger" type="submit" name="action"
+                                    value="rejected">Reject</button>
                             </form>
                         @endif
 
@@ -415,7 +417,7 @@
                             onsubmit="return confirm('Are you sure you want to delete this time slip record?');">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-danger" type="submit" title="Delete Record">Delete</button>
+                            <button class="btn btn-danger" type="submit">Delete</button>
                         </form>
                     </div>
 

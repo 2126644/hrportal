@@ -6,6 +6,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -25,8 +26,8 @@ class EventController extends Controller
             });
         }
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->category);
+        if ($request->filled('event_category')) {
+            $query->where('event_category', $request->event_category);
         }
 
         if ($request->filled('event_status')) {
@@ -82,7 +83,7 @@ class EventController extends Controller
             ];
         });
 
-        $categories = ['meeting', 'conference', 'workshop', 'networking', 'webinar', 'social', 'other'];
+        $categories = setting('event_categories');
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
         $rsvpOptions = ['required' => 'Required', 'not_required' => 'Not Required'];
 
@@ -114,7 +115,7 @@ class EventController extends Controller
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
-            'category'          => 'required|in:meeting,conference,workshop,networking,webinar,social,other',
+            'event_category'    => ['required', Rule::in(setting('event_categories'))],
             'capacity'          => 'required|integer|min:1',
             'attendees'         => 'nullable|integer|min:0',
             'price'             => 'nullable|numeric|min:0',
@@ -141,13 +142,13 @@ class EventController extends Controller
         $event->event_date       = $request->event_date;
         $event->event_time       = $request->event_time;
         $event->event_location   = $request->event_location;
-        $event->category         = $request->category;
+        $event->event_category   = $request->event_category;
         $event->capacity         = $request->capacity;
         $event->attendees        = $request->attendees ?? 0; // default
         $event->price            = $request->price ?? 0;     // default
         $event->image            = $imagePath; // can be null
         $event->organizer        = $request->organizer;
-        $event->tags             = $request->tags ? json_encode($request->tags) : null; // store as JSON or null
+        $event->tags             = $request->tags;
         $event->rsvp_required    = $request->boolean('rsvp_required', false);
         // event_status defaults to "upcoming" in the migration
 
@@ -189,7 +190,7 @@ class EventController extends Controller
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
-            'category'          => 'required|in:meeting,conference,workshop,networking,webinar,social,other',
+            'category'          => ['required', Rule::in(setting('event_categories'))],
             'capacity'          => 'required|integer|min:1',
             'attendees'         => 'nullable|integer|min:0',
             'price'             => 'nullable|numeric|min:0',

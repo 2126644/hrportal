@@ -157,10 +157,6 @@ class EmployeeController extends Controller
         $user = Auth::user();
         // $role_id = $user->role_id;
 
-        // $employment = $employee->employment()
-        //     ->with('reportToEmployee')
-        //     ->first();
-
         // If no employee param provided, use the logged in user's employee
         if (! $employee) {
             $employee = $user->employee;
@@ -179,8 +175,6 @@ class EmployeeController extends Controller
         $employment = $employee->employment()
             ->with('reportToEmployee')
             ->first();
-
-        $user = Auth::user()->load('role');
 
         return view('profile.show', compact('employee', 'employment', 'user'));
     }

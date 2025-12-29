@@ -58,8 +58,7 @@
                                 Employment Type <span class="text-danger">*</span>
                             </label>
                             <select id="employment_type" name="employment_type" class="form-select" required>
-                                <option value="" disabled
-                                    {{ old('employment_type') ? '' : 'selected' }}>
+                                <option value="" disabled {{ old('employment_type') ? '' : 'selected' }}>
                                     Select type
                                 </option>
                                 @php
@@ -81,7 +80,7 @@
                             <label for="employment_status" class="form-label">Employment Status <span
                                     class="text-danger">*</span></label>
                             <select id="employment_status" name="employment_status" class="form-select" required>
-                                <option value="" disabled{{ old('employment_status') ? '' : 'selected' }}>Select
+                                <option value="" disabled {{ old('employment_status') ? '' : 'selected' }}>Select
                                     status
                                 </option>
                                 @php
@@ -287,12 +286,29 @@
                     <form method="POST" action="{{ route('employees.approvers.store', $employee) }}">
                         @csrf
 
+                        {{-- LEVEL 0 (ADMIN – READ ONLY) --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label>Level 1 Approver</label>
-                                <select name="approvers[0][id]" class="form-control">
+                                <label>Level 0 Approver</label>
+                                <input type="text" class="form-control" value="Admin" disabled>
+                                <small class="text-muted">
+                                    Default system approver (cannot be changed)
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="level1_approver" class="form-label">
+                                    Level 1 Approver <span class="text-danger">*</span>
+                                </label>
+                                <select name="approvers[0][id]" class="form-control" required>
+                                    <option value="" disabled {{ old('approvers.0.id') ? '' : 'selected' }}>
+                                        Select approver 1
+                                    </option>
                                     @foreach ($approverCandidates as $approver)
-                                        <option value="{{ $approver->employee_id }}">
+                                        <option value="{{ $approver->employee_id }}"
+                                            {{ old('approvers.0.id') == $approver->employee_id ? 'selected' : '' }}>
                                             {{ $approver->full_name }}
                                         </option>
                                     @endforeach
@@ -303,11 +319,16 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label>Level 2 Approver</label>
+                                <label for="level2_approver" class="form-label">
+                                    Level 2 Approver <span class="text-muted">(Optional)</span>
+                                </label>
                                 <select name="approvers[1][id]" class="form-control">
-                                    <option value="">— Optional —</option>
+                                    <option value="" disabled {{ old('approvers.1.id') ? '' : 'selected' }}>
+                                        Select approver 2
+                                    </option>
                                     @foreach ($approverCandidates as $approver)
-                                        <option value="{{ $approver->employee_id }}">
+                                        <option value="{{ $approver->employee_id }}"
+                                            {{ old('approvers.1.id') == $approver->employee_id ? 'selected' : '' }}>
                                             {{ $approver->full_name }}
                                         </option>
                                     @endforeach

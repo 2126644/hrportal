@@ -17,7 +17,7 @@ class Event extends Model
         'event_date',
         'event_time',
         'event_location',
-        'category',
+        'event_category',
         'capacity',
         'attendees',
         'price',

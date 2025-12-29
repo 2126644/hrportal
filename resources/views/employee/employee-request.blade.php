@@ -150,18 +150,6 @@
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
-                                        <!-- Approve Button: Server-side action (wrapped in form) -->
-                                        @if ($leave->status === 'pending')
-                                            <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
-                                                style="display: inline;"
-                                                onsubmit="return confirm('Are you sure you want to approve this leave request?');">
-                                                @csrf
-                                                <button class="btn btn-sm btn-outline-success" type="submit"
-                                                    name="action" value="approved" title="Approve Leave">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </button>
-                                            </form>
-                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -253,28 +241,6 @@
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
-                                        <!-- Approve Button: Server-side action (wrapped in form) -->
-                                        @if ($timeSlip->time_slip_status === 'pending')
-                                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}"
-                                                method="POST" style="display: inline;"
-                                                onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
-                                                @csrf
-                                                <button class="btn btn-sm btn-outline-success" type="submit"
-                                                    name="action" value="approved" title="Approve Time Slip">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </button>
-                                            </form>
-
-                                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}"
-                                                method="POST" style="display: inline;"
-                                                onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
-                                                @csrf
-                                                <button class="btn btn-sm btn-outline-danger" type="submit"
-                                                    name="action" value="rejected" title="Reject Time Slip">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </button>
-                                            </form>
-                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -334,20 +300,11 @@
                     </div>
 
                     <div class="modal-footer">
-                        @if ($leave->status === 'pending')
-                            <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure you want to approve this leave request?');">
-                                @csrf
-                                <button class="btn btn-success" type="submit" name="action" value="approved"
-                                    title="Approve">Approve</button>
-                            </form>
-                        @endif
-
                         <form action="{{ route('leave.destroy.admin', $leave->id) }}" method="POST"
                             onsubmit="return confirm('Are you sure you want to delete this leave record?');">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-danger" type="submit" title="Delete Record">Delete</button>
+                            <button class="btn btn-danger" type="submit">Delete</button>
                         </form>
                     </div>
 
@@ -396,27 +353,11 @@
                     </div>
 
                     <div class="modal-footer">
-                        @if ($timeSlip->time_slip_status === 'pending')
-                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure you want to approve this time slip request?');">
-                                @csrf
-                                <button class="btn btn-success" type="submit" name="action"
-                                    value="approved">Approve</button>
-                            </form>
-
-                            <form action="{{ route('timeslip.updateStatus', $timeSlip->id) }}" method="POST"
-                                onsubmit="return confirm('Are you sure you want to reject this time slip request?');">
-                                @csrf
-                                <button class="btn btn-danger" type="submit" name="action"
-                                    value="rejected">Reject</button>
-                            </form>
-                        @endif
-
                         <form action="{{ route('timeslip.destroy', $timeSlip->id) }}" method="POST"
                             onsubmit="return confirm('Are you sure you want to delete this time slip record?');">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-danger" type="submit" title="Delete Record">Delete</button>
+                            <button class="btn btn-danger" type="submit">Delete</button>
                         </form>
                     </div>
 
