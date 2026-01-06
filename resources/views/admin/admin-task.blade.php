@@ -190,7 +190,9 @@
         <div class="row">
             @forelse ($tasks as $task)
                 <div class="col-md-6 mb-3 task-item" data-status="{{ $task->task_status }}">
-                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#taskModal{{ $task->id }}"
+                    <div class="card h-100" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#taskModal{{ $task->id }}"
                         style="cursor:pointer;">
 
                         <div class="card-body">

@@ -191,6 +191,11 @@
                         <i class="bi bi-person-circle"></i>
                         <span>Profile</span>
                     </a>
+                    <a class="nav-link {{ request()->routeIs('settings*') ? 'active' : '' }}"
+                        href="{{ route('settings') }}">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
+                    </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
                 @elseif (Auth::user()->role_id !== '2')

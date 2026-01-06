@@ -724,13 +724,13 @@ footer {
 .task-item {
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
-    word-wrap: break-word;
+    border-radius: 12px;
+    padding-left: 0;
 }
 
 .task-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border-left-color: var(--primary-color);
 }
 
 /* Task status border colors */
@@ -762,11 +762,6 @@ footer {
 
 .badge.bg-primary {
     background-color: var(--primary-color) !important;
-}
-
-/* Task item content spacing */
-.task-item .card-body {
-    padding: 1.25rem;
 }
 
 .task-item h5 {
@@ -858,13 +853,13 @@ footer {
 .project-item {
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
-    word-wrap: break-word;
+    border-radius: 12px;
+    padding-left: 0;
 }
 
 .project-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border-left-color: var(--primary-color);
 }
 
 /* Task status border colors */

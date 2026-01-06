@@ -159,7 +159,9 @@
         <div class="row">
             @forelse ($projects as $project)
                 <div class="col-md-12 mb-3 project-item" data-status="{{ $project->project_status }}">
-                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
+                    <div class="card h-100" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#projectModal{{ $project->id }}"
                         style="cursor:pointer;">
 
                         <div class="card-body">

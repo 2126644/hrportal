@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -51,39 +52,38 @@ class EventController extends Controller
         $events = $query->get();
 
         // FOR CALENDAR TAB
-        $colors = [
-            '#f87171', // red
-            '#60a5fa', // blue
-            '#34d399', // green
-            '#fbbf24', // yellow
-            '#a78bfa', // purple
-            '#f472b6', // pink
-            '#38bdf8', // sky
-            '#fde047', // amber
-            '#80d0b0', // light green
-            '#fca5a5', // light red
-            '#93c5fd', // light blue
-        ];
 
-        $eventColorMap = [];
-        $colorIndex = 0;
+        $birthday_colour = '#60a5fa';     // blue - Events
+        $event_colour = '#f472b6';  // pink -Birthdays
 
-        $calendarEvents = $events->map(function ($event) use (&$eventColorMap, &$colorIndex, $colors) {
-            $eventName = $event->event_name;
-            // Assign color if employee has no color yet
-            if (!isset($eventColorMap[$eventName])) {
-                $eventColorMap[$eventName] = $colors[$colorIndex % count($colors)];
-                $colorIndex++;
-            }
-            return [
-                'title'         => $event->event_name,
-                'start'         => Carbon::parse($event->event_date)->toDateString(),
-                'color'          => $eventColorMap[$eventName],
-                'url'           => route('event.show', $event->id),
-            ];
-        });
+        $calendarEvents = collect();
 
-        $categories = setting('event_categories');
+        foreach ($events as $event) {
+            $calendarEvents->push([
+                'title' => $event->event_name,
+                'start' => Carbon::parse($event->event_date)->toDateString(),
+                'color' => $event_colour,
+                'url'   => route('event.show', $event->id),
+                'type'  => 'event',
+            ]);
+        }
+
+        $employees = Employee::whereNotNull('birthday')->get();
+
+        foreach ($employees as $emp) {
+            $birthdayThisYear = Carbon::parse($emp->birthday)
+                ->year(now()->year)
+                ->toDateString(); // repeats every year
+
+            $calendarEvents->push([
+                'title' => '🎂 ' . $emp->full_name,
+                'start' => $birthdayThisYear,
+                'color' => $birthday_colour,
+                'type'  => 'birthday',
+            ]);
+        }
+
+        $categories = setting('event_categories', []);
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
         $rsvpOptions = ['required' => 'Required', 'not_required' => 'Not Required'];
 

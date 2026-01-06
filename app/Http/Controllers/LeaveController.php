@@ -227,7 +227,7 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        $leaveTypeEnum = setting('leave_types');
+        $leaveTypeEnum = setting('leave_types', []);
         $leaveLengthEnum = ['full_day', 'AM', 'PM'];
 
         return view('employee.applyleave', compact('leaveTypeEnum', 'leaveLengthEnum'));

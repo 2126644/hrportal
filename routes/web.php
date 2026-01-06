@@ -15,6 +15,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\EmploymentApproversController;
+use App\Http\Controllers\SettingController;
 
 use App\Models\Employee;
 use App\Models\User;
@@ -155,5 +156,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/employees/{employee}/approvers', [EmploymentApproversController::class, 'store'])->name('employees.approvers.store');
 
-    // Route::get('/setting', [SettingController::class, 'index'])->name('admin.setting');
+    Route::get('/admin/settings', [SettingController::class, 'index'])->name('settings');
+    Route::post('/admin/settings', [SettingController::class, 'update'])->name('settings.update');
 });
