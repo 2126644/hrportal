@@ -55,39 +55,79 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="project_id" class="form-label">Project <span class="text-danger">*</span></label>
+                            <label for="project_id" class="form-label">Project</label>
                             <select id="project_id" name="project_id" class="form-control" required>
-                            <option value="">Select Project</option>
-                            @foreach ($projects as $project)
-                                <option value="{{ $project->id }}"
-                                    {{ request('project_id') == $project->id ? 'selected' : '' }}>
-                                    {{ $project->project_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                                <option value="">Select Project</option>
+                                @foreach ($projects as $project)
+                                    <option value="{{ $project->id }}"
+                                        {{ request('project_id') == $project->id ? 'selected' : '' }}>
+                                        {{ $project->project_name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('project_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="mb-3">
-                            <label for="assigned_to" class="form-label">Assigned To <span class="text-danger">*</span></label>
-                            <select id="assigned_to" name="assigned_to" class="form-control" required>
-                            <option value="">All Employees</option>
-                            @foreach ($employees as $employee)
-                                <option value="{{ $employee->employee_id }}"
-                                    {{ request('assigned_to') == $employee->employee_id ? 'selected' : '' }}>
-                                    {{ $employee->full_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                            @error('assigned_to')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
+                            <label class="form-label fw-semibold">
+                                Assign To <span class="text-danger">*</span>
+                            </label>
+
+                            <div class="border rounded p-3 bg-white">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">
+                                        Add Department
+                                    </label>
+                                    <div class="row">
+                                        @foreach ($departments as $dept)
+                                            <div class="col-md-4">
+                                                <div class="form-check">
+                                                    <input class="form-check-input department-checkbox" type="checkbox"
+                                                        value="{{ $dept->id }}" id="dept_{{ $dept->id }}" name="department_ids[]">
+                                                    <label class="form-check-label" for="dept_{{ $dept->id }}">
+                                                        {{ $dept->department_name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <hr class="my-3">
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">
+                                        Add Individual Employee
+                                    </label>
+                                    <select id="employeeSearch" class="form-select">
+                                        <option value="">Search employee...</option>
+                                        @foreach ($allEmployees as $emp)
+                                            <option value="{{ $emp['id'] }}" data-name="{{ $emp['name'] }}"
+                                                data-dept="{{ $emp['department'] }}">
+                                                {{ $emp['name'] }} ({{ $emp['department'] }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="form-label text-muted">
+                                        Assigned Employees
+                                    </label>
+
+                                    <div id="employeeList" class="border rounded p-3 bg-light" style="min-height: 120px;">
+                                        <small class="text-muted">No employees selected</small>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="task_status" class="form-label">Task Status <span class="text-danger">*</span></label>
+                            <label for="task_status" class="form-label">Task Status <span
+                                    class="text-danger">*</span></label>
                             <select id="task_status" name="task_status" class="form-select" required>
                                 <option value="" disabled {{ old('task_status') ? '' : 'selected' }}>
                                     Select Status</option>
@@ -141,5 +181,93 @@
             </div>
         </div>
     </div>
-    </div>
+
+    <script>
+        let selectedEmployees = new Map(); // id => {id, name, dept}
+        let selectedDepartments = new Set();
+        let departmentEmployees = new Map(); // deptId => Set(empIds)
+
+        // Script to render selected employees
+
+        function renderEmployees() {
+            const container = document.getElementById('employeeList');
+            container.innerHTML = '';
+
+            if (selectedEmployees.size === 0) {
+                container.innerHTML = '<small class="text-muted">No employees selected</small>';
+                return;
+            }
+
+            selectedEmployees.forEach(emp => {
+                container.innerHTML += `
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <div>
+                        <strong>${emp.name}</strong>
+                        <small class="text-muted">(${emp.department})</small>
+                    </div>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="removeEmployee('${emp.id}')">
+                        Remove
+                    </button>
+                    <input type="hidden" name="employee_ids[]" value="${emp.id}">
+                </div>
+            `;
+            });
+        }
+
+        function removeEmployee(id) {
+            selectedEmployees.delete(id);
+            renderEmployees();
+        }
+
+        // Script to add individual employees
+
+        document.getElementById('employeeSearch').addEventListener('change', function() {
+            const option = this.selectedOptions[0];
+            if (!option.value) return;
+
+            const emp = {
+                id: option.value,
+                name: option.dataset.name,
+                department: option.dataset.dept
+            };
+
+            selectedEmployees.set(emp.id, emp);
+            renderEmployees();
+            this.value = '';
+        });
+
+        // Script to add employees by department
+
+        document.querySelectorAll('.department-checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const deptId = this.value;
+
+                if (this.checked) {
+                    fetch(`/departments/${deptId}/employees`)
+                        .then(res => res.json())
+                        .then(employees => {
+                            const empIds = new Set();
+
+                            employees.forEach(emp => {
+                                selectedEmployees.set(emp.id, emp);
+                                empIds.add(emp.id);
+                            });
+
+                            departmentEmployees.set(deptId, empIds);
+                            renderEmployees();
+                        });
+                } else {
+                    // remove employees added by this department
+                    const empIds = departmentEmployees.get(deptId) || [];
+
+                    empIds.forEach(id => selectedEmployees.delete(id));
+                    departmentEmployees.delete(deptId);
+
+                    renderEmployees();
+                }
+            });
+        });
+    </script>
 @endsection

@@ -325,7 +325,7 @@
                                     <div class="detail-item">
                                         <div class="detail-label text-muted small">Department</div>
                                         <div class="detail-value fw-semibold">
-                                            {{ $employment->department ?? '-' }}
+                                            {{ $employee->employment->department->department_name ?? '-' }}
                                         </div>
                                     </div>
                                 </div>

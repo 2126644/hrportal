@@ -12,11 +12,11 @@ class Employment extends Model
 
     protected $fillable = [
         'employee_id',
+        'department_id',
         'employment_type',
         'employment_status',
         'company_branch', // enum
         'report_to', // enum employee_id
-        'department',
         'position',
         'date_joined',
         'probation_start',
@@ -49,5 +49,10 @@ class Employment extends Model
     public function reportToEmployee()
     {
         return $this->belongsTo(Employee::class, 'report_to', 'employee_id');
+    }
+    
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

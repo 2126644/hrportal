@@ -12,8 +12,6 @@ use Illuminate\Support\Carbon;
  */
 class AttendanceFactory extends Factory
 {
-    protected $model = Attendance::class;
-
     /**
      * Define the model's default state.
      *

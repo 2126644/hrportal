@@ -89,11 +89,11 @@
                     </div>
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label class="form-label">Assigned To</label>
-                        <select name="assigned_to" class="form-control">
+                        <select name="employee_id" class="form-control">
                             <option value="">All Employees</option>
                             @foreach ($employees as $employee)
                                 <option value="{{ $employee->employee_id }}"
-                                    {{ request('assigned_to') == $employee->employee_id ? 'selected' : '' }}>
+                                    {{ request('employee_id') == $employee->employee_id ? 'selected' : '' }}>
                                     {{ $employee->full_name }}
                                 </option>
                             @endforeach
@@ -185,14 +185,12 @@
             </div>
         </div>
     </div>
-    
+
     <div id="tasksCard">
         <div class="row">
             @forelse ($tasks as $task)
                 <div class="col-md-6 mb-3 task-item" data-status="{{ $task->task_status }}">
-                    <div class="card h-100" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#taskModal{{ $task->id }}"
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#taskModal{{ $task->id }}"
                         style="cursor:pointer;">
 
                         <div class="card-body">
@@ -215,9 +213,13 @@
                                             </div>
                                         @endif
 
+                                        @php($summary = $task->assignmentSummary())
+
                                         <small class="text-muted">
                                             <i class="bi bi-person-fill me-1"></i>
-                                            Assigned To: {{ $task->assigned_to }} |
+                                            Assigned To:
+                                            {{ collect($summary['departments'])->merge($summary['employees'])->join(', ') }}
+                                            |
                                             Assigned By: {{ $task->created_by }}
                                         </small>
 
@@ -323,9 +325,13 @@
                                                 @endforeach
                                             </select>
                                         </td>
+                                    </tr>
+                                    @php($summary = $task->assignmentSummary())
                                     <tr>
                                         <th>Assigned to</th>
-                                        <td>{{ $task->assigned_to }}</td>
+                                        <td>
+                                            {{ collect($summary['departments'])->merge($summary['employees'])->join(', ') }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Assigned by</th>

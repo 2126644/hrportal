@@ -15,7 +15,6 @@ class Task extends Model
         'created_by',
         'task_name',
         'task_desc',
-        'assigned_to',
         'task_status',
         'notes',
         'due_date',
@@ -37,6 +36,25 @@ class Task extends Model
 
     public function assignedTo()
     {
-        return $this->belongsTo(Employee::class, 'assigned_to', 'employee_id');
+        return $this->hasMany(TaskAssignments::class);
+    }
+
+    // App\Models\Task.php
+
+    public function assignmentSummary(): array
+    {
+        $employees = $this->assignedTo
+            ->pluck('employee')
+            ->filter();
+
+        $departments = $this->assignedTo
+            ->pluck('department')
+            ->filter()
+            ->unique('id');
+
+        return [
+            'employees'   => $employees->pluck('full_name')->values(),
+            'departments' => $departments->pluck('department_name')->values(),
+        ];
     }
 }

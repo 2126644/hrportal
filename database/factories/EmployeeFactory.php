@@ -4,15 +4,12 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Employee;
-use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employee>
  */
 class EmployeeFactory extends Factory
 {
-    protected $model = Employee::class;
-
     /**
      * Define the model's default state.
      *
@@ -22,7 +19,6 @@ class EmployeeFactory extends Factory
     {
         return [
             'employee_id'       => strtoupper(fake()->unique()->bothify('EMP###')),
-            'user_id'           => User::factory(), // or existing user id
             'full_name'         => fake()->name(),
             'email'             => fake()->unique()->safeEmail(),
             'phone_number'      => fake()->unique()->phoneNumber(),
@@ -37,5 +33,14 @@ class EmployeeFactory extends Factory
             'education_institution' => fake()->company(),
             'graduation_year'   => fake()->year(),
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterMaking(function (Employee $employee) {
+            if ($employee->user) {
+                $employee->full_name = $employee->user->name;
+            }
+        });
     }
 }

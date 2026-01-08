@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Leave;
 use App\Models\Announcement;
+use App\Models\Department;
 
 class EmployeeController extends Controller
 {
@@ -46,7 +47,9 @@ class EmployeeController extends Controller
         ];
 
         // Task Summary Card
-        $taskRecords = Task::where('assigned_to', $employee->employee_id)->get();
+        $taskRecords = Task::whereHas('assignedTo', function ($q) use ($employee) {
+            $q->where('employee_id', $employee->employee_id);
+        })->get();
 
         // Group tasks by status for display
         $tasksByStatus = [
@@ -59,7 +62,7 @@ class EmployeeController extends Controller
         $pendingTask = optional($taskRecords->whereIn('task_status', ['to-do', 'in-progress', 'in-review', 'to-review']))->count();
         $completedTask  = $taskRecords->where('task_status', 'completed')->count();
         $overdueTask = $taskRecords->where('task_status', '!=', 'completed')->where('due_date', '<', now())->count();
-        $totalTask = $taskRecords->where('assigned_to', $employee->employee_id)->count();
+        $totalTask = $taskRecords->count();
 
         $task = [
             'pending_task' => $pendingTask,
@@ -176,7 +179,11 @@ class EmployeeController extends Controller
             ->with('reportToEmployee')
             ->first();
 
-        return view('profile.show', compact('employee', 'employment', 'user'));
+        $department = Department::whereHas('employment')
+            ->orderBy('department_name')
+            ->pluck('department_name');
+
+        return view('profile.show', compact('employee', 'employment', 'user', 'department'));
     }
 
     /**

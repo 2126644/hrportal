@@ -52,11 +52,6 @@ class Employee extends Model
         return $this->hasMany(Leave::class, 'employee_id', 'employee_id');
     }
 
-    public function tasks()
-    {
-        return $this->hasMany(Task::class, 'assigned_to', 'employee_id');
-    }
-
     public function employment()
     {
         return $this->hasOne(Employment::class, 'employee_id', 'employee_id');
@@ -70,5 +65,22 @@ class Employee extends Model
             'employee_id',
             'approver_id'
         )->withPivot('level')->orderBy('pivot_level');
+    }
+
+    public function taskAssignments()
+    {
+        return $this->hasMany(TaskAssignments::class, 'employee_id', 'employee_id');
+    }
+
+    public function tasks()
+    {
+        return $this->hasManyThrough(
+            Task::class,
+            TaskAssignments::class,
+            'employee_id', // FK on task_assignments
+            'id',          // FK on tasks
+            'employee_id', // local key on employees
+            'task_id'      // local key on task_assignments
+        );
     }
 }

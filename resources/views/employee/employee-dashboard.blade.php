@@ -187,7 +187,7 @@
                                         </span>
                                     </div>
                                     <p class="text-muted mb-1 small">{{ Str::limit($announcement->description, 100) }}</p>
-                                    <small class="text-muted">{{ $announcement->created_at->format('M j, g:i A') }}</small>
+                                    <small class="text-muted">Posted at: {{ $announcement->created_at->format('M j, g:i A') }}</small>
                                 </div>
                             @empty
                                 <p class="text-muted small">No recent announcements found.</p>

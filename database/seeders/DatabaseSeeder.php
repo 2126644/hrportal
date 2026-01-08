@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class, // Seed fixed roles first (so the FK in users->role_id is valid)
             AdminSeeder::class,
             UserSeeder::class,
+            DepartmentSeeder::class,
             EmployeeSeeder::class,
             EmploymentSeeder::class,
             ProjectSeeder::class, // Seed project first

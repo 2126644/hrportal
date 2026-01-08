@@ -10,7 +10,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Employee Management</li>
                                     </ol>
                                 </nav>
@@ -40,17 +41,11 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Department</label>
-                            <select name="department" class="form-select">
+                            <select name="department_name" class="form-select">
                                 <option value="">All Departments</option>
-                                @php
-                                    $departments = \App\Models\Employment::select('department')
-                                        ->distinct()
-                                        ->pluck('department')
-                                        ->filter();
-                                @endphp
                                 @foreach ($departments as $dept)
                                     <option value="{{ $dept }}"
-                                        {{ request('department') == $dept ? 'selected' : '' }}>
+                                        {{ request('department_name') == $dept ? 'selected' : '' }}>
                                         {{ $dept }}
                                     </option>
                                 @endforeach
@@ -236,7 +231,7 @@
                                     <td>{{ $employee->employee_id }}</td>
                                     <td>
                                         <span
-                                            class="badge bg-light text-dark">{{ $employee->employment->department ?? 'Not assigned' }}</span>
+                                            class="badge bg-light text-dark">{{ $employee->employment->department->department_name ?? 'Not assigned' }}</span>
                                     </td>
                                     <td>{{ $employee->employment->position ?? 'Staff' }}</td>
                                     <td>

@@ -6,6 +6,7 @@ use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Employee;
+use App\Models\Department;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -18,72 +19,85 @@ class TaskController extends Controller
         $user = Auth::user();
         $employee = $user->employee;
 
-        // Preload supporting lists for the filters (blade)
-        $projects = Project::orderBy('project_name')->get();
+        $projects  = Project::orderBy('project_name')->get();
         $employees = Employee::orderBy('full_name')->get();
 
-        // query model with relationships
-        $query = Task::with(['project', 'assignedTo', 'createdBy'])->orderBy('created_at', 'desc');
+        $query = Task::with([
+            'project',
+            'createdBy',
+            'assignedTo.employee',
+            'assignedTo.department',
+        ])->orderBy('created_at', 'desc');
 
-        // Employee — only see their own tasks
-        if ($user->role_id !== 2) { // employee roles
-            $query->where('assigned_to', $employee->employee_id);
-        }
-
-        // Filter by task name or ID
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('task_name', 'like', "%{$search}%")
-                    ->orWhere('id', 'like', "%{$search}%");
+        // Employee: only tasks assigned to them (via pivot)
+        if ($user->role_id !== 2 && $employee) {
+            $query->whereHas('assignedTo', function ($q) use ($employee) {
+                $q->where('employee_id', $employee->employee_id);
             });
         }
 
-        // Filter by created by
+        if ($user->role_id === 2) {
+            if ($request->filled('employee_id')) {
+                $query->whereHas('assignedTo', function ($q) use ($request) {
+                    $q->where('employee_id', $request->employee_id);
+                });
+            }
+
+            if ($request->filled('department_id')) {
+                $query->whereHas('assignedTo', function ($q) use ($request) {
+                    $q->where('department_id', $request->department_id);
+                });
+            }
+        }
+
+        // Filters
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('task_name', 'like', "%{$request->search}%")
+                    ->orWhere('id', $request->search);
+            });
+        }
+
         if ($request->filled('created_by')) {
             $query->where('created_by', $request->created_by);
         }
 
-        if ($request->filled('assigned_to')) {
-            $query->where('assigned_to', $request->assigned_to);
-        }
-
-        // Filter by project
         if ($request->filled('project_id')) {
             $query->where('project_id', $request->project_id);
         }
 
-        // Filter by task status
         if ($request->filled('task_status')) {
             $query->where('task_status', $request->task_status);
         }
 
-        // Filter by due date
         if ($request->filled('due_date')) {
-            $query->where('due_date', $request->due_date);
+            $query->whereDate('due_date', $request->due_date);
         }
 
         $tasks = $query->get();
 
-        $totalTasks = $tasks->count();
-        $toDoTasks = $tasks->where('task_status', 'to-do')->count();
+        // 📊 Stats
+        $totalTasks      = $tasks->count();
+        $toDoTasks       = $tasks->where('task_status', 'to-do')->count();
         $inProgressTasks = $tasks->where('task_status', 'in-progress')->count();
-        $inReviewTasks = $tasks->where('task_status', 'in-review')->count();
-        $toReviewTasks = $tasks->where('task_status', 'to-review')->count();
-        $completedTasks = $tasks->where('task_status', 'completed')->count();
+        $inReviewTasks   = $tasks->where('task_status', 'in-review')->count();
+        $toReviewTasks   = $tasks->where('task_status', 'to-review')->count();
+        $completedTasks  = $tasks->where('task_status', 'completed')->count();
 
-        $view = $user->role_id == 2 ? 'admin.admin-task' : 'employee.employee-task';
+        $view = $user->role_id == 2
+            ? 'admin.admin-task'
+            : 'employee.employee-task';
 
         return view($view, compact(
+            'tasks',
+            'projects',
+            'employees',
             'totalTasks',
             'toDoTasks',
             'inProgressTasks',
             'inReviewTasks',
             'toReviewTasks',
-            'completedTasks',
-            'tasks',
-            'projects',
-            'employees'
+            'completedTasks'
         ));
     }
 
@@ -92,11 +106,44 @@ class TaskController extends Controller
      */
     public function create()
     {
-        $role_id = Auth::user()->role_id;
-        $employees = Employee::orderBy('full_name')->get();
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        $role_id = $user->role_id;
+
+        $employment   = $employee?->employment;
+        $departmentId = $employment?->department_id;
+
         $projects = Project::orderBy('project_name')->get();
 
-        return view('employee.createtask', compact('role_id', 'employees', 'projects'));
+        // Employees from same department
+        $employees = Employee::with('employment.department')
+            ->whereHas('employment', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId)
+                    ->where('employment_status', 'active');
+            })
+            ->get()
+            ->map(fn($e) => [
+                'id'         => $e->employee_id,
+                'name'       => $e->full_name,
+                'department' => $e->employment->department->department_name ?? 'N/A',
+            ]);
+
+        $departments = Department::orderBy('department_name')->get();
+
+        $allEmployees = Employee::with('employment.department')->get()->map(fn($e) => [
+            'id'         => $e->employee_id,
+            'name'       => $e->full_name,
+            'department' => $e->employment->department->department_name ?? 'N/A',
+        ]);
+
+        return view('employee.createtask', compact(
+            'projects',
+            'employees',
+            'departments',
+            'allEmployees',
+            'role_id'
+        ));
     }
 
     /**
@@ -106,34 +153,47 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $employee = Auth::user()->employee;
-        if (! $employee) {
-            return redirect()->back()->with('error', 'No employee profile found for this user.');
-        }
 
         $request->validate([
-            'project_id'    => 'nullable|exists:projects,id',
-            'task_name'     => 'required|string|max:255',
-            'task_desc'     => 'nullable|string',
-            // ensure assigned_to maps to an existing employee.employee_id
-            'assigned_to'   => 'required|string|exists:employees,employee_id',
-            'task_status'   => 'required|in:to-do,in-progress,in-review,to-review,completed',
-            'notes'         => 'nullable|string',
-            'due_date'      => 'nullable|date',
+            'project_id'      => 'nullable|exists:projects,id',
+            'task_name'       => 'required|string|max:255',
+            'task_desc'       => 'nullable|string',
+            'task_status'     => 'required|in:to-do,in-progress,in-review,to-review,completed',
+            'due_date'        => 'nullable|date',
+            'notes'           => 'nullable|string',
+            'department_ids'  => 'array',
+            'department_ids.*' => 'exists:departments,id',
+            'employee_ids'    => 'array',
+            'employee_ids.*'  => 'exists:employees,employee_id',
         ]);
 
-        $task = new Task();
-        $task->created_by   = $employee->employee_id;
-        $task->project_id   = $request->project_id;
-        $task->task_name    = $request->task_name;
-        $task->task_desc    = $request->task_desc;
-        $task->assigned_to  = $request->assigned_to;
-        $task->task_status  = $request->task_status;
-        $task->notes        = $request->notes;
-        $task->due_date     = $request->due_date;
+        $task = Task::create([
+            'project_id' => $request->project_id,
+            'task_name'  => $request->task_name,
+            'task_desc'  => $request->task_desc,
+            'task_status' => $request->task_status,
+            'due_date'   => $request->due_date,
+            'notes'      => $request->notes,
+            'created_by' => $employee->employee_id,
+        ]);
 
-        $task->save();
+        // Assign departments
+        foreach ($request->department_ids ?? [] as $deptId) {
+            $task->assignedTo()->create([
+                'department_id' => $deptId,
+            ]);
+        }
 
-        return redirect()->route('task.index.employee')->with('success', 'Task created successfully!');
+        // Assign employees
+        foreach ($request->employee_ids ?? [] as $empId) {
+            $task->assignedTo()->create([
+                'employee_id' => $empId,
+            ]);
+        }
+
+        return redirect()
+            ->route('task.index.employee')
+            ->with('success', 'Task created successfully');
     }
 
     // Mark task as completed

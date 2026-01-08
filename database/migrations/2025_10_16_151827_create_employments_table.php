@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('employments', function (Blueprint $table) {
             $table->id();
             $table->string('employee_id');  // add foreign key column
+            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
             $table->string('employment_type'); // full_time, part_time, intern, etc.
             $table->string('employment_status'); // active, probation, suspended, resigned, terminated
             $table->enum('company_branch', ['AHG', 'D-8CEFC'])->default('AHG');
             $table->string('report_to')->nullable();
-            $table->string('department')->nullable();
             $table->string('position')->nullable();
             $table->date('date_joined')->nullable();
             $table->date('probation_start')->nullable();
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->time('work_start_time')->nullable();
             $table->time('work_end_time')->nullable();
 
-            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  
+            $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();
             $table->foreign('report_to')->references('employee_id')->on('employees')->nullOnDelete();
 
             $table->timestamps();

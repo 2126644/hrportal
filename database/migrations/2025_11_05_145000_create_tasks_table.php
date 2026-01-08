@@ -17,13 +17,11 @@ return new class extends Migration
             $table->string('created_by')->nullable();  // add foreign key column
             $table->string('task_name');
             $table->text('task_desc')->nullable();
-            $table->string('assigned_to')->nullable();
             $table->enum('task_status', ['to-do', 'in-progress', 'in-review','to-review', 'completed'])->default('to-do');
             $table->text('notes')->nullable();
             $table->date('due_date')->nullable();
 
             $table->foreign('created_by')->references('employee_id')->on('employees')->nullOnDelete();
-            $table->foreign('assigned_to')->references('employee_id')->on('employees')->nullOnDelete();
             
             $table->timestamps();
         });

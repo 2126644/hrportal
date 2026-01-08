@@ -201,9 +201,13 @@
                                             </div>
                                         @endif
 
+                                        @php($summary = $task->assignmentSummary())
+
                                         <small class="text-muted">
                                             <i class="bi bi-person-fill me-1"></i>
-                                            Assigned To: {{ $task->assigned_to }} |
+                                            Assigned To:
+                                            {{ collect($summary['departments'])->merge($summary['employees'])->join(', ') }}
+                                            |
                                             Assigned By: {{ $task->created_by }}
                                         </small>
 
@@ -396,9 +400,13 @@
                                                 @endforeach
                                             </select>
                                         </td>
+                                    </tr>
+                                    @php($summary = $task->assignmentSummary())
                                     <tr>
                                         <th>Assigned to</th>
-                                        <td>{{ $task->assigned_to }}</td>
+                                        <td>
+                                            {{ collect($summary['departments'])->merge($summary['employees'])->join(', ') }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Assigned by</th>

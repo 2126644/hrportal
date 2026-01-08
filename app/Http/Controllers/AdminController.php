@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Task;
 use App\Models\Leave;
 use App\Models\Announcement;
+use App\Models\Department;
 use Carbon\Carbon;
 use App\Models\Employment;
 use Illuminate\Http\Request;
@@ -194,7 +195,7 @@ class AdminController extends Controller
 
     public function employee(Request $request)
     {
-        $query = Employee::with('employment');
+        $query = Employee::with('employment.department');
 
         // Search by name or employee_id
         if ($request->filled('search')) {
@@ -205,10 +206,10 @@ class AdminController extends Controller
             });
         }
 
-        // Filter by department
-        if ($request->filled('department')) {
-            $query->whereHas('employment', function ($q) use ($request) {
-                $q->where('department', $request->department);
+        // Filter by department NAME
+        if ($request->filled('department_name')) {
+            $query->whereHas('employment.department', function ($q) use ($request) {
+                $q->where('department_name', $request->department_name);
             });
         }
 
@@ -242,8 +243,14 @@ class AdminController extends Controller
             ->count();
         $newThisMonth = Employment::whereMonth('date_joined', Carbon::now()->month)->count();
 
+        // Departments for dropdown
+        $departments = Department::whereHas('employment')
+            ->orderBy('department_name')
+            ->pluck('department_name');
+
         return view('admin.admin-employee', compact(
             'employees',
+            'departments',
             'totalEmployees',
             'activeToday',
             'onLeave',
