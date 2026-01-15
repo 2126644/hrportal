@@ -32,20 +32,20 @@ class TaskController extends Controller
         // Employee: only tasks assigned to them (via pivot)
         if ($user->role_id !== 2 && $employee) {
             $query->whereHas('assignedTo', function ($q) use ($employee) {
-                $q->where('employee_id', $employee->employee_id);
+                $q->where('task_assignments.employee_id', $employee->employee_id);
             });
         }
 
         if ($user->role_id === 2) {
             if ($request->filled('employee_id')) {
                 $query->whereHas('assignedTo', function ($q) use ($request) {
-                    $q->where('employee_id', $request->employee_id);
+                    $q->where('task_assignments.employee_id', $request->employee_id);
                 });
             }
 
             if ($request->filled('department_id')) {
                 $query->whereHas('assignedTo', function ($q) use ($request) {
-                    $q->where('department_id', $request->department_id);
+                    $q->where('task_assignments.department_id', $request->department_id);
                 });
             }
         }

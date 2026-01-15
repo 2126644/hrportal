@@ -59,7 +59,7 @@ class LeavesExport implements FromView
         // -------------------------
         $finalEntitlements = [];
         // make sure join date is Carbon (employee model should cast it)
-        $joinDate = $employee->date_joined ? Carbon::parse($employee->date_joined) : null;
+        $joinDate = $employee->date_of_employment ? Carbon::parse($employee->date_of_employment) : null;
 
         foreach ($leaveTypes as $lt) {
             // lt may be model or fallback object; unify to string and full value

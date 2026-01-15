@@ -26,9 +26,11 @@ class Employee extends Model
         'gender',
         'birthday',
         'nationality',
-        'emergency_contact',
-        'highest_education',
-        'education_institution',
+        'emergency_contact_name',
+        'emergency_contact_number',
+        'emergency_contact_relationship',
+        'highest_education_level',
+        'highest_education_institution',
         'graduation_year'
     ];
 
@@ -69,14 +71,14 @@ class Employee extends Model
 
     public function taskAssignments()
     {
-        return $this->hasMany(TaskAssignments::class, 'employee_id', 'employee_id');
+        return $this->hasMany(TaskAssignment::class, 'employee_id', 'employee_id');
     }
 
     public function tasks()
     {
         return $this->hasManyThrough(
             Task::class,
-            TaskAssignments::class,
+            TaskAssignment::class,
             'employee_id', // FK on task_assignments
             'id',          // FK on tasks
             'employee_id', // local key on employees

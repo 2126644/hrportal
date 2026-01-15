@@ -149,21 +149,21 @@
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
-                            <select id="department" name="department" class="form-select" required>
-                                <option value="" disabled {{ old('department') ? '' : 'selected' }}>Select
-                                    department
+                            <label for="department_id" class="form-label">Department <span
+                                    class="text-danger">*</span></label>
+                            <select id="department_id" name="department_id" class="form-select" required>
+                                <option value="" disabled
+                                    {{ old('department_id', $employment?->department_id) ? '' : 'selected' }}>
+                                    Select department
                                 </option>
-                                @php
-                                    $departments = ['HR', 'IT', 'Finance', 'Marketing', 'Department'];
-                                @endphp
-                                @foreach ($departments as $branch)
-                                    <option value="{{ $branch }}"
-                                        {{ old('department', $employment?->department) === $branch ? 'selected' : '' }}>
-                                        {{ ucfirst($branch) }}</option>
+                                @foreach ($departments as $department)
+                                    <option value="{{ $department->id }}"
+                                        {{ old('department_id', $employment?->department_id) == $department->id ? 'selected' : '' }}>
+                                        {{ ucfirst($department->department_name) }}
+                                    </option>
                                 @endforeach
                             </select>
-                            @error('department')
+                            @error('department_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -179,10 +179,11 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="date_joined" class="form-label">Date Joined</label>
-                                <input type="date" id="date_joined" name="date_joined" class="form-control"
-                                    value="{{ old('date_joined', $employment?->date_joined) }}">
-                                @error('date_joined')
+                                <label for="date_of_employment" class="form-label">Date of Employment</label>
+                                <input type="date" id="date_of_employment" name="date_of_employment"
+                                    class="form-control"
+                                    value="{{ old('date_of_employment', $employment?->date_of_employment?->format('Y-m-d')) }}">
+                                @error('date_of_employment')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -234,19 +235,19 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label for="suspended_start" class="form-label">Suspended Start</label>
-                                <input type="date" id="suspended_start" name="suspended_start" class="form-control"
-                                    value="{{ old('suspended_start', $employment?->suspended_start) }}">
-                                @error('suspended_start')
+                                <label for="suspension_start" class="form-label">Suspension Start</label>
+                                <input type="date" id="suspension_start" name="suspension_start" class="form-control"
+                                    value="{{ old('suspension_start', $employment?->suspension_start) }}">
+                                @error('suspension_start')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="suspended_end" class="form-label">Suspended End</label>
-                                <input type="date" id="suspended_end" name="suspended_end" class="form-control"
-                                    value="{{ old('suspended_end', $employment?->suspended_end) }}">
-                                @error('suspended_end')
+                                <label for="suspension_end" class="form-label">Suspension End</label>
+                                <input type="date" id="suspension_end" name="suspension_end" class="form-control"
+                                    value="{{ old('suspension_end', $employment?->suspension_end) }}">
+                                @error('suspension_end')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -254,10 +255,19 @@
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-6 mb-3">
-                                <label for="resigned_date" class="form-label">Resigned Date</label>
-                                <input type="date" id="resigned_date" name="resigned_date" class="form-control"
-                                    value="{{ old('resigned_date', $employment?->resigned_date) }}">
-                                @error('resigned_date')
+                                <label for="resignation_date" class="form-label">Resignation Date</label>
+                                <input type="date" id="resignation_date" name="resignation_date" class="form-control"
+                                    value="{{ old('resignation_date', $employment?->resignation_date) }}">
+                                @error('resignation_date')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="last_working_day" class="form-label">Last Working Day</label>
+                                <input type="date" id="last_working_day" name="last_working_day" class="form-control"
+                                    value="{{ old('last_working_day', $employment?->last_working_day) }}">
+                                @error('last_working_day')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -303,12 +313,13 @@
                                     Level 1 Approver <span class="text-danger">*</span>
                                 </label>
                                 <select name="approvers[0][id]" class="form-control" required>
-                                    <option value="" disabled {{ old('approvers.0.id') ? '' : 'selected' }}>
+                                    <option value="" disabled
+                                        {{ old('approvers.0.id', $level1Approver?->employee_id) ? '' : 'selected' }}>
                                         Select approver 1
                                     </option>
                                     @foreach ($approverCandidates as $approver)
                                         <option value="{{ $approver->employee_id }}"
-                                            {{ old('approvers.0.id') == $approver->employee_id ? 'selected' : '' }}>
+                                            {{ old('approvers.0.id', $level1Approver?->employee_id) == $approver->employee_id ? 'selected' : '' }}>
                                             {{ $approver->full_name }}
                                         </option>
                                     @endforeach
@@ -323,12 +334,13 @@
                                     Level 2 Approver <span class="text-muted">(Optional)</span>
                                 </label>
                                 <select name="approvers[1][id]" class="form-control">
-                                    <option value="" disabled {{ old('approvers.1.id') ? '' : 'selected' }}>
+                                    <option value="" disabled
+                                        {{ old('approvers.1.id', $level2Approver?->employee_id) ? '' : 'selected' }}>
                                         Select approver 2
                                     </option>
                                     @foreach ($approverCandidates as $approver)
                                         <option value="{{ $approver->employee_id }}"
-                                            {{ old('approvers.1.id') == $approver->employee_id ? 'selected' : '' }}>
+                                            {{ old('approvers.1.id', $level2Approver?->employee_id) == $approver->employee_id ? 'selected' : '' }}>
                                             {{ $approver->full_name }}
                                         </option>
                                     @endforeach

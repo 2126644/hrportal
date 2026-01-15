@@ -14,7 +14,7 @@ use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RequestController;
-use App\Http\Controllers\EmploymentApproversController;
+use App\Http\Controllers\EmploymentApproverController;
 use App\Http\Controllers\SettingController;
 
 use App\Models\Employee;
@@ -104,6 +104,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/profile/show/{employee?}', [EmployeeController::class, 'show'])->name('profile.show');
     Route::get('/profile/settings', [EmployeeController::class, 'settings'])->name('profile.settings');
+    Route::get('/profile/{id}/print', [EmployeeController::class, 'downloadProfile'])->name('profile.print');
 
     Route::get('/profile/edit/personal/{employee}', [EmployeeController::class, 'editPersonal'])->name('profile.editPersonal');
     Route::put('/profile/update/personal/{employee}', [EmployeeController::class, 'updatePersonal'])->name('profile.updatePersonal');
@@ -154,7 +155,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/admin/leave/{leave}', [LeaveController::class, 'destroy'])->name('leave.destroy.admin');
 
-    Route::post('/employees/{employee}/approvers', [EmploymentApproversController::class, 'store'])->name('employees.approvers.store');
+    Route::post('/employees/{employee}/approvers', [EmploymentApproverController::class, 'store'])->name('employees.approvers.store');
 
     Route::get('/admin/settings', [SettingController::class, 'index'])->name('settings');
     Route::post('/admin/settings', [SettingController::class, 'update'])->name('settings.update');

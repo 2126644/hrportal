@@ -89,7 +89,7 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Join Date</label>
-                            <input type="date" name="date_joined" value="{{ request('date_joined') }}"
+                            <input type="date" name="date_of_employment" value="{{ request('date_of_employment') }}"
                                 class="form-control">
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
@@ -254,7 +254,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        {{ optional($employee->employment)->date_joined ? \Carbon\Carbon::parse($employee->employment->date_joined)->format('M d, Y') : 'Not set' }}
+                                        {{ optional($employee->employment)->date_of_employment ? \Carbon\Carbon::parse($employee->employment->date_of_employment)->format('M d, Y') : 'Not set' }}
 
                                     </td>
                                     <td>

@@ -11,7 +11,7 @@ use App\Exports\LeavesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LeaveEntitlement;
 use App\Models\Employee;
-use App\Models\EmploymentApprovers;
+use App\Models\EmploymentApprover;
 use Illuminate\Validation\Rule;
 
 class LeaveController extends Controller
@@ -177,7 +177,7 @@ class LeaveController extends Controller
         // -------------------------
         $finalEntitlements = [];
         // make sure join date is Carbon (employee model should cast it)
-        $joinDate = $employee->date_joined ? Carbon::parse($employee->date_joined) : null;
+        $joinDate = $employee->date_of_employment ? Carbon::parse($employee->date_of_employment) : null;
 
         foreach ($leaveTypes as $lt) {
             // lt may be model or fallback object; unify to string and full value
@@ -375,7 +375,7 @@ class LeaveController extends Controller
          * STEP 2: NORMAL APPROVER FLOW
          */
 
-        $currentApprover = EmploymentApprovers::where('employee_id', $leave->employee_id)
+        $currentApprover = EmploymentApprover::where('employee_id', $leave->employee_id)
             ->where('level', $leave->approval_level)
             ->firstOrFail();
 
@@ -392,7 +392,7 @@ class LeaveController extends Controller
         }
 
         // Check next level
-        $nextLevelExists = EmploymentApprovers::where('employee_id', $leave->employee_id)
+        $nextLevelExists = EmploymentApprover::where('employee_id', $leave->employee_id)
             ->where('level', '>', $leave->approval_level)
             ->exists();
 

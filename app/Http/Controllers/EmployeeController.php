@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Leave;
 use App\Models\Announcement;
 use App\Models\Department;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EmployeeController extends Controller
 {
@@ -48,7 +49,7 @@ class EmployeeController extends Controller
 
         // Task Summary Card
         $taskRecords = Task::whereHas('assignedTo', function ($q) use ($employee) {
-            $q->where('employee_id', $employee->employee_id);
+            $q->where('employees.employee_id', $employee->employee_id);
         })->get();
 
         // Group tasks by status for display
@@ -179,11 +180,7 @@ class EmployeeController extends Controller
             ->with('reportToEmployee')
             ->first();
 
-        $department = Department::whereHas('employment')
-            ->orderBy('department_name')
-            ->pluck('department_name');
-
-        return view('profile.show', compact('employee', 'employment', 'user', 'department'));
+        return view('profile.show', compact('employee', 'employment', 'user'));
     }
 
     /**
@@ -230,10 +227,12 @@ class EmployeeController extends Controller
             'birthday'          => 'required|date',
             'marital_status'    => 'required|string|max:50',
             'nationality'       => 'required|string|max:50',
-            'emergency_contact' => 'required|string|max:255',
+            'emergency_contact_name' => 'required|string|max:255',
+            'emergency_contact_number' => 'required|string|max:20',
+            'emergency_contact_relationship' => 'required|string|max:50',
             'ic_number'         => 'required|string|max:20',
-            'highest_education' => 'required|string|max:100',
-            'education_institution' => 'required|string|max:255',
+            'highest_education_level' => 'required|string|max:100',
+            'highest_education_institution' => 'required|string|max:255',
             'graduation_year'   => 'required|integer|min:1900|max:' . date('Y'),
         ]);
 
@@ -249,6 +248,7 @@ class EmployeeController extends Controller
         }
 
         $employment = Employment::where('employee_id', $employee->employee_id)->first();
+        $departments = Department::orderBy('department_name')->get();
 
         $currentEmployeeId = $employee->employee_id;
         $adminEmployeeId   = optional(Auth::user()->employee)->employee_id;
@@ -262,7 +262,11 @@ class EmployeeController extends Controller
             )
             ->get();
 
-        return view('profile.editemployment', compact('employee', 'employment', 'approverCandidates'));
+        $employee->load('approvers');
+        $level1Approver = $employee->approvers->firstWhere('pivot.level', 1);
+        $level2Approver = $employee->approvers->firstWhere('pivot.level', 2);
+
+        return view('profile.editemployment', compact('employee', 'employment', 'departments', 'approverCandidates', 'level1Approver', 'level2Approver'));
     }
 
     /**
@@ -280,14 +284,15 @@ class EmployeeController extends Controller
             'employment_status'  => 'required|string|max:100',
             'company_branch'     => 'required|string|max:100',
             'report_to'          => 'nullable|exists:employees,employee_id',
-            'department'         => 'required|string|max:100',
-            'position'           => 'required|string|max:100',
-            'date_joined'       => 'required|date',
+            'department_id'         => 'required|exists:departments,id',
+            'position'           => 'nullable|string|max:100',
+            'date_of_employment'       => 'required|date',
             'probation_start'    => 'nullable|date',
             'probation_end'      => 'nullable|date',
-            'suspended_start'    => 'nullable|date',
-            'suspended_end'      => 'nullable|date',
-            'resigned_date'      => 'nullable|date',
+            'suspension_start'    => 'nullable|date',
+            'suspension_end'      => 'nullable|date',
+            'resignation_date'      => 'nullable|date',
+            'last_working_day'      => 'nullable|date',
             'termination_date'   => 'nullable|date',
             'work_start_time'    => 'nullable|date_format:H:i',
             'work_end_time'      => 'nullable|date_format:H:i',
@@ -307,5 +312,15 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function downloadProfile(string $id)
+    {
+        $employee = Employee::findOrFail($id);
+        $employment = Employment::where('employee_id', $id)->first();
+
+        $pdf = PDF::loadView('pdf.employee-profile', compact('employee', 'employment'));
+
+        return $pdf->download("employee-profile-{$id}.pdf");
     }
 }

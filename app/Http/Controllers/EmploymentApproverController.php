@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
 
-class EmploymentApproversController extends Controller
+class EmploymentApproverController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -32,6 +32,10 @@ class EmploymentApproversController extends Controller
         $adminEmployeeId = optional(Auth::user()->employee)->employee_id;
 
         foreach ($request->approvers as $approver) {
+            // ⛔ skip empty optional approvers
+            if (empty($approver['id'])) {
+                continue;
+            }
 
             // ❌ employee approving themselves
             if ($approver['id'] === $employee->employee_id) {
@@ -47,13 +51,17 @@ class EmploymentApproversController extends Controller
         $employee->approvers()->sync([]);
 
         foreach ($request->approvers as $approver) {
+            if (empty($approver['id'])) {
+                continue;
+            }
+
             $employee->approvers()->attach(
                 $approver['id'],
                 ['level' => $approver['level']]
             );
         }
 
-        return back()->with('success', 'Approvers assigned.');
+        return redirect()->route('profile.show', $employee->employee_id)->with('success', 'Approvers assigned successfully');
     }
 
     /**

@@ -15,17 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('employee_id');  // add foreign key column
             $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
-            $table->string('employment_type'); // full_time, part_time, intern, etc.
+            $table->string('employment_type'); // full time, part time, intern, etc.
             $table->string('employment_status'); // active, probation, suspended, resigned, terminated
             $table->enum('company_branch', ['AHG', 'D-8CEFC'])->default('AHG');
             $table->string('report_to')->nullable();
             $table->string('position')->nullable();
-            $table->date('date_joined')->nullable();
+            $table->date('date_of_employment')->nullable();
             $table->date('probation_start')->nullable();
             $table->date('probation_end')->nullable();
-            $table->date('suspended_start')->nullable();
-            $table->date('suspended_end')->nullable();
-            $table->date('resigned_date')->nullable();
+            $table->date('suspension_start')->nullable();
+            $table->date('suspension_end')->nullable();
+            $table->date('resignation_date')->nullable();
+            $table->date('last_working_day')->nullable();
             $table->date('termination_date')->nullable();
             $table->time('work_start_time')->nullable();
             $table->time('work_end_time')->nullable();

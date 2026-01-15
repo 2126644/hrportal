@@ -36,19 +36,24 @@ class Task extends Model
 
     public function assignedTo()
     {
-        return $this->hasMany(TaskAssignments::class);
+        return $this->belongsToMany(
+            Employee::class,
+            'task_assignments',
+            'task_id',
+            'employee_id',
+            'id',
+            'employee_id'
+        );
     }
 
     // App\Models\Task.php
 
     public function assignmentSummary(): array
     {
-        $employees = $this->assignedTo
-            ->pluck('employee')
-            ->filter();
+        $employees = $this->assignedTo;
 
-        $departments = $this->assignedTo
-            ->pluck('department')
+        $departments = $employees
+            ->pluck('employment.department')
             ->filter()
             ->unique('id');
 

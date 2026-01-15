@@ -30,13 +30,14 @@ class EmploymentFactory extends Factory
             'company_branch' => fake()->randomElement(['AHG', 'D-8CEFC']),
             'report_to' => null, // Will set this in seeder to avoid circular dependency
             'position'          => fake()->jobTitle(),
-            
-            'date_joined'       => fake()->dateTimeBetween('-5 years', 'now'),
+
+            'date_of_employment'       => fake()->dateTimeBetween('-5 years', 'now'),
             'probation_start' => $employmentStatus === 'probation' ? fake()->dateTimeBetween('-2 months', 'now') : null,
             'probation_end' => $employmentStatus === 'probation' ? fake()->dateTimeBetween('now', '+2 months') : null,
-            'suspended_start' => $employmentStatus === 'suspended' ? fake()->dateTimeBetween('-1 month', 'now') : null,
-            'suspended_end' => $employmentStatus === 'suspended' ? fake()->dateTimeBetween('now', '+1 month') : null,
-            'resigned_date' => $employmentStatus === 'resigned' ? fake()->dateTimeBetween('-6 months', 'now') : null,
+            'suspension_start' => $employmentStatus === 'suspended' ? fake()->dateTimeBetween('-1 month', 'now') : null,
+            'suspension_end' => $employmentStatus === 'suspended' ? fake()->dateTimeBetween('now', '+1 month') : null,
+            'resignation_date' => $employmentStatus === 'resigned' ? fake()->dateTimeBetween('-6 months', 'now') : null,
+            'last_working_day' => $employmentStatus === 'resigned' || $employmentStatus === 'terminated' ? fake()->dateTimeBetween('-6 months', 'now') : null,
             'termination_date' => $employmentStatus === 'terminated' ? fake()->dateTimeBetween('-6 months', 'now') : null,
             'work_start_time' => fake()->randomElement(['08:30', '09:00']),
             'work_end_time' => fake()->randomElement(['17:30', '18:00']),

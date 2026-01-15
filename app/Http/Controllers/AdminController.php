@@ -227,9 +227,9 @@ class AdminController extends Controller
             });
         }
 
-        if ($request->filled('date_joined')) {
+        if ($request->filled('date_of_employment')) {
             $query->whereHas('employment', function ($q) use ($request) {
-                $q->whereDate('date_joined', $request->date_joined);
+                $q->whereDate('date_of_employment', $request->date_of_employment);
             });
         }
 
@@ -241,7 +241,7 @@ class AdminController extends Controller
             ->whereDate('end_date', '>=', Carbon::today())
             ->where('status', 'approved')
             ->count();
-        $newThisMonth = Employment::whereMonth('date_joined', Carbon::now()->month)->count();
+        $newThisMonth = Employment::whereMonth('date_of_employment', Carbon::now()->month)->count();
 
         // Departments for dropdown
         $departments = Department::whereHas('employment')

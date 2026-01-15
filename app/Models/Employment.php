@@ -18,24 +18,26 @@ class Employment extends Model
         'company_branch', // enum
         'report_to', // enum employee_id
         'position',
-        'date_joined',
+        'date_of_employment',
         'probation_start',
         'probation_end',
-        'suspended_start',
-        'suspended_end',
-        'resigned_date',
+        'suspension_start',
+        'suspension_end',
+        'resignation_date',
+        'last_working_day',
         'termination_date',
         'work_start_time',
         'work_end_time',
     ];
 
     protected $casts = [
-        'date_joined' => 'date',
+        'date_of_employment' => 'date',
         'probation_start' => 'date',
         'probation_end' => 'date',
-        'suspended_start' => 'date',
-        'suspended_end' => 'date',
-        'resigned_date' => 'date',
+        'suspension_start' => 'date',
+        'suspension_end' => 'date',
+        'resignation_date' => 'date',
+        'last_working_day' => 'date',
         'termination_date' => 'date',
         'work_start_time' => 'datetime:H:i',
         'work_end_time' => 'datetime:H:i'
@@ -53,6 +55,6 @@ class Employment extends Model
     
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class, 'department_id', 'id');
     }
 }

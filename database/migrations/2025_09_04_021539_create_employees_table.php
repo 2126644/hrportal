@@ -23,9 +23,11 @@ return new class extends Migration
             $table->string('gender')->nullable();
             $table->date('birthday')->nullable();
             $table->string('nationality')->nullable();
-            $table->string('emergency_contact')->nullable();
-            $table->string('highest_education')->nullable();
-            $table->string('education_institution', 255)->nullable();
+            $table->string('emergency_contact_name')->nullable();
+            $table->string('emergency_contact_number')->nullable();
+            $table->string('emergency_contact_relationship')->nullable();
+            $table->string('highest_education_level')->nullable();
+            $table->string('highest_education_institution', 255)->nullable();
             $table->year('graduation_year')->nullable();
             $table->timestamps();
         });
