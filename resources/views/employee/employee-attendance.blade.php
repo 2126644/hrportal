@@ -450,7 +450,7 @@
                             @error('time_slip_end')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @else
-                                <small class="text-muted">Maximum time slip duration is 3 hours</small>
+                                <small class="text-muted">Maximum time slip duration is 2 hours</small>
                             @enderror
                             <!-- Error container for JavaScript validation -->
                             <div class="alert alert-danger mt-2 d-none" id="timeSlipError"></div>
@@ -728,9 +728,9 @@
                     const diffMs = end - start;
                     const diffHours = diffMs / (1000 * 60 * 60);
 
-                    if (diffHours > 24) {
+                    if (diffHours > 2) {
                         e.preventDefault();
-                        errorContainer.textContent = 'Time slip cannot exceed 24 hours.';
+                        errorContainer.textContent = 'Time slip cannot exceed 2 hours.';
                         errorContainer.classList.remove('d-none');
                         timeSlipEnd.focus();
                     } else {
@@ -750,8 +750,8 @@
                     const diffMs = end - start;
                     const diffHours = diffMs / (1000 * 60 * 60);
 
-                    if (diffHours > 24) {
-                        errorContainer.textContent = 'Time slip cannot exceed 24 hours.';
+                    if (diffHours > 2) {
+                        errorContainer.textContent = 'Time slip cannot exceed 2 hours.';
                         errorContainer.classList.remove('d-none');
                     } else {
                         errorContainer.classList.add('d-none');

@@ -36,6 +36,10 @@ class AttendanceController extends Controller
                 });
             }
         } else {
+            if (!$employee) {
+                abort(403, 'Employee record not found.');
+            }
+
             $query->where('employee_id', $employee->employee_id);
         }
 
@@ -62,12 +66,19 @@ class AttendanceController extends Controller
         // Finally fetch results
         $attendances = $query->get();
 
-        // Latest record (also filter by today)
-        $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
-            ->whereDate('date', Carbon::today())
-            ->orderBy('date', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->first();
+        // admins should not have “today attendance”
+        // $employee will be null for admin bcs no employee record (same as in LeaveController)
+        // so we fix:
+
+        $todayAttendance = null;
+
+        if ($user->role_id != 2 && $employee) {
+            $todayAttendance = Attendance::where('employee_id', $employee->employee_id)
+                ->whereDate('date', Carbon::today())
+                ->orderBy('date', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
 
         // provide distinct status options to the view (move DB calls out of blade)
         $statusTimeInOptions = Attendance::select('status_time_in')->distinct()->pluck('status_time_in')->filter()->values();
@@ -214,7 +225,7 @@ class AttendanceController extends Controller
 
         $distance = $this->calculateDistance($officeLat, $officeLng, $lat, $lng);
         $location_out = $distance <= $maxDistance ? 'On-site' : 'Off-site';
-        
+
         $now = Carbon::now();
 
         // Punch Out (before 5:30pm) → ❌ Early Leave
@@ -403,10 +414,10 @@ class AttendanceController extends Controller
         $end = Carbon::createFromFormat('H:i', $request->time_slip_end);
         $durationMinutes = $end->diffInMinutes($start);
 
-        // Check if duration exceeds 24 hours (1440 minutes)
-        if ($durationMinutes > 1440) {
+        // Check if duration exceeds 2 hours (120 minutes)
+        if ($durationMinutes > 120) {
             return redirect()->back()
-                ->withErrors(['time_slip_end' => 'Time slip cannot exceed 24 hours.'])
+                ->withErrors(['time_slip_end' => 'Time slip cannot exceed 2 hours.'])
                 ->withInput();
         }
 

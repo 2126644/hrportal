@@ -2,22 +2,25 @@
 
 use App\Models\Setting;
 
-function setting($key, $default = [])
-{
-    $value = Setting::where('key', $key)->value('value');
+if (!function_exists('setting')) {
 
-    if (is_null($value)) {
-        return $default;
+    function setting($key, $default = [])
+    {
+        $value = Setting::where('key', $key)->value('value');
+
+        if (is_null($value)) {
+            return $default;
+        }
+
+        // If JSON string → decode
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            return json_last_error() === JSON_ERROR_NONE
+                ? $decoded
+                : $default;
+        }
+
+        return $value;
     }
-
-    // If JSON string → decode
-    if (is_string($value)) {
-        $decoded = json_decode($value, true);
-
-        return json_last_error() === JSON_ERROR_NONE
-            ? $decoded
-            : $default;
-    }
-
-    return $value;
 }

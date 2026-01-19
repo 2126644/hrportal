@@ -115,6 +115,15 @@
                                     <i class="bi bi-arrow-left me-1"></i> Back to Login
                                 </a>
                             </div>
+
+                            <div class="text-center mt-3">
+                                If you don't have an account, please contact HR.
+                            
+                                <small class="text-muted d-block mt-4">
+                                    &copy; {{ date('Y') }} AHG HR Portal. All rights reserved.
+                                </small>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>

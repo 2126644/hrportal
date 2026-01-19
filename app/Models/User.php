@@ -30,6 +30,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'profile_photo_path',
     ];
 
     /**
@@ -49,7 +50,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $appends = [
-        'profile_photo_url',
+        'profile_photo_path',
     ];
 
     /**
@@ -81,6 +82,11 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array(optional($this->role)->role_name, ['admin', 'superadmin']);
     }
 
     public function employee()

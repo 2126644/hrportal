@@ -14,6 +14,7 @@ use App\Models\Leave;
 use App\Models\Announcement;
 use App\Models\Department;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -322,5 +323,34 @@ class EmployeeController extends Controller
         $pdf = PDF::loadView('pdf.employee-profile', compact('employee', 'employment'));
 
         return $pdf->download("employee-profile-{$id}.pdf");
+    }
+
+    public function updateProfilePhoto(Request $request, Employee $employee)
+    {
+        abort_unless(Auth::user()->role_id === 2, 403);
+
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $user = $employee->user;
+
+        if (!$user) {
+            return back()->withErrors('Employee has no linked user account.');
+        }
+
+        // Delete old photo
+        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
+            Storage::disk('public')->delete($user->profile_photo_path);
+        }
+
+        // Store new photo
+        $path = $request->file('profile_photo')->store('profile-photos', 'public');
+
+        $user->update([
+            'profile_photo_path' => $path,
+        ]);
+
+        return back()->with('success', 'Profile photo updated successfully.');
     }
 }

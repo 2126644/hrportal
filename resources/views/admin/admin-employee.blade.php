@@ -18,6 +18,9 @@
                                 <h3 class="page-title"><br>Employee Management</h3>
                                 <p class="text-muted">Manage your team members and their information</p>
                             </div>
+                            <button class="btn-new" onclick="window.location='{{ route('admin.employee.create') }}'">
+                                Create New Employee
+                            </button>
                         </div>
                     </div>
                 </div>

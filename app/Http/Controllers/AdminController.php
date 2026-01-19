@@ -9,9 +9,12 @@ use App\Models\Task;
 use App\Models\Leave;
 use App\Models\Announcement;
 use App\Models\Department;
+use App\Models\Role;
 use Carbon\Carbon;
 use App\Models\Employment;
+use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
+use App\Actions\Fortify\CreateNewUser;
 
 class AdminController extends Controller
 {
@@ -274,5 +277,21 @@ class AdminController extends Controller
     {
         $events = Event::orderBy('event_date', 'desc')->paginate(10);
         return view('admin.events', compact('events'));
+    }
+
+    public function createUser()
+    {
+        // abort_if(!auth()->user()->isAdmin(), 403);
+
+        $roles = Role::orderBy('id')->get();
+
+        return view('admin.admin-createemployee', compact('roles'));
+    }
+
+    public function storeUser(Request $request, CreateNewUser $creator)
+    {
+        $creator->create($request->all());
+
+        return redirect()->route('admin.employee')->with('success', 'User created successfully! Please inform the user to check their email for login details.');
     }
 }

@@ -176,8 +176,16 @@ class LeaveController extends Controller
         // Compute final entitlements (prorated if joined this year)
         // -------------------------
         $finalEntitlements = [];
-        // make sure join date is Carbon (employee model should cast it)
-        $joinDate = $employee->date_of_employment ? Carbon::parse($employee->date_of_employment) : null;
+
+        // admins should not have “join date”
+        // $employee will be null for admin bcs no employee record (same as in AttendanceController)
+        // so we fix:
+
+        $joinDate = null;
+
+        if ($user->role_id !== 2 && $employee && $employee->date_of_employment) {
+            $joinDate = Carbon::parse($employee->date_of_employment);
+        }
 
         foreach ($leaveTypes as $lt) {
             // lt may be model or fallback object; unify to string and full value

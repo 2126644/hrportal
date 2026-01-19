@@ -45,7 +45,7 @@ Route::get('/dashboard', function () {
     }
     // otherwise send guests to login
     return redirect()->route('login');
-})->middleware('auth')->name('dashboard');
+})->middleware('auth', 'force.password.reset')->name('dashboard');
 
 // Two-Factor Routes
 
@@ -60,7 +60,7 @@ Route::post('/notifications/read-all', function () {
 })->middleware('auth')->name('notifications.readAll');
 
 //Route for employee
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'force.password.reset'])->group(function () {
     Route::get('employee-dashboard', [EmployeeController::class, 'showDashboardForLoggedInUser'])->name('employee.dashboard');
 
     Route::get('/announcement', [AnnouncementController::class, 'index'])->name('announcement.index.employee');
@@ -134,6 +134,9 @@ Route::middleware(['auth'])->group(function () {
     // Route::delete('/announcement/{announcement}', [AnnouncementController::class, 'destroy'])->name('announcement.destroy');
 
     Route::get('/admin/employee', [AdminController::class, 'employee'])->name('admin.employee');
+    Route::get('/admin/employee/create', [AdminController::class, 'createUser'])->name('admin.employee.create');
+    Route::post('/admin/employee', [AdminController::class, 'storeUser'])->name('admin.employee.store');
+    Route::put('/admin/employee/{employee}/photo', [EmployeeController::class, 'updateProfilePhoto'])->name('admin.employee.updatePhoto');
 
     Route::get('/admin/attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
 

@@ -141,13 +141,13 @@
                                     </button>
                                 </div>
                             </form>
-
-                            <!-- Register Link -->
+                            
                             <div class="text-center mt-3">
-                                Don't have an account?
-                                <a href="{{ route('register') }}" class="text-primary">
-                                    Sign Up
-                                </a>
+                                If you don't have an account, please contact HR.
+                            
+                                <small class="text-muted d-block mt-4">
+                                    &copy; {{ date('Y') }} AHG HR Portal. All rights reserved.
+                                </small>
                             </div>
                         </div>
                     </div>

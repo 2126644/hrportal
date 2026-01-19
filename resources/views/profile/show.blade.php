@@ -33,21 +33,35 @@
             <div class="col-lg-5">
                 <div class="card h-100">
                     <div class="card-body text-center p-4">
-                        <!-- Profile Picture -->
-                        <div class="profile-pic mb-4">
-                            <div class="profile-avatar position-relative mx-auto">
-                                @if ($employee->user && $employee->user->profile_photo_path)
-                                    <img src="{{ asset('storage/' . $employee->user->profile_photo_path) }}"
-                                        alt="{{ $employee->full_name }}" class="rounded-circle img-fluid"
-                                        style="width: 120px; height: 120px; object-fit: cover;">
-                                @else
-                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto"
-                                        style="width: 120px; height: 120px; border: 2px dashed #dee2e6;">
-                                        <i class="bi bi-person-fill text-muted" style="font-size: 3rem;"></i>
-                                    </div>
-                                @endif
+
+                        <form method="POST" action="{{ route('admin.employee.updatePhoto', $employee->employee_id) }}"
+                            enctype="multipart/form-data" id="profilePhotoForm">
+
+                            @csrf
+                            @method('PUT')
+
+                            <div class="profile-pic mb-3 d-flex justify-content-center">
+                                <label class="profile-photo-wrapper position-relative">
+
+                                    <img src="{{ $employee->user->profile_photo_path
+                                        ? asset('storage/' . $employee->user->profile_photo_path)
+                                        : asset('images/default-avatar.png') }}"
+                                        alt="{{ $employee->full_name }}" class="rounded-circle"
+                                        style="width:120px;height:120px;object-fit:cover;cursor:pointer;">
+
+                                    <!-- Hover overlay -->
+                                    @if (auth()->user()->role_id === 2)
+                                        <div class="photo-overlay d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-camera-fill"></i>
+                                        </div>
+
+                                        <!-- Auto-submit when file selected -->
+                                        <input type="file" name="profile_photo" class="d-none" accept="image/*"
+                                            onchange="document.getElementById('profilePhotoForm').submit();">
+                                    @endif
+                                </label>
                             </div>
-                        </div>
+                        </form>
 
                         <!-- Full Name -->
                         <h4 class="employee-name">{{ $employee->full_name ?? 'Employee Name' }}</h4>
@@ -173,7 +187,7 @@
                     <button class="btn btn-primary"
                         onclick="window.location='{{ route('profile.print', $employee->employee_id) }}'">
                         <i class="bi bi-file-pdf me-2"></i>Download PDF
-                    </button> 
+                    </button>
 
                 </div>
             </div>
