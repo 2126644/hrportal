@@ -16,7 +16,7 @@
                                     </ol>
                                 </nav>
                                 <h3 class="page-title"><br>Events</h3>
-                                <p class="text-muted">Manage your events and view your schedule.</p>
+                                <p class="text-muted">Manage your events and schedule.</p>
                             </div>
                             <button class="btn-new" onclick="window.location='{{ route('event.create') }}'">
                                 New Event
@@ -72,11 +72,11 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Category</label>
-                            <select name="category" class="form-control">
+                            <select name="event_category" class="form-control">
                                 <option value="">All Categories</option>
-                                @foreach ($categories as $category)
+                                @foreach ($eventCategories as $category)
                                     <option value="{{ $category }}"
-                                        {{ request('category') == $category ? 'selected' : '' }}>
+                                        {{ request('event_category') == $category ? 'selected' : '' }}>
                                         {{ ucwords(str_replace('_', ' ', $category)) }}
                                     </option>
                                 @endforeach
@@ -90,17 +90,6 @@
                                     <option value="{{ $status }}"
                                         {{ request('event_status') == $status ? 'selected' : '' }}>
                                         {{ ucwords(str_replace('_', ' ', $status)) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">RSVP</label>
-                            <select name="rsvp_status" class="form-control">
-                                <option value="">All</option>
-                                @foreach ($rsvpOptions as $key => $label)
-                                    <option value="{{ $key }}" {{ request('rsvp_status') == $key ? 'selected' : '' }}>
-                                        {{ $label }} 
                                     </option>
                                 @endforeach
                             </select>
@@ -122,56 +111,207 @@
                         </div>
                     </div>
                 </form>
-                <div class="events-grid mt-4">
+                <div class="event-grid mt-4">
                     @forelse($events as $event)
                         @php
-                            $eventDate = \Carbon\Carbon::parse($event->event_date);
-                            $eventTime = \Carbon\Carbon::parse($event->event_time);
                             $now = \Carbon\Carbon::now();
-                            $isPast = $eventDate->lt($now);
+                            $isPast = $event->event_date->lt($now);
                             $eventImage = $event->image
                                 ? asset('storage/' . $event->image) // public/storage/events
                                 : asset('img/event-corporate.jpg'); // public/img-default image
                         @endphp
 
                         <div class="event-card">
-                            <img src="{{ $eventImage }}" alt="{{ $event->event_name }}">
+                            {{-- Top Section: Image & Overlay Badges --}}
+                            <div class="event-image-wrapper"
+                                onclick="window.location='{{ route('event.show', $event->id) }}'" style="cursor: pointer;">
+                                <img src="{{ $eventImage }}" alt="{{ $event->event_name }}">
+
+                                <div class="event-category-badge">
+                                    {{ $event->event_category }}
+                                </div>
+
+                                <span class="status-pill event-status-{{ strtolower($event->event_status) }}">
+                                    {{ ucfirst($event->event_status) }}
+                                </span>
+                            </div>
+
+                            @if ($event->created_by === auth()->id())
+                                <div class="dropdown event-actions">
+                                    <button class="btn btn-sm btn-light dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#deleteEventModal" data-event-id="{{ $event->id }}"
+                                                data-event-name="{{ $event->event_name }}">
+                                                <i class="bi bi-trash me-2"></i> Delete Event
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @endif
+
+                            {{-- Middle Section: Content --}}
                             <div class="event-card-body">
-                                <h3 onclick="window.location='{{ route('event.show', $event->id) }}'">
+                                <h3 class="event-title"
+                                    onclick="window.location='{{ route('event.show', $event->id) }}'">
                                     {{ $event->event_name }}
                                 </h3>
 
-                                <div class="event-meta">
-                                    <span title="Date">📅 {{ $eventDate->format('d F Y') }}</span><br>
-                                    <span title="Time">⏰ {{ $eventTime->format('g:i A') }}</span><br>
-                                    <span title="Location">📍 {{ $event->event_location }}</span><br><br>
+                                {{-- Modernized Meta Container --}}
+                                <div class="event-meta-container">
+                                    {{-- Visual Date Block --}}
+                                    <div class="date-block">
+                                        <span class="month">{{ $event->event_date->format('M') }}</span>
+                                        <span class="day">{{ $event->event_date->format('d') }}</span>
+                                    </div>
 
-                                    @if ($event->rsvp_required)
-                                        <span class="event-rsvp" title="RSVP Required">RSVP</span>
-                                    @endif
-                                    <span class="event-status event-status-{{ strtolower($event->event_status) }}">
-                                        {{ ucfirst($event->event_status) }}
-                                    </span>
+                                    {{-- Time and Location Details --}}
+                                    <div class="meta-details">
+                                        <div class="detail-row">
+                                            <i class="bi bi-watch"></i>
+                                            <span>{{ $event->event_time->format('g:i A') }}</span>
+                                        </div>
+
+                                        <div class="detail-row">
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                            <span class="location-text">{{ $event->event_location }}</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <p class="event-description">{{ Str::limit($event->description, 140) }}</p>
+                                <p class="event-description">
+                                    {{ Str::limit($event->description, 100) }}
+                                </p>
 
-                                @if (!$isPast && $event->rsvp_required)
-                                    <a href="{{ route('event.show', $event->id) }}" class="btn-primary">Join Now</a>
+                                @if ($event->tags)
+                                    <p class="event-tags">
+                                        @foreach (explode(',', $event->tags) as $tag)
+                                            #{{ trim($tag) }}
+                                        @endforeach
+                                    </p>
                                 @endif
                             </div>
+
+                            {{-- Bottom Section: Dynamic Attendance Actions --}}
+                            @php
+                                $myAttendance = $event->attendees
+                                    ->where('employee_id', auth()->user()->employee?->employee_id)
+                                    ->first();
+                            @endphp
+
+                            @if (!$isPast)
+                                <div class="event-card-footer">
+                                    @if ($myAttendance && $myAttendance->response_status === 'pending')
+                                        <div class="attendance-prompt">
+                                            <div class="text-muted small mb-1 fw-bold">RSVP REQUIRED</div>
+                                            <div class="d-flex gap-2">
+                                                <form action="{{ route('event.attendance.confirm', $myAttendance->id) }}"
+                                                    method="POST" class="flex-grow-1">
+                                                    @csrf
+                                                    <button class="btn btn-success w-100">Accept</button>
+                                                </form>
+
+                                                <form action="{{ route('event.attendance.decline', $myAttendance->id) }}"
+                                                    method="POST" class="flex-grow-1">
+                                                    @csrf
+                                                    <button type="button" class="btn btn-danger w-100"
+                                                        data-bs-toggle="modal" data-bs-target="#declineReasonModal"
+                                                        data-action="{{ route('event.attendance.decline', $myAttendance->id) }}"
+                                                        data-event-date="{{ $event->event_date->format('d M Y') }}">
+                                                        Decline
+                                                    </button>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    @elseif ($myAttendance && $myAttendance->response_status === 'confirmed')
+                                        <div class="status-confirmed d-flex align-items-center gap-2">
+                                            <span style="font-size: 1.2rem;">✓</span> You accepted this invitation
+                                        </div>
+                                    @elseif ($myAttendance && $myAttendance->response_status === 'declined')
+                                        <div class="status-declined d-flex align-items-center gap-2">
+                                            <span>✕</span> You declined this invitation
+                                        </div>
+                                    @else
+                                        <div class="text-muted small">
+                                            Not assigned to this event
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <div class="event-card-footer">
+                                    <span class="badge bg-light text-dark border w-100 py-2">Past Event</span>
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <div class="col-12 text-center py-5">
                             <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
-                            <h5 class="text-muted mb-2">No past events found</h5>
-                            <p class="text-muted">There are no past events to display.</p>
+                            <h5 class="text-muted">No events found</h5>
+                            <p class="text-muted">There are no events to display.</p>
                         </div>
                     @endforelse
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="declineReasonModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="declineForm" method="POST">
+                    @csrf
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="declineReasonModalLabel">Enter Decline Reason for Event on <span
+                                id="eventDateText"></span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="decline_reason" class="form-label">Reason</label>
+                            <textarea name="decline_reason" class="form-control" rows="1"
+                                placeholder="Please provide a reason for declining">{{ old('decline_reason') }}</textarea>
+                            @error('decline_reason')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('declineReasonModal');
+            const form = document.getElementById('declineForm');
+
+            modal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+
+                const attendanceId = button.getAttribute('data-attendance-id');
+                const eventDate = button.getAttribute('data-event-date');
+                const actionTemplate = button.getAttribute('data-action');
+
+                form.action = actionTemplate.replace(':id', attendanceId);
+                document.getElementById('eventDateText').innerText = eventDate;
+            });
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

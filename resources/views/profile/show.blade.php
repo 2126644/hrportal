@@ -43,8 +43,8 @@
                             <div class="profile-pic mb-3 d-flex justify-content-center">
                                 <label class="profile-photo-wrapper position-relative">
 
-                                    <img src="{{ $employee->user->profile_photo_path
-                                        ? asset('storage/' . $employee->user->profile_photo_path)
+                                    <img src="{{ $employee->user->profile_photo_url
+                                        ? asset('storage/' . $employee->user->profile_photo_url)
                                         : asset('images/default-avatar.png') }}"
                                         alt="{{ $employee->full_name }}" class="rounded-circle"
                                         style="width:120px;height:120px;object-fit:cover;cursor:pointer;">

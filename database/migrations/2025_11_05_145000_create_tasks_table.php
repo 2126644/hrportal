@@ -14,14 +14,12 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->nullable()->constrained('projects')->nullOnDelete();   // add foreign key column
-            $table->string('created_by')->nullable();  // add foreign key column
+            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->string('task_name');
             $table->text('task_desc')->nullable();
             $table->enum('task_status', ['to-do', 'in-progress', 'in-review','to-review', 'completed'])->default('to-do');
             $table->text('notes')->nullable();
             $table->date('due_date')->nullable();
-
-            $table->foreign('created_by')->references('employee_id')->on('employees')->nullOnDelete();
             
             $table->timestamps();
         });

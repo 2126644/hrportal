@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Project;
-use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Support\Str;
 
 /**
@@ -21,7 +21,7 @@ class TaskFactory extends Factory
     {
         return [
             'project_id'    => Project::inRandomOrder()->value('id') ?? Project::factory(),
-            'created_by'    => Employee::inRandomOrder()->value('employee_id'),
+            'created_by'    => User::inRandomOrder()->first()->id,
             'task_name'     => fake()->sentence(4),
             'task_desc'     => fake()->optional()->paragraph(),
             'task_status'   => fake()->randomElement(['to-do', 'in-progress', 'in-review', 'to-review', 'completed']),

@@ -10,12 +10,13 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Events</li>
                                     </ol>
                                 </nav>
                                 <h3 class="page-title"><br>Events</h3>
-                                <p class="text-muted">Manage all events and schedule.</p>
+                                <p class="text-muted">Manage events and schedule.</p>
                             </div>
                             <button class="btn-new" onclick="window.location='{{ route('event.create') }}'">
                                 New Event
@@ -40,12 +41,6 @@
                 <button class="nav-link" id="event-tab" data-bs-toggle="tab" data-bs-target="#event" type="button"
                     role="tab" aria-controls="event" aria-selected="false">
                     Events
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="registration-tab" data-bs-toggle="tab" data-bs-target="#registration"
-                    type="button" role="tab" aria-controls="registration" aria-selected="false">
-                    Registrations
                 </button>
             </li>
         </ul>
@@ -77,11 +72,11 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Category</label>
-                            <select name="category" class="form-control">
+                            <select name="event_category" class="form-control">
                                 <option value="">All Categories</option>
-                                @foreach ($categories as $category)
+                                @foreach ($eventCategories as $category)
                                     <option value="{{ $category }}"
-                                        {{ request('category') == $category ? 'selected' : '' }}>
+                                        {{ request('event_category') == $category ? 'selected' : '' }}>
                                         {{ ucwords(str_replace('_', ' ', $category)) }}
                                     </option>
                                 @endforeach
@@ -95,17 +90,6 @@
                                     <option value="{{ $status }}"
                                         {{ request('event_status') == $status ? 'selected' : '' }}>
                                         {{ ucwords(str_replace('_', ' ', $status)) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">RSVP</label>
-                            <select name="rsvp_status" class="form-control">
-                                <option value="">All</option>
-                                @foreach ($rsvpOptions as $key => $label)
-                                    <option value="{{ $key }}" {{ request('rsvp_status') == $key ? 'selected' : '' }}>
-                                        {{ $label }} 
                                     </option>
                                 @endforeach
                             </select>
@@ -127,50 +111,116 @@
                         </div>
                     </div>
                 </form>
-                <div class="events-grid mt-4">
+                <div class="event-grid mt-4">
                     @forelse($events as $event)
                         @php
-                            $eventDate = \Carbon\Carbon::parse($event->event_date);
-                            $eventTime = \Carbon\Carbon::parse($event->event_time);
                             $now = \Carbon\Carbon::now();
-                            $isPast = $eventDate->lt($now);
+                            $isPast = $event->event_date->lt($now);
                             $eventImage = $event->image
                                 ? asset('storage/' . $event->image) // public/storage/events
                                 : asset('img/event-corporate.jpg'); // public/img-default image
                         @endphp
 
                         <div class="event-card">
-                            <img src="{{ $eventImage }}" alt="{{ $event->event_name }}">
+                            {{-- Top Section: Image & Overlay Badges --}}
+                            <div class="event-image-wrapper"
+                                onclick="window.location='{{ route('event.show', $event->id) }}'" style="cursor: pointer;">
+                                <img src="{{ $eventImage }}" alt="{{ $event->event_name }}">
+
+                                <div class="event-category-badge">
+                                    {{ $event->event_category }}
+                                </div>
+
+                                <span class="status-pill event-status-{{ strtolower($event->event_status) }}">
+                                    {{ ucfirst($event->event_status) }}
+                                </span>
+                            </div>
+
+                            {{-- Middle Section: Content --}}
                             <div class="event-card-body">
-                                <h3 onclick="window.location='{{ route('event.show', $event->id) }}'">
+                                <h3 class="event-title"
+                                    onclick="window.location='{{ route('event.show', $event->id) }}'">
                                     {{ $event->event_name }}
                                 </h3>
 
-                                <div class="event-meta">
-                                    <span title="Date">📅 {{ $eventDate->format('d F Y') }}</span>
-                                    <span title="Time">⏰ {{ $eventTime->format('g:i A') }}</span>
-                                    <span title="Location">📍 {{ $event->event_location }}</span>
+                                {{-- Modernized Meta Container --}}
+                                <div class="event-meta-container">
+                                    {{-- Visual Date Block --}}
+                                    <div class="date-block">
+                                        <span class="month">{{ $event->event_date->format('M') }}</span>
+                                        <span class="day">{{ $event->event_date->format('d') }}</span>
+                                    </div>
 
-                                    @if ($event->rsvp_required)
-                                        <span class="event-rsvp" title="RSVP Required">RSVP</span>
-                                    @endif
-                                    <span class="event-status event-status-{{ strtolower($event->event_status) }}">
-                                        {{ ucfirst($event->event_status) }}
-                                    </span>
+                                    {{-- Time and Location Details --}}
+                                    <div class="meta-details">
+                                        <div class="detail-row">
+                                            <i class="bi bi-watch"></i>
+                                            <span>{{ $event->event_time->format('g:i A') }}</span>
+                                        </div>
+
+                                        <div class="detail-row">
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                            <span class="location-text">{{ $event->event_location }}</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <p class="event-description">{{ Str::limit($event->description, 140) }}</p>
+                                <p class="event-description">
+                                    {{ Str::limit($event->description, 100) }}
+                                </p>
 
-                                @if (!$isPast && $event->rsvp_required)
-                                    <a href="{{ route('event.show', $event->id) }}" class="btn-primary">Join Now</a>
+                                @if ($event->tags)
+                                    <p class="event-tags">
+                                        @foreach (explode(',', $event->tags) as $tag)
+                                            #{{ trim($tag) }}
+                                        @endforeach
+                                    </p>
                                 @endif
+                            </div>
+
+                            {{-- Bottom Section: Dynamic Actions --}}
+
+                            <div class="event-card-footer">
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="small text-muted fw-bold">EVENT OVERVIEW</div>
+
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Confirmed</span>
+                                        <span
+                                            class="fw-bold text-success">{{ $event->attendees->where('response_status', 'confirmed')->count() }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Declined</span>
+                                        <span
+                                            class="fw-bold text-danger">{{ $event->attendees->where('response_status', 'declined')->count() }}</span>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between small">
+                                        <span>Pending</span>
+                                        <span
+                                            class="fw-bold text-warning">{{ $event->attendees->where('response_status', 'pending')->count() }}</span>
+                                    </div>
+
+                                    <div class="d-flex gap-2 mt-2">
+                                        <a href="{{ route('event.edit', $event->id) }}"
+                                            class="btn btn-outline-primary w-100">
+                                            Edit Event
+                                        </a>
+
+                                        <a href="{{ route('event.destroy', $event->id) }}"
+                                            class="btn btn-outline-secondary w-100">
+                                            Delete Event
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @empty
                         <div class="col-12 text-center py-5">
                             <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
-                            <h5 class="text-muted">No past events found</h5>
-                            <p class="text-muted">There are no past events to display.</p>
+                            <h5 class="text-muted">No events found</h5>
+                            <p class="text-muted">There are no events to display.</p>
                         </div>
                     @endforelse
                 </div>

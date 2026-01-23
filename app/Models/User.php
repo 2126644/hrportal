@@ -50,7 +50,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $appends = [
-        'profile_photo_path',
+        'profile_photo_url',
     ];
 
     /**
@@ -92,10 +92,5 @@ class User extends Authenticatable
     public function employee()
     {
         return $this->hasOne(Employee::class);
-    }
-
-    public function eventRegistrations()
-    {
-        return $this->hasMany(EventRegistration::class);
     }
 }

@@ -212,8 +212,8 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-sm me-3">
-                                                @if ($employee->user && $employee->user->profile_photo_path)
-                                                    <img src="{{ asset('storage/' . $employee->user->profile_photo_path) }}"
+                                                @if ($employee->user && $employee->user->profile_photo_url)
+                                                    <img src="{{ asset('storage/' . $employee->user->profile_photo_url) }}"
                                                         alt="{{ $employee->full_name }}" class="rounded-circle"
                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else

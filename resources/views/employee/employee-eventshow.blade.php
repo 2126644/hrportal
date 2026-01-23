@@ -1,345 +1,301 @@
 @extends('layouts.master')
 
 @section('content')
+    <style>
+        /* Fix Title/Breadcrumb Overlap */
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb {
+            margin-bottom: 0.5rem !important;
+        }
+
+        .page-title {
+            font-weight: 800;
+            font-size: 2.2rem;
+            color: #1a233a;
+            margin-top: 0;
+            display: block;
+            /* Ensures it sits below breadcrumb */
+        }
+
+        /* Hero Image Container */
+        .event-hero-container {
+            background: #f0f2f5;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .event-hero-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .hero-placeholder {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+        }
+
+        /* Side Passport Card */
+        .event-passport {
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .passport-header {
+            background: #2d3748;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Info Row Styling */
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .icon-box {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d6efd;
+            font-size: 1.2rem;
+        }
+
+        /* Attendance Progress */
+        .attendance-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 18px;
+        }
+
+        .progress-custom {
+            height: 8px;
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+
+        .avatar-mini {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #6c757d;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            border: 2px solid #fff;
+            margin-right: -8px;
+        }
+
+        .btn-custom {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 20px;
+        }
+    </style>
+
     <div class="content container-fluid">
-        <div class="page-header">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="page-sub-header">
-                        <div class="d-flex justify-content-between align-items-center w-100">
-                            <div>
-                                <nav aria-label="breadcrumb">
-                                    <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">Show Event</li>
-                                    </ol>
-                                </nav>
-                                <h3 class="page-title"><br>Events</h3>
-                                <p class="text-muted">Manage your events and view your schedule.</p>
-                            </div>
-                            <button class="btn-new" onclick="window.location='{{ route('event.edit', $event->id) }}'">
-                                Edit Event
-                            </button>
-                        </div>
-                    </div>
-                </div>
+        <!-- Header: Fixed Layout -->
+        <div class="page-header d-md-flex justify-content-between align-items-end">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ $event->event_name }}</li>
+                    </ol>
+                </nav>
+                <h2 class="page-title">{{ $event->event_name }}</h2>
+            </div>
+            <div class="d-flex gap-2 mb-2">
+                <button class="btn btn-outline-secondary btn-custom"><i class="bi bi-share me-2"></i>Share</button>
+                <a href="{{ route('event.edit', $event->id) }}" class="btn btn-primary btn-custom"
+                    style="background-color: #3b82f6; border-color: #3b82f6;">
+                    <i class="bi bi-pencil-square me-2"></i>Edit Event
+                </a>
             </div>
         </div>
 
-        <!-- Event Header -->
-        <div class="event-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="display-5 fw-bold mb-3">{{ $event->event_name }}</h1>
-                    <div class="d-flex flex-wrap align-items-center mb-3">
-                        @php
-                            $statusClass = 'status-upcoming';
-                            if ($event->event_status === 'ongoing') {
-                                $statusClass = 'status-ongoing';
-                            } elseif ($event->event_status === 'completed') {
-                                $statusClass = 'status-completed';
-                            } elseif ($event->event_status === 'cancelled') {
-                                $statusClass = 'status-cancelled';
-                            }
-                        @endphp
-                        <span
-                            class="status-badge {{ $statusClass }} me-3 text-capitalize">{{ $event->event_status }}</span>
-                        <span class="me-3"><i class="bi bi-calendar me-1"></i>
-                            {{ \Carbon\Carbon::parse($event->event_date)->format('F j, Y') }}</span>
-                        <span><i class="bi bi-clock me-1"></i>
-                            {{ \Carbon\Carbon::parse($event->event_time)->format('h:i A') }}</span>
-                    </div>
-                    <p class="lead mb-0">{{ Str::limit($event->description, 150) }}</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    @if ($event->price > 0)
-                        <div class="fs-4 fw-bold">${{ number_format($event->price, 2) }}</div>
-                        <div class="text-white-50">Registration fee</div>
+        <div class="row">
+            <!-- Main Column -->
+            <div class="col-lg-8">
+                <div class="event-hero-container">
+                    @if ($event->image)
+                        <img src="{{ asset('storage/' . $event->image) }}" class="event-hero-image" alt="Event Banner">
                     @else
-                        <div class="fs-4 fw-bold">Free</div>
-                        <div class="text-white-50">No cost to attend</div>
+                        <div class="hero-placeholder">
+                            <i class="bi bi-image" style="font-size: 5rem; opacity: 0.2;"></i>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 20px;">
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <span class="badge bg-soft-primary text-primary border px-3 py-2 text-uppercase"
+                            style="background: #eef2ff;">{{ $event->event_category }}</span>
+                        <span class="text-{{ $event->event_status === 'cancelled' ? 'danger' : 'success' }} fw-bold">
+                            <i class="bi bi-dot" style="font-size: 1.5rem;"></i> {{ ucfirst($event->event_status) }}
+                        </span>
+                    </div>
+
+                    <h4 class="fw-bold mb-3">About this event</h4>
+                    <div class="text-secondary" style="line-height: 1.8; font-size: 1.05rem;">
+                        {!! nl2br(e($event->description)) !!}
+                    </div>
+
+                    @if (!empty($event->tags))
+                        <div class="mt-4">
+                            @foreach (explode(',', $event->tags) as $tag)
+                                <span class="badge border text-dark bg-light rounded-pill px-3 py-2 me-1">
+                                    #{{ trim($tag) }}
+                                </span>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-12 col-md-8 mb-4">
-                <div class="card event-details-card mb-4">
-                    <div class="event-card-body p-0">
-                        @if ($event->image)
-                            <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->event_name }}"
-                                class="event-image">
-                        @else
-                            <div class="event-image bg-light d-flex align-items-center justify-content-center">
-                                <div class="text-center text-muted">
-                                    <i class="bi bi-image-fill fs-3 mb-3"></i>
-                                    <p>No event image available</p>
+            <!-- Sidebar Column -->
+            <div class="col-lg-4">
+                <div class="event-passport mb-4">
+                    <div class="passport-header">
+                        <small class="text-uppercase fw-bold opacity-75">Event Ticket</small>
+                        <h5 class="mb-0 mt-1">Registration Details</h5>
+                    </div>
+
+                    <div class="p-4">
+                        <div class="info-row">
+                            <div class="icon-box"><i class="bi bi-calendar3"></i></div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Date</small>
+                                <div class="fw-bold">{{ \Carbon\Carbon::parse($event->event_date)->format('D, M j, Y') }}
                                 </div>
                             </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+                        </div>
 
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card event-details-card mb-4">
-                    <div class="card-header">
-                        <i class="bi bi-info-circle-fill me-2"></i>About This Event
-                    </div>
-                    <div class="event-card-body">
-                        <p>{{ $event->description }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div class="info-row">
+                            <div class="icon-box"><i class="bi bi-clock"></i></div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Time</small>
+                                <div class="fw-bold">{{ \Carbon\Carbon::parse($event->event_time)->format('h:i A') }}</div>
+                            </div>
+                        </div>
 
-        <div class="row">
-            <div class="col-12 col-md-8 mb-4">
-                <div class="card event-details-card mb-4">
-                    <div class="card-header">
-                        <i class="bi bi-list-ul me-2"></i>Event Schedule
-                    </div>
-                    <div class="event-card-body">
-                        @php
-                            $eventTime = \Carbon\Carbon::parse($event->event_time);
-                            $eventEndTime = $eventTime->copy()->addHours(2); // Assuming 2-hour duration
-                        @endphp
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-door-open-fill"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Registration & Welcome</div>
-                                <div class="event-detail-value">{{ $eventTime->copy()->subMinutes(30)->format('h:i A') }} -
-                                    {{ $eventTime->format('h:i A') }}</div>
+                        <div class="info-row">
+                            <div class="icon-box"><i class="bi bi-geo-alt"></i></div>
+                            <div>
+                                <small class="text-muted text-uppercase fw-bold"
+                                    style="font-size: 0.65rem;">Location</small>
+                                <div class="fw-bold">{{ $event->event_location }}</div>
                             </div>
                         </div>
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-mic-fill"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Main Event</div>
-                                <div class="event-detail-value">{{ $eventTime->format('h:i A') }} -
-                                    {{ $eventEndTime->copy()->subMinutes(30)->format('h:i A') }}</div>
-                            </div>
-                        </div>
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Networking & Closing</div>
-                                <div class="event-detail-value">
-                                    {{ $eventEndTime->copy()->subMinutes(30)->format('h:i A') }} -
-                                    {{ $eventEndTime->format('h:i A') }}</div>
-                            </div>
-                        </div>
-                        <!-- Optional: Add custom schedule items if stored in database -->
-                        @if ($event->category === 'workshop')
-                            <div class="event-detail-item">
-                                <div class="event-detail-icon">
-                                    <i class="bi bi-laptop-fill"></i>
+
+                        <!-- Attendance -->
+                        <div class="attendance-container mt-2">
+                            @php
+                                $totalAssigned = $event->attendees->count();
+                                $confirmedCount = $event->attendees->where('response_status', 'confirmed')->count();
+
+                                $percent = $totalAssigned > 0 ? ($confirmedCount / $totalAssigned) * 100 : 0;
+                            @endphp
+
+                            <div class="attendance-container mt-2">
+                                <div class="d-flex justify-content-between small">
+                                    <span class="fw-bold">Attendance</span>
+                                    <span class="text-muted">{{ $confirmedCount }}/{{ $totalAssigned }} confirmed</span>
                                 </div>
-                                <div class="event-detail-content">
-                                    <div class="event-detail-label">Hands-on Workshop Session</div>
-                                    <div class="event-detail-value">
-                                        {{ $eventTime->copy()->addMinutes(45)->format('h:i A') }} -
-                                        {{ $eventEndTime->copy()->subMinutes(45)->format('h:i A') }}</div>
+                                <div class="progress progress-custom">
+                                    <div class="progress-bar bg-primary" style="width: {{ $percent }}%"></div>
+                                </div>
+
+                                <div class="d-flex align-items-center mt-2">
+                                    @foreach ($event->attendees->where('response_status', 'confirmed')->take(5) as $attendee)
+                                        <div class="avatar-mini">
+                                            {{ substr($attendee->employee_id, -2) }}
+                                        </div>
+                                    @endforeach
+
+                                    @if ($confirmedCount > 5)
+                                        <span class="ms-2 small text-muted">+{{ $confirmedCount - 5 }} more</span>
+                                    @else
+                                        <span class="ms-3 small text-muted">Going</span>
+                                    @endif
                                 </div>
                             </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
+                        </div>
 
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card event-details-card mb-4">
-                    <div class="card-header">
-                        <i class="bi bi-calendar-date me-2"></i>Event Details
-                    </div>
-                    <div class="event-card-body">
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-calendar-date"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Date</div>
-                                <div class="event-detail-value">
-                                    {{ \Carbon\Carbon::parse($event->event_date)->format('F j, Y') }}</div>
-                            </div>
-                        </div>
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-clock"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Time</div>
-                                <div class="event-detail-value">
-                                    {{ \Carbon\Carbon::parse($event->event_time)->format('h:i A') }}</div>
-                            </div>
-                        </div>
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-map-fill"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Location</div>
-                                <div class="event-detail-value">{{ $event->event_location }}</div>
-                            </div>
-                        </div>
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Category</div>
-                                <div class="event-detail-value text-capitalize">{{ $event->category }}</div>
-                            </div>
-                        </div>
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-person"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Organizer</div>
-                                <div class="event-detail-value">{{ $event->organizer }}</div>
-                            </div>
-                        </div>
-                        @if ($event->tags)
-                            <div class="event-detail-item">
-                                <div class="event-detail-icon">
-                                    <i class="bi bi-tags"></i>
-                                </div>
-                                <div class="event-detail-content">
-                                    <div class="event-detail-label">Tags</div>
-                                    <div class="event-detail-value">
-                                        @php
-                                            $tags = is_array($event->tags) ? $event->tags : json_decode($event->tags, true);
-                                        @endphp
-                                        @foreach ($tags as $tag)
-                                            <span class="tag">{{ $tag }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                        <div class="event-detail-item">
-                            <div class="event-detail-icon">
-                                <i class="bi bi-pencil-fill"></i>
-                            </div>
-                            <div class="event-detail-content">
-                                <div class="event-detail-label">Created By</div>
-                                <div class="event-detail-value">Employee #{{ $event->created_by }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <!-- Action Button -->
+                        <div class="mt-4">
+                            @php
+                                $employeeId = auth()->user()->employee?->employee_id;
 
-        <div class="row">
-            <div class="col-12 col-md-8 mb-4">
-                <div class="card event-details-card">
-                    <div class="card-header">
-                        <i class="bi bi-map-fill me-2"></i>Location
-                    </div>
-                    <div class="event-card-body p-0">
-                        <iframe width="100%" height="250" style="border:0; border-radius: 0 0 10px 10px;"
-                            loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
-                            src="https://www.google.com/maps?q={{ urlencode($event->event_location) }}&output=embed">
-                        </iframe>
-                        <div class="p-2 text-muted small">
-                            <i class="bi bi-geo-alt-fill me-1"></i>{{ $event->event_location }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @if ($event->rsvp_required)
-                <div class="col-12 col-md-4 mb-4">
-                    <!-- Attendance Card -->
-                    <div class="card event-details-card mb-4">
-                        <div class="card-header">
-                            <i class="bi bi-bar-chart-fill me-2"></i>Attendance
-                        </div>
-                        <div class="event-card-body">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span class="event-detail-label">Registered</span>
-                                <span class="event-detail-value">{{ $event->attendees }} / {{ $event->capacity }}</span>
-                            </div>
-                            <div class="capacity-meter">
-                                @php
-                                    $attendancePercentage =
-                                        $event->capacity > 0 ? ($event->attendees / $event->capacity) * 100 : 0;
-                                @endphp
-                                <div class="capacity-fill" style="width: {{ $attendancePercentage }}%"></div>
-                            </div>
-                            <div class="mt-2">
-                                @php
-                                    $spotsLeft = $event->capacity - $event->attendees;
-                                @endphp
-                                <small class="text-muted">{{ $spotsLeft }} spots left</small>
-                            </div>
-
-                            <div class="action-buttons">
-                                @if ($event->event_status === 'upcoming')
-                                    <button class="btn btn-rsvp flex-fill" id="rsvp-button">
-                                        <i class="bi bi-check-circle me-2"></i>Join Now
+                                $myRSVP = $employeeId
+                                    ? $event->attendees->firstWhere('employee_id', $employeeId)
+                                    : null;
+                            @endphp
+                            @if (!$myRSVP || $myRSVP->response_status === 'pending')
+                                <form action="{{ route('event.attendance.confirm', $event->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary w-100 btn-custom">
+                                        <i class="bi bi-check-circle me-2"></i> Confirm Attendance
                                     </button>
-                                @else
-                                    <button class="btn btn-secondary flex-fill" disabled>
-                                        <i class="bi bi-slash-circle me-2"></i>Registration Closed
+                                </form>
+                                <form action="{{ route('event.attendance.decline', $event->id) }}" method="POST"
+                                    class="mt-2">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-secondary w-100 btn-custom">
+                                        <i class="bi bi-x-circle me-2"></i> Decline
                                     </button>
-                                @endif
-                                <button class="btn btn-outline-secondary" id="share-button">
-                                    <i class="bi bi-share me-2"></i>Share
-                                </button>
-                            </div>
+                                </form>
+                            @elseif ($myRSVP->response_status === 'confirmed')
+                                <div class="alert alert-success border-0 text-center py-3 mb-0"
+                                    style="background: #ecfdf5; color: #065f46; border-radius: 12px;">
+                                    <i class="bi bi-check-circle-fill me-2"></i> You're on the list!
+                                </div>
+                            @elseif ($myRSVP->response_status === 'declined')
+                                <div class="alert alert-danger border-0 text-center py-3 mb-0"
+                                    style="background: #fef2f2; color: #991b1b; border-radius: 12px;">
+                                    <i class="bi bi-x-circle-fill me-2"></i> You have declined the invitation.
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
-            @endif
+
+                <!-- Organizer Info -->
+                <div class="card border shadow-sm p-3" style="border-radius: 15px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-box bg-light text-secondary"><i class="bi bi-person-badge"></i></div>
+                        <div>
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.65rem;">Event Created
+                                By</small>
+                            <div class="fw-bold">{{ $event->createdBy->name }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle RSVP/Register button click
-            const actionButton = document.getElementById('rsvp-button') || document.getElementById(
-                'register-button');
-            if (actionButton) {
-                actionButton.addEventListener('click', function() {
-                    // In a real app, you would make an AJAX request here
-                    const buttonText = this.id === 'rsvp-button' ? 'RSVP' : 'Registration';
-                    alert(`Thank you! Your ${buttonText} has been received.`);
-                    this.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${buttonText} Confirmed`;
-                    this.classList.remove('btn-rsvp');
-                    this.classList.add('btn-success');
-                    this.disabled = true;
-                });
-            }
-
-            // Handle share button
-            document.getElementById('share-button').addEventListener('click', function() {
-                if (navigator.share) {
-                    navigator.share({
-                            title: '{{ $event->event_name }}',
-                            text: 'Check out this event!',
-                            url: window.location.href,
-                        })
-                        .catch(console.error);
-                } else {
-                    // Fallback: copy to clipboard
-                    navigator.clipboard.writeText(window.location.href).then(function() {
-                        alert('Event link copied to clipboard!');
-                    });
-                }
-            });
-        });
-    </script>
-@endpush

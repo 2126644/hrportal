@@ -85,4 +85,26 @@ class Employee extends Model
             'task_id'      // local key on task_assignments
         );
     }
+
+    public function eventAttendees()
+    {
+        return $this->hasMany(EventAttendee::class, 'employee_id', 'employee_id');
+    }
+
+    public function events()
+    {
+        return $this->hasManyThrough(
+            Event::class,
+            EventAttendee::class,
+            'employee_id', // FK on event_attendees
+            'id',          // FK on events
+            'employee_id', // local key on employees
+            'event_id'     // local key on event_attendees
+        );
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
 }

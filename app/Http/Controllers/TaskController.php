@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Employee;
 use App\Models\Department;
+use App\Models\TaskAssignment;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -174,7 +175,7 @@ class TaskController extends Controller
             'task_status' => $request->task_status,
             'due_date'   => $request->due_date,
             'notes'      => $request->notes,
-            'created_by' => $employee->employee_id,
+            'created_by' => Auth::id(),
         ]);
 
         // Assign departments
@@ -185,8 +186,12 @@ class TaskController extends Controller
         }
 
         // Assign employees
-        foreach ($request->employee_ids ?? [] as $empId) {
-            $task->assignedTo()->create([
+        $employeeIds = Employee::whereIn('employee_id', $request->employee_ids ?? [])
+            ->pluck('employee_id');
+
+        foreach ($employeeIds as $empId) {
+            TaskAssignment::firstOrCreate([
+                'task_id'    => $task->id,
                 'employee_id' => $empId,
             ]);
         }

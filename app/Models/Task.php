@@ -46,8 +46,6 @@ class Task extends Model
         );
     }
 
-    // App\Models\Task.php
-
     public function assignmentSummary(): array
     {
         $employees = $this->assignedTo;

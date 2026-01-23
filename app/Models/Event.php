@@ -18,31 +18,39 @@ class Event extends Model
         'event_time',
         'event_location',
         'event_category',
-        'capacity',
-        'attendees',
-        'price',
         'image',
         'event_status',
-        'organizer',
         'tags',
-        'rsvp_required'
     ];
 
     // Optional: format date for easy usage in Blade
     protected $casts = [
         'event_date' => 'date',
         'event_time' => 'datetime:H:i',
-        'tags' => 'array',
-        'rsvp_required' => 'boolean',
     ];
 
     public function createdBy()
     {
-        return $this->belongsTo(Employee::class, 'created_by');
+        return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function registrations()
+    // 🔥 MAIN RELATION: raw pivot records
+    public function attendees()
     {
-        return $this->hasMany(EventRegistration::class);
+        return $this->hasMany(EventAttendee::class);
+    }
+
+    // ✅ Convenience relation (optional, but useful)
+    public function employees()
+    {
+        return $this->belongsToMany(
+            Employee::class,
+            'event_attendees',
+            'event_id',
+            'employee_id',
+            'id',
+            'employee_id',
+            'response_status'
+        );
     }
 }

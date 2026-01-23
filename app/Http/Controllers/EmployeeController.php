@@ -353,4 +353,16 @@ class EmployeeController extends Controller
 
         return back()->with('success', 'Profile photo updated successfully.');
     }
+
+    public function getAllEmployees()
+    {
+        return Employee::with('employment.department')
+            ->whereHas('employment', fn($q) => $q->where('employment_status', 'active'))
+            ->get()
+            ->map(fn($e) => [
+                'id'         => $e->employee_id,
+                'name'       => $e->full_name,
+                'department' => $e->employment->department->department_name ?? 'N/A',
+            ]);
+    }
 }

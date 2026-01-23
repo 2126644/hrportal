@@ -220,12 +220,6 @@
                                     <strong>{{ $event->event_name }}</strong>
                                 </div>
 
-                                @if ($event->rsvp_required)
-                                    <div class="text-end">
-                                        <span class="event-rsvp" title="RSVP Required">RSVP</span>
-                                    </div>
-                                @endif
-
                                 <span title="Date">📅 {{ $event->event_date->format('d F Y') }}</span>
                                 <span title="Time">⏰ {{ $event->event_time->format('g:i A') }}</span><br>
                                 <span title="Location">📍 {{ $event->event_location }}</span><br>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Employee;
+use App\Models\EventAttendee;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -18,7 +20,35 @@ class EventController extends Controller
     {
         $user = Auth::user();
         $employee = $user->employee;
-        $query = Event::query()->orderBy('event_date', 'asc');
+
+        $employees = Employee::orderBy('full_name')->get();
+
+        $query = Event::with([
+            'createdBy',
+            'attendees.employee',
+            'attendees.department',
+        ])->orderBy('created_at', 'desc');
+
+        // Employee: only events assigned to them (via pivot)
+        if ($user->role_id !== 2 && $employee) {
+            $query->whereHas('attendees', function ($q) use ($employee) {
+                $q->where('employee_id', $employee->employee_id);
+            });
+        }
+
+        if ($user->role_id === 2) {
+            if ($request->filled('employee_id')) {
+                $query->whereHas('attendees', function ($q) use ($request) {
+                    $q->where('employee_id', $request->employee_id);
+                });
+            }
+
+            if ($request->filled('department_id')) {
+                $query->whereHas('attendees', function ($q) use ($request) {
+                    $q->where('department_id', $request->department_id);
+                });
+            }
+        }
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -33,15 +63,6 @@ class EventController extends Controller
 
         if ($request->filled('event_status')) {
             $query->where('event_status', $request->event_status);
-        }
-
-        // RSVP filter: 'required' => true, 'not_required' => false
-        if ($request->filled('rsvp_status')) {
-            if ($request->rsvp_status === 'required') {
-                $query->where('rsvp_required', true);
-            } elseif ($request->rsvp_status === 'not_required') {
-                $query->where('rsvp_required', false);
-            }
         }
 
         if ($request->filled('event_date')) {
@@ -83,13 +104,12 @@ class EventController extends Controller
             ]);
         }
 
-        $categories = setting('event_categories', []);
+        $eventCategories = setting('event_categories', []);
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
-        $rsvpOptions = ['required' => 'Required', 'not_required' => 'Not Required'];
 
         $view = $user->role_id == 2 ? 'admin.admin-event' : 'employee.employee-event';
 
-        return view($view, compact('events', 'calendarEvents', 'categories', 'eventStatuses', 'rsvpOptions'));
+        return view($view, compact('events', 'employees', 'calendarEvents', 'eventCategories', 'eventStatuses'));
     }
 
     /**
@@ -97,8 +117,38 @@ class EventController extends Controller
      */
     public function create()
     {
-        $role_id = Auth::user()->role_id;
-        return view('employee.createevent', compact('role_id'));
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        $role_id = $user->role_id;
+
+        $employment   = $employee?->employment;
+        $departmentId = $employment?->department_id;
+
+        // Employees from same department
+        $employees = Employee::with('employment.department')
+            ->whereHas('employment', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId)
+                    ->where('employment_status', 'active');
+            })
+            ->get()
+            ->map(fn($e) => [
+                'id'         => $e->employee_id,
+                'name'       => $e->full_name,
+                'department' => $e->employment->department->department_name ?? 'N/A',
+            ]);
+
+        $departments = Department::orderBy('department_name')->get();
+
+        $allEmployees = Employee::with('employment.department')->get()->map(fn($e) => [
+            'id'         => $e->employee_id,
+            'name'       => $e->full_name,
+            'department' => $e->employment->department->department_name ?? 'N/A',
+        ]);
+
+        $eventCategoriesEnum = setting('event_categories', []);
+
+        return view('employee.createevent', compact('role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum'));
     }
 
     /**
@@ -106,24 +156,29 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $employee = Auth::user()->employee;
+        $user = Auth::user();
+
+        if ($user->role_id !== 2 && !$user->employee) {
+            abort(403, 'Employee profile not found. Please contact HR.');
+        }
+
+        $employee = $user->employee;
 
         // ✅ 1. Validate all important columns that are NOT nullable
         $request->validate([
             'event_name'        => 'required|string|max:100',
-            'description'       => 'required|string',
+            'description'       => 'required|string|max:255',
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
             'event_category'    => ['required', Rule::in(setting('event_categories'))],
-            'capacity'          => 'required|integer|min:1',
-            'attendees'         => 'nullable|integer|min:0',
-            'price'             => 'nullable|numeric|min:0',
             'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // max 2MB
             'event_status'      => 'required|in:upcoming,ongoing,completed,cancelled',
-            'organizer'         => 'required|string|max:100',
-            'tags'              => 'nullable|array',    // expecting an array from form
-            'rsvp_required'     => 'nullable|boolean',
+            'tags'              => 'nullable|string|max:100',    // expecting an array from form
+            'department_ids'  => 'array',
+            'department_ids.*' => 'exists:departments,id',
+            'employee_ids'    => 'array',
+            'employee_ids.*'  => 'exists:employees,employee_id',
 
         ]);
 
@@ -136,23 +191,48 @@ class EventController extends Controller
 
         // ✅ 3. Create and save event
         $event = new Event();
-        $event->created_by       = $employee->employee_id;
+        $event->created_by       = Auth::id();
         $event->event_name       = $request->event_name;
         $event->description      = $request->description;
         $event->event_date       = $request->event_date;
         $event->event_time       = $request->event_time;
         $event->event_location   = $request->event_location;
         $event->event_category   = $request->event_category;
-        $event->capacity         = $request->capacity;
-        $event->attendees        = $request->attendees ?? 0; // default
-        $event->price            = $request->price ?? 0;     // default
         $event->image            = $imagePath; // can be null
-        $event->organizer        = $request->organizer;
         $event->tags             = $request->tags;
-        $event->rsvp_required    = $request->boolean('rsvp_required', false);
         // event_status defaults to "upcoming" in the migration
 
         $event->save();
+
+        if ($request->boolean('assign_all')) {
+            $employees = Employee::all();
+
+            foreach ($employees as $emp) {
+                EventAttendee::create([
+                    'event_id'    => $event->id,
+                    'employee_id' => $emp->employee_id,
+                    'response_status' => 'pending',
+                ]);
+            }
+        } else {
+            // Assign departments
+            foreach ($request->department_ids ?? [] as $deptId) {
+                $event->attendees()->create([
+                    'department_id' => $deptId,
+                ]);
+            }
+
+            // Assign employees
+            $employeeIds = Employee::whereIn('employee_id', $request->employee_ids ?? [])
+                ->pluck('employee_id');
+
+            foreach ($employeeIds as $empId) {
+                EventAttendee::firstOrCreate([
+                    'event_id'    => $event->id,
+                    'employee_id' => $empId,
+                ]);
+            }
+        }
 
         return redirect()->route('event.create')->with('success', 'Event created successfully!');
     }
@@ -162,8 +242,17 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
+        $user = Auth::user();
+        $employee = $user->employee;
+
         $event = Event::findOrFail($id);
-        return view('employee.employee-eventshow', compact('event'));
+
+        $eventCategories = setting('event_categories', []);
+        $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
+
+        $view = $user->role_id == 2 ? 'admin.admin-eventshow' : 'employee.employee-eventshow';
+
+        return view($view, compact('event', 'eventCategories', 'eventStatuses'));
     }
 
     /**
@@ -171,9 +260,56 @@ class EventController extends Controller
      */
     public function edit(string $id)
     {
-        $event = Event::findOrFail($id);
-        $role_id = Auth::user()->role_id;
-        return view('employee.editevent', compact('event', 'role_id'));
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        $role_id = $user->role_id;
+
+        // ✅ LOAD EVENT
+        $event = Event::with('attendees')->findOrFail($id);
+
+        $employment   = $employee?->employment;
+        $departmentId = $employment?->department_id;
+
+        // Employees from same department
+        $employees = Employee::with('employment.department')
+            ->whereHas('employment', function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId)
+                    ->where('employment_status', 'active');
+            })
+            ->get()
+            ->map(fn($e) => [
+                'id'         => $e->employee_id,
+                'name'       => $e->full_name,
+                'department' => $e->employment->department->department_name ?? 'N/A',
+            ]);
+
+        $departments = Department::orderBy('department_name')->get();
+
+        $allEmployees = Employee::with('employment.department')->get()->map(fn($e) => [
+            'id'         => $e->employee_id,
+            'name'       => $e->full_name,
+            'department' => $e->employment->department?->department_name ?? 'N/A',
+        ]);
+
+        $selectedDepartmentIds = $event->attendees()
+            ->whereNotNull('department_id')
+            ->pluck('department_id')
+            ->toArray();
+
+        $assignedEmployees = $event->attendees()
+            ->whereNotNull('employee_id')
+            ->with('employee.department')
+            ->get()
+            ->map(fn($a) => [
+                'id' => $a->employee->employee_id,
+                'name' => $a->employee->full_name,
+                'department' => $a->employee->department?->department_name ?? 'N/A',
+            ]);
+
+        $eventCategoriesEnum = setting('event_categories', []);
+
+        return view('employee.editevent', compact('event', 'role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum', 'selectedDepartmentIds', 'assignedEmployees'));
     }
 
     /**
@@ -181,41 +317,83 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $event = Event::findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->role_id !== 2 && !$user->employee) {
+            abort(403, 'Employee profile not found. Please contact HR.');
+        }
 
         // ✅ 1. Validate all important columns that are NOT nullable
-        $validated = $request->validate([
+        $request->validate([
             'event_name'        => 'required|string|max:100',
-            'description'       => 'required|string',
+            'description'       => 'required|string|max:255',
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
-            'category'          => ['required', Rule::in(setting('event_categories'))],
-            'capacity'          => 'required|integer|min:1',
-            'attendees'         => 'nullable|integer|min:0',
-            'price'             => 'nullable|numeric|min:0',
+            'event_category'    => ['required', Rule::in(setting('event_categories'))],
             'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // max 2MB
             'event_status'      => 'required|in:upcoming,ongoing,completed,cancelled',
-            'organizer'         => 'required|string|max:100',
-            'tags'              => 'nullable|array',    // expecting an array from form
-            'rsvp_required'     => 'nullable|boolean',
+            'tags'              => 'nullable|string|max:100',    // expecting an array from form
+            'department_ids'  => 'array',
+            'department_ids.*' => 'exists:departments,id',
+            'employee_ids'    => 'array',
+            'employee_ids.*'  => 'exists:employees,employee_id',
+
         ]);
 
-        // Handle image upload if there’s a new one
+        // ✅ 3. Create and save event
+        $event = Event::findOrFail($id);
+
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('events', 'public');
-            $validated['image'] = $imagePath;
-        } else {
-            $validated['image'] = $event->image; // keep old image if not replaced
+            $event->image = $request->file('image')->store('events', 'public');
         }
 
-        // Checkbox fix (since unchecked means "not sent")
-        $validated['rsvp_required'] = $request->has('rsvp_required');
+        $event->update([
+            'event_name'     => $request->event_name,
+            'description'    => $request->description,
+            'event_date'     => $request->event_date,
+            'event_time'     => $request->event_time,
+            'event_location' => $request->event_location,
+            'event_category' => $request->event_category,
+            'event_status'   => $request->event_status,
+            'tags'           => $request->tags,
+        ]);
 
-        // Update event
-        $event->update($validated);
+        // Reset attendees
+        $event->attendees()->delete();
 
-        return redirect()->route('event.show', $event->id)->with('success', 'Event updated successfully!');
+        if ($request->boolean('assign_all')) {
+            $employees = Employee::all();
+
+            foreach ($employees as $emp) {
+                EventAttendee::create([
+                    'event_id'    => $event->id,
+                    'employee_id' => $emp->employee_id,
+                    'response_status' => 'pending',
+                ]);
+            }
+        } else {
+
+            // Assign departments
+            foreach ($request->department_ids ?? [] as $deptId) {
+                $event->attendees()->create([
+                    'department_id' => $deptId,
+                ]);
+            }
+
+            // Assign employees
+            $employeeIds = Employee::whereIn('employee_id', $request->employee_ids ?? [])
+                ->pluck('employee_id');
+
+            foreach ($employeeIds as $empId) {
+                EventAttendee::firstOrCreate([
+                    'event_id'    => $event->id,
+                    'employee_id' => $empId,
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Event updated successfully!');
     }
 
     /**

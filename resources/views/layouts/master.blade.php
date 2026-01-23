@@ -89,10 +89,16 @@
 
                     <div class="dropdown-menu dropdown-menu-end">
                         @forelse(auth()->user()->unreadNotifications as $notification)
-                            <a href="{{ route('announcement.index.admin') }}" class="dropdown-item">
-                                <strong>{{ $notification->data['message'] }}</strong>
+                            @php
+                                $link =
+                                    $notification->type === 'App\Notifications\EventReminderNotification'
+                                        ? route('event.index.admin')
+                                        : route('announcement.index.admin');
+                            @endphp
+                            <a href="{{ $link }}" class="dropdown-item">
+                                <strong>{{ $notification->data['title'] ?? $notification->data['message'] }}</strong>
                                 <br>
-                                <small>{{ $notification->data['content'] }}</small>
+                                <small>{{ $notification->data['message'] ?? $notification->data['content'] }}</small>
                                 <br>
                                 <small>{{ $notification->created_at->diffForHumans() }}</small>
                             </a>

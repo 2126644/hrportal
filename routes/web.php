@@ -16,6 +16,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\EmploymentApproverController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\EventAttendeeController;
 
 use App\Models\Employee;
 use App\Models\User;
@@ -102,6 +103,9 @@ Route::middleware(['auth', 'force.password.reset'])->group(function () {
     Route::put('/event/{id}', [EventController::class, 'update'])->name('event.update');
     Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
 
+    Route::post('/event/{myAttendance}/attendance/confirm', [EventAttendeeController::class, 'confirm'])->name('event.attendance.confirm');
+    Route::post('/event/{myAttendance}/attendance/decline', [EventAttendeeController::class, 'decline'])->name('event.attendance.decline');
+
     Route::get('/profile/show/{employee?}', [EmployeeController::class, 'show'])->name('profile.show');
     Route::get('/profile/settings', [EmployeeController::class, 'settings'])->name('profile.settings');
     Route::get('/profile/{id}/print', [EmployeeController::class, 'downloadProfile'])->name('profile.print');
@@ -144,7 +148,17 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/tasks', [TaskController::class, 'index'])->name('task.index.admin');
 
-    Route::get('/admin/event', [EventController::class, 'index'])->name('event.index.admin');
+    Route::get('/admin/events', [EventController::class, 'index'])->name('event.index.admin');
+    Route::get('/admin/event/{id}/attendees', [EventController::class, 'attendees'])->name('event.attendees');
+    // Route::post('/admin/event', [EventController::class, 'edit'])->name('event.edit');
+
+    // Route::get('/event', [EventController::class, 'index'])->name('event.index.employee');
+    // Route::post('/event', [EventController::class, 'store'])->name('event.store');
+    // Route::get('/event/create', [EventController::class, 'create'])->name('event.create');
+    // Route::get('/event/{id}', [EventController::class, 'show'])->name('event.show');
+    // Route::get('/event/{id}/edit', [EventController::class, 'edit'])->name('event.edit');
+    // Route::put('/event/{id}', [EventController::class, 'update'])->name('event.update');
+    // Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
 
     Route::get('/admin/projects', [ProjectController::class, 'index'])->name('project.index.admin');
 
@@ -162,4 +176,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/admin/settings', [SettingController::class, 'index'])->name('settings');
     Route::post('/admin/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    Route::get('/employees/all', [EmployeeController::class, 'getAllEmployees'])->name('employees.all');
 });
