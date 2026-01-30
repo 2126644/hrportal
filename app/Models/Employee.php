@@ -59,11 +59,21 @@ class Employee extends Model
         return $this->hasOne(Employment::class, 'employee_id', 'employee_id');
     }
 
-    public function approvers()
+    public function approvers() // for leaves
     {
         return $this->belongsToMany(
             Employee::class,
-            'employment_approvers',
+            'request_approvers',
+            'employee_id',
+            'approver_id'
+        )->withPivot('level')->orderBy('pivot_level');
+    }
+
+    public function formApprovers() // for forms
+    {
+        return $this->belongsToMany(
+            Employee::class,
+            'form_approvers',
             'employee_id',
             'approver_id'
         )->withPivot('level')->orderBy('pivot_level');

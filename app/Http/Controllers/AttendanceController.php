@@ -435,18 +435,6 @@ class AttendanceController extends Controller
         return redirect()->back()->with('success', 'Time slip request submitted.');
     }
 
-    public function approveTimeSlip(Request $request, Attendance $attendance)
-    {
-        $request->validate([
-            'action' => 'required|in:approved,rejected'
-        ]);
-
-        $attendance->time_slip_status = $request->action;
-        $attendance->save();
-
-        return redirect()->back()->with('success', 'Time slip has been approved.');
-    }
-
     public function pendingTimeSlips()
     {
         $pendingTimeSlips = Attendance::with('employee')

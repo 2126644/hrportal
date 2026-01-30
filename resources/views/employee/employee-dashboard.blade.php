@@ -234,7 +234,7 @@
             </div>
 
             <!-- Calendar Column -->
-            <div class="col-12 col-md-4 mb-4 d-flex">
+            {{-- <div class="col-12 col-md-4 mb-4 d-flex">
                 <div class="card w-100 h-100">
                     <div class="card-header">
                         <h4 class="card-title">Calendar</h4>
@@ -243,7 +243,7 @@
                         <div id="calendar-doctor" class="calendar-container"></div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 @endsection

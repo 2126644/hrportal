@@ -21,74 +21,124 @@
             </div>
         </div>
 
-        <!-- Stats Overview -->
-        <div class="row mb-4">
-            <!-- Total Employees -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted mb-2">Total Employees</h6>
-                                <h3 class="mb-0">{{ $totalEmployees }}</h3>
-                                <small class="text-success">Active employees</small>
+        <!-- Profile Summary & System Status Section -->
+        <div class="row mb-4 g-4 stretch-card">
+            <!-- Profile Card -->
+            <div class="col-12 col-lg-8">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-body p-4 d-flex flex-column justify-content-center">
+                        <!-- Centered content vertically -->
+                        <div class="d-flex align-items-center flex-column flex-md-row">
+                            <!-- Avatar Section -->
+                            <div class="position-relative mb-3 mb-md-0 me-md-4">
+                                <img src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_url) : asset('img/default-avatar.png') }}"
+                                    alt="{{ Auth::user()->name }}"
+                                    class="rounded-circle border border-4 border-light shadow-sm"
+                                    style="width:120px; height:120px; object-fit:cover;">
                             </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-people-fill text-primary"></i>
+
+                            <!-- User Info Section -->
+                            <div class="flex-grow-1 text-center text-md-start">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <h3 class="mb-0 fw-bold text-dark mb-2">{{ Auth::user()->name }}</h3>
+                                        <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1 mb-3"
+                                            style="font-size: 0.75rem;">
+                                            <i class="bi bi-shield-check me-1"></i>
+                                            {{ ucfirst(Auth::user()->role->role_name) }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-md-0">
+                                        <a href="{{ route('admin.profile.settings') }}"
+                                            class="btn btn-outline-primary btn-sm rounded-pill px-4 shadow-sm">
+                                            <i class="bi bi-gear-fill me-1"></i> Account Settings
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Details Section (Adjusted spacing) -->
+                                <div class="row g-3 mt-1 pt-3 border-top">
+                                    <div class="col-sm-auto me-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 text-primary me-3">
+                                                <i class="bi bi-person-badge fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block lh-1 mb-1"
+                                                    style="font-size: 0.7rem;">EMPLOYEE ID</small>
+                                                <span class="fw-bold text-dark">#{{ Auth::user()->id }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 text-primary me-3">
+                                                <i class="bi bi-envelope fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block lh-1 mb-1" style="font-size: 0.7rem;">EMAIL
+                                                    ADDRESS</small>
+                                                <span class="fw-bold text-dark">{{ Auth::user()->email }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Present Today -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
+            <!-- System Status Card -->
+            <div class="col-12 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted mb-2">Present Today</h6>
-                                <h3 class="mb-0">{{ $presentToday }}</h3>
-                                <small class="text-muted">/ {{ $totalEmployees }} employees</small>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-person-check text-success"></i>
-                            </div>
+                            <h5 class="mb-0 fw-bold text-dark">System Overview</h5>
+                            <span class="badge bg-soft-success text-success px-3 py-1">Live</span>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <div class="card-body p-4">
+                        <div class="list-group list-group-flush">
+                            <div
+                                class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary-soft rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                        style="width: 36px; height: 36px;">
+                                        <i class="bi bi-database text-primary"></i>
+                                    </div>
+                                    <span class="fw-medium text-dark">Database</span>
+                                </div>
+                                <span class="text-success small fw-bold"><i class="bi bi-circle-fill me-1"
+                                        style="font-size: 6px;"></i> Connected</span>
+                            </div>
 
-            <!-- Pending Leave -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted mb-2">Pending Leave</h6>
-                                <h3 class="mb-0">{{ $pendingLeaves }}</h3>
-                                <small class="text-warning">Requires approval</small>
+                            <div
+                                class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info-soft rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                        style="width: 36px; height: 36px;">
+                                        <i class="bi bi-people text-info"></i>
+                                    </div>
+                                    <span class="fw-medium text-dark">Active Users</span>
+                                </div>
+                                <span
+                                    class="badge bg-light text-dark fw-bold rounded-pill px-3">{{ $totalEmployees ?? 0 }}</span>
                             </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-clock-history text-warning"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Active Tasks -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted mb-2">Active Tasks</h6>
-                                <h3 class="mb-0">{{ $activeTasks }}</h3>
-                                <small class="text-info">In progress</small>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-list-task text-info"></i>
+                            <div
+                                class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-warning-soft rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                        style="width: 36px; height: 36px;">
+                                        <i class="bi bi-clock-history text-warning"></i>
+                                    </div>
+                                    <span class="fw-medium text-dark">Sync Status</span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="text-dark small fw-bold lh-1">{{ now()->format('G:i A') }}</div>
+                                    <small class="text-muted" style="font-size: 0.65rem;">Last update</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -132,7 +182,7 @@
                         <div class="request-list">
                             @forelse($recentRequests as $request)
                                 <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
-                                    onclick="window.location.href='{{ route('admin.request') }}'"
+                                    onclick="window.location.href='{{ route('admin.requests') }}'"
                                     style="cursor: pointer; border-radius: 8px;">
                                     <div class="d-flex align-items-center">
                                         <div
@@ -170,7 +220,7 @@
 
                         <!-- View All Link -->
                         <div class="text-center">
-                            <a href="{{ route('admin.request') }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('admin.requests') }}" class="btn btn-outline-primary btn-sm">
                                 View All Requests <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -200,8 +250,8 @@
                                         </span>
                                     </div>
                                     <p class="text-muted mb-1 small">{{ Str::limit($announcement->description, 100) }}</p>
-                                    <small
-                                        class="text-muted">Posted at: {{ $announcement->created_at->format('M j, g:i A') }}</small>
+                                    <small class="text-muted">Posted at:
+                                        {{ $announcement->created_at->format('M j, g:i A') }}</small>
                                 </div>
                             @empty
                                 <p class="text-muted small">No recent announcements found.</p>
@@ -326,27 +376,6 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">System Status</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="system-status">
-                            <div class="status-item d-flex justify-content-between align-items-center mb-2">
-                                <span>Database</span>
-                                <span class="badge bg-success">Online</span>
-                            </div>
-                            <div class="status-item d-flex justify-content-between align-items-center mb-2">
-                                <span>Active Users</span>
-                                <span class="text-muted">{{ $totalEmployees }}</span>
-                            </div>
-                            <div class="status-item d-flex justify-content-between align-items-center">
-                                <span>Last Update</span>
-                                <span class="text-muted">{{ now()->format('M j, g:i A') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

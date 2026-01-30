@@ -32,13 +32,7 @@
         <!-- Tabs navigation -->
         <ul class="nav nav-tabs" id="leaveTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar"
-                    type="button" role="tab" aria-controls="calendar" aria-selected="true">
-                    Calendar
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="leave-application-tab" data-bs-toggle="tab" data-bs-target="#leave-application"
+                <button class="nav-link active" id="leave-application-tab" data-bs-toggle="tab" data-bs-target="#leave-application"
                     type="button" role="tab" aria-controls="leave-application" aria-selected="false">
                     Leave Application
                 </button>
@@ -54,10 +48,6 @@
         <!-- Tabs content -->
         <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="leaveTabsContent"
             style="min-height: 500px;">
-            <!-- Calendar tab -->
-            <div class="tab-pane fade show active" id="calendar" role="tabpanel" aria-labelledby="calendar-tab">
-                <div id="leaveCalendar"></div>
-            </div>
 
             <!-- Leave Application tab -->
             <div class="tab-pane fade" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
@@ -174,23 +164,23 @@
                                             <th>Start Date</th>
                                             <th>End Date</th>
                                             <th>Duration</th>
-                                            <th>Reason</th>
+                                            <th>Leave Reason</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody id="leavesTable">
                                         @foreach ($leaves as $leave)
-                                            <tr data-status="{{ $leave->status }}">
+                                            <tr data-status="{{ $leave->leave_status }}">
                                                 <td>{{ $leave->created_at->format('d M Y') }}</td>
                                                 <td>{{ ucfirst($leave->leave_type) }} Leave</td>
                                                 <td>{{ $leave->start_date->format('d M Y') }}</td>
                                                 <td>{{ $leave->end_date->format('d M Y') }}</td>
                                                 <td>{{ $leave->days }} days</td>
-                                                <td>{{ $leave->reason }}</td>
+                                                <td>{{ $leave->leave_reason }}</td>
                                                 <td>
-                                                    @if ($leave->status === 'approved')
+                                                    @if ($leave->leave_status === 'approved')
                                                         <span class="badge bg-success">Approved</span>
-                                                    @elseif ($leave->status === 'rejected')
+                                                    @elseif ($leave->leave_status === 'rejected')
                                                         <span class="badge bg-danger">Rejected</span>
                                                     @else
                                                         <span class="badge bg-warning text-dark">Pending</span>
@@ -357,32 +347,6 @@
     </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var calendarEl = document.getElementById('leaveCalendar');
-
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'dayGridMonth',
-                    height: 500,
-                    themeSystem: 'bootstrap5',
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: ''
-                    },
-                    events: @json($employeeLeaves),
-                    eventDidMount: function(info) {
-                        // tooltip on hover (using Bootstrap tooltip)
-                        var tooltip = new bootstrap.Tooltip(info.el, {
-                            title: info.event.title,
-                            placement: 'top',
-                            trigger: 'hover',
-                            container: 'body'
-                        });
-                    }
-                });
-
-                calendar.render();
-            });
 
             document.querySelectorAll('.filter-card').forEach(card => {
                 card.addEventListener('click', function() {

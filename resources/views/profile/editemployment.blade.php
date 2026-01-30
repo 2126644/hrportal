@@ -11,7 +11,7 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                                         <li class="breadcrumb-item"><a href="{{ route('admin.employee') }}">Employees</a>
                                         </li>
                                         <li class="breadcrumb-item active" aria-current="page">Edit Employment</li>
@@ -51,6 +51,115 @@
                             @error('employee_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="position" class="form-label">Position</label>
+                                <input type="text" id="position" name="position" class="form-control"
+                                    placeholder="Enter Position" value="{{ old('position', $employment?->position) }}">
+                                @error('position')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="date_of_employment" class="form-label">Date of Employment</label>
+                                <input type="date" id="date_of_employment" name="date_of_employment" class="form-control"
+                                    value="{{ old('date_of_employment', $employment?->date_of_employment?->format('Y-m-d')) }}">
+                                @error('date_of_employment')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="department_id" class="form-label">Department <span
+                                    class="text-danger">*</span></label>
+                            <select id="department_id" name="department_id" class="form-select" required>
+                                <option value="" disabled
+                                    {{ old('department_id', $employment?->department_id) ? '' : 'selected' }}>
+                                    Select department
+                                </option>
+                                @foreach ($departments as $department)
+                                    <option value="{{ $department->id }}"
+                                        {{ old('department_id', $employment?->department_id) == $department->id ? 'selected' : '' }}>
+                                        {{ ucfirst($department->department_name) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('department_id')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="company_branch" class="form-label">Company Branch <span
+                                    class="text-danger">*</span></label>
+                            <select id="company_branch" name="company_branch" class="form-select" required>
+                                <option value="" disabled {{ old('company_branch') ? '' : 'selected' }}>Select
+                                    branch
+                                </option>
+                                @php
+                                    $company_branches = ['AHG', 'D-8CEFC'];
+                                @endphp
+                                @foreach ($company_branches as $branch)
+                                    <option value="{{ $branch }}"
+                                        {{ old('company_branch', $employment?->company_branch) === $branch ? 'selected' : '' }}>
+                                        {{ ucfirst($branch) }}</option>
+                                @endforeach
+                            </select>
+                            @error('company_branch')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="report_to" class="form-label">Report To <span class="text-danger">*</span></label>
+                            <select id="report_to" name="report_to" class="form-select" required>
+                                <option value="" disabled {{ old('report_to') ? '' : 'selected' }}>Select
+                                    employee
+                                </option>
+                                @php
+                                    $employees = \App\Models\Employee::where(
+                                        'employee_id',
+                                        '!=',
+                                        $employee->employee_id,
+                                    )->get();
+                                @endphp
+                                @foreach ($employees as $emp)
+                                    <option value="{{ $emp->employee_id }}"
+                                        {{ old('report_to', $employment?->report_to) === $emp->employee_id ? 'selected' : '' }}>
+                                        {{ ucfirst($emp->full_name) }}</option>
+                                @endforeach
+                            </select>
+                            @error('report_to')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="work_start_time" class="form-label">Work Start Time <span
+                                        class="text-danger">*</span></label>
+                                <input type="time" id="work_start_time" name="work_start_time" class="form-control"
+                                    value="{{ old('work_start_time', $employment?->work_start_time?->format('H:i')) }}"
+                                    required>
+                                @error('work_start_time')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="work_end_time" class="form-label">Work End Time <span
+                                        class="text-danger">*</span></label>
+                                <input type="time" id="work_end_time" name="work_end_time" class="form-control"
+                                    value="{{ old('work_end_time', $employment?->work_end_time?->format('H:i')) }}"
+                                    required>
+                                @error('work_end_time')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="col-md-12 mb-3">
@@ -103,117 +212,27 @@
                             @enderror
                         </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label for="company_branch" class="form-label">Company Branch <span
-                                    class="text-danger">*</span></label>
-                            <select id="company_branch" name="company_branch" class="form-select" required>
-                                <option value="" disabled {{ old('company_branch') ? '' : 'selected' }}>Select
-                                    branch
-                                </option>
-                                @php
-                                    $company_branches = ['AHG', 'D-8CEFC'];
-                                @endphp
-                                @foreach ($company_branches as $branch)
-                                    <option value="{{ $branch }}"
-                                        {{ old('company_branch', $employment?->company_branch) === $branch ? 'selected' : '' }}>
-                                        {{ ucfirst($branch) }}</option>
-                                @endforeach
-                            </select>
-                            @error('company_branch')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-12 mb-3">
-                            <label for="report_to" class="form-label">Report To <span class="text-danger">*</span></label>
-                            <select id="report_to" name="report_to" class="form-select" required>
-                                <option value="" disabled {{ old('report_to') ? '' : 'selected' }}>Select
-                                    employee
-                                </option>
-                                @php
-                                    $employees = \App\Models\Employee::where(
-                                        'employee_id',
-                                        '!=',
-                                        $employee->employee_id,
-                                    )->get();
-                                @endphp
-                                @foreach ($employees as $emp)
-                                    <option value="{{ $emp->employee_id }}"
-                                        {{ old('report_to', $employment?->report_to) === $emp->employee_id ? 'selected' : '' }}>
-                                        {{ ucfirst($emp->full_name) }}</option>
-                                @endforeach
-                            </select>
-                            @error('report_to')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-12 mb-3">
-                            <label for="department_id" class="form-label">Department <span
-                                    class="text-danger">*</span></label>
-                            <select id="department_id" name="department_id" class="form-select" required>
-                                <option value="" disabled
-                                    {{ old('department_id', $employment?->department_id) ? '' : 'selected' }}>
-                                    Select department
-                                </option>
-                                @foreach ($departments as $department)
-                                    <option value="{{ $department->id }}"
-                                        {{ old('department_id', $employment?->department_id) == $department->id ? 'selected' : '' }}>
-                                        {{ ucfirst($department->department_name) }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('department_id')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6 mb-3">
-                                <label for="position" class="form-label">Position</label>
-                                <input type="text" id="position" name="position" class="form-control"
-                                    placeholder="Enter Position" value="{{ old('position', $employment?->position) }}">
-                                @error('position')
+                        <div class="row g-3 mb-3 date-group" data-type="contract intern">
+                            <div class="col-md-6">
+                                <label for="contract_start" class="form-label">Contract Start</label>
+                                <input type="date" id="contract_start" name="contract_start" class="form-control"
+                                    value="{{ old('contract_start', $employment?->contract_start) }}">
+                                @error('contract_start')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="date_of_employment" class="form-label">Date of Employment</label>
-                                <input type="date" id="date_of_employment" name="date_of_employment"
-                                    class="form-control"
-                                    value="{{ old('date_of_employment', $employment?->date_of_employment?->format('Y-m-d')) }}">
-                                @error('date_of_employment')
+                            <div class="col-md-6">
+                                <label for="contract_end" class="form-label">Contract End</label>
+                                <input type="date" id="contract_end" name="contract_end" class="form-control"
+                                    value="{{ old('contract_end', $employment?->contract_end) }}">
+                                @error('contract_end')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6 mb-3">
-                                <label for="work_start_time" class="form-label">Work Start Time <span
-                                        class="text-danger">*</span></label>
-                                <input type="time" id="work_start_time" name="work_start_time" class="form-control"
-                                    value="{{ old('work_start_time', $employment?->work_start_time?->format('H:i')) }}"
-                                    required>
-                                @error('work_start_time')
-                                    <div class="text-danger small">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="work_end_time" class="form-label">Work End Time <span
-                                        class="text-danger">*</span></label>
-                                <input type="time" id="work_end_time" name="work_end_time" class="form-control"
-                                    value="{{ old('work_end_time', $employment?->work_end_time?->format('H:i')) }}"
-                                    required>
-                                @error('work_end_time')
-                                    <div class="text-danger small">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-3">
+                        <div class="row g-3 mb-3 date-group" data-status="probation">
                             <div class="col-md-6">
                                 <label for="probation_start" class="form-label">Probation Start</label>
                                 <input type="date" id="probation_start" name="probation_start" class="form-control"
@@ -233,7 +252,7 @@
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-3">
+                        <div class="row g-3 mb-3 date-group" data-status="suspended">
                             <div class="col-md-6">
                                 <label for="suspension_start" class="form-label">Suspension Start</label>
                                 <input type="date" id="suspension_start" name="suspension_start" class="form-control"
@@ -253,8 +272,8 @@
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-3 mb-3 date-group" data-status="resigned">
+                            <div class="col-md-6">
                                 <label for="resignation_date" class="form-label">Resignation Date</label>
                                 <input type="date" id="resignation_date" name="resignation_date" class="form-control"
                                     value="{{ old('resignation_date', $employment?->resignation_date) }}">
@@ -263,7 +282,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label for="last_working_day" class="form-label">Last Working Day</label>
                                 <input type="date" id="last_working_day" name="last_working_day" class="form-control"
                                     value="{{ old('last_working_day', $employment?->last_working_day) }}">
@@ -271,8 +290,10 @@
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-3 mb-3 date-group" data-status="terminated">
+                            <div class="col-md-12">
                                 <label for="termination_date" class="form-label">Termination Date</label>
                                 <input type="date" id="termination_date" name="termination_date" class="form-control"
                                     value="{{ old('termination_date', $employment?->termination_date) }}">
@@ -293,7 +314,7 @@
                         </div>
                     </form>
 
-                    <form method="POST" action="{{ route('employees.approvers.store', $employee) }}">
+                    <form method="POST" action="{{ route('request.approvers.store', $employee) }}">
                         @csrf
 
                         {{-- LEVEL 0 (ADMIN – READ ONLY) --}}
@@ -365,3 +386,34 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const typeSelect = document.getElementById('employment_type');
+            const statusSelect = document.getElementById('employment_status');
+            const groups = document.querySelectorAll('.date-group');
+
+            function updateVisibility() {
+                const type = typeSelect.value;
+                const status = statusSelect.value;
+
+                groups.forEach(group => {
+                    const types = group.dataset.type?.split(' ') || [];
+                    const statuses = group.dataset.status?.split(' ') || [];
+
+                    const showByType = types.length === 0 || types.includes(type);
+                    const showByStatus = statuses.length === 0 || statuses.includes(status);
+
+                    group.style.display = (showByType && showByStatus) ? '' : 'none';
+                });
+            }
+
+            typeSelect.addEventListener('change', updateVisibility);
+            statusSelect.addEventListener('change', updateVisibility);
+
+            // 🔥 Run once on page load (EDIT form support)
+            updateVisibility();
+        });
+    </script>
+@endpush

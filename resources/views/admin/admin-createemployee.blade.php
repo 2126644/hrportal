@@ -64,6 +64,10 @@
                             @error('email')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
+
+                            <small class="text-muted">
+                                A verification email will be sent to this email address.
+                            </small>
                         </div>
 
                         <div class="mb-3">
@@ -87,7 +91,7 @@
                             </small>
                         </div>
 
-                        <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800">
+                        <div class="mb-3 bg-yellow-50 p-3 rounded text-sm text-yellow-800">
                             A temporary password will be generated automatically and emailed to the user.
                         </div>
 

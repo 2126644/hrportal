@@ -152,7 +152,7 @@
             @auth
                 <!-- Admin Navigation (Role ID: 2) -->
                 @if (Auth::user()->role_id == '2')
-                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('admin.dashboard', 'admin.profile*') ? 'active' : '' }}"
                         href="{{ route('admin.dashboard') }}">
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
@@ -162,7 +162,7 @@
                         <i class="bi bi-megaphone"></i>
                         <span>Announcement</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.employee*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('admin.employee*', 'profile*') ? 'active' : '' }}"
                         href="{{ route('admin.employee') }}">
                         <i class="bi bi-people"></i>
                         <span>Employee</span>
@@ -187,20 +187,25 @@
                         <i class="bi bi-megaphone"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.request*') ? 'active' : '' }}"
-                        href="{{ route('admin.request') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.requests*') ? 'active' : '' }}"
+                        href="{{ route('admin.requests') }}">
                         <i class="bi bi-clipboard"></i>
                         <span>Request</span>
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
-                        href="{{ route('profile.show') }}">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Profile</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('settings*') ? 'active' : '' }}"
                         href="{{ route('settings') }}">
                         <i class="bi bi-gear"></i>
-                        <span>Settings</span>
+                        <span>System Settings</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}"
+                        href="{{ route('calendar.index') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Calendar</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
+                        href="{{ route('form.admin') }}">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Form</span>
                     </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
@@ -252,6 +257,23 @@
                         <i class="bi bi-person-circle"></i>
                         <span>Profile</span>
                     </a>
+                    <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}"
+                        href="{{ route('calendar.index') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Calendar</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
+                        href="{{ route('form.myforms') }}">
+                        <i class="bi bi-clipboard"></i>
+                        <span>My Forms</span>
+                    </a>
+                    @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
+                        <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
+                            href="{{ route('form.employee') }}">
+                            <i class="bi bi-clipboard"></i>
+                            <span>Forms</span>
+                        </a>
+                    @endif
                 @endif
             @endauth
         </div>
@@ -314,7 +336,7 @@
     <!-- Footer -->
     <footer class="text-center py-3 mt-4 text-muted">
         <div class="container">
-            &copy; {{ date('Y') }} Al-Hidayah Group HR Portal. All Rights Reserved.
+            &copy; {{ date('Y') }} Teha. All Rights Reserved.
         </div>
     </footer>
 </body>

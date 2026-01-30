@@ -36,8 +36,7 @@
         <div class="row">
             @forelse ($announcements as $announcement)
                 <div class="col-md-6 mb-3 announcement-item" data-status="{{ $announcement->priority }}">
-                    <div class="card h-100" data-bs-toggle="modal"
-                        data-bs-target="#announcementModal{{ $announcement->id }}" style="cursor:pointer;">
+                    <div class="card h-100" data-announcement-id="{{ $announcement->id }}" style="cursor:pointer;">
 
                         <div class="card-body">
                             <div class="row">
@@ -82,6 +81,24 @@
                                             </span>
                                         @break
                                     @endswitch
+
+                                    <div class="announcement-actions dropdown">
+                                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteAnnouncementModal"
+                                                    data-announcement-id="{{ $announcement->id }}"
+                                                    data-announcement-name="{{ $announcement->title }}">
+                                                    <i class="bi bi-trash me-2"></i> Delete Announcement
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
 
                                     <h5 class="fw-bold mb-2 text-dark">{{ $announcement->title }}</h5>
                                     <p class="text-muted mb-3">{{ $announcement->description }}</p>
@@ -242,6 +259,77 @@
             </div>
         @endforeach
 
+        <div class="modal fade" id="deleteAnnouncementModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="deleteAnnouncementForm" method="POST">
+                        @csrf
+                        @method('DELETE')
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Announcement</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p>
+                                Are you sure you want to delete
+                                <strong id="deleteAnnouncementName"></strong>?
+                            </p>
+                            <p class="text-danger small mb-0">
+                                This action cannot be undone.
+                            </p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                Delete
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Handle card clicks to open announcement modal, but skip if clicking on actions
+                document.querySelectorAll('.card[data-announcement-id]').forEach(card => {
+                    card.addEventListener('click', function(event) {
+                        if (!event.target.closest('.announcement-actions')) {
+                            const announcementId = this.getAttribute('data-announcement-id');
+                            const modal = new bootstrap.Modal(document.getElementById(
+                                'announcementModal' + announcementId));
+                            modal.show();
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteModal = document.getElementById('deleteAnnouncementModal');
+
+                deleteModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget; // the clicked delete link
+
+                    const announcementId = button.getAttribute('data-announcement-id');
+                    const announcementName = button.getAttribute('data-announcement-name');
+
+                    // Set announcement name in modal
+                    document.getElementById('deleteAnnouncementName').textContent = announcementName;
+
+                    // Set delete form action
+                    const form = document.getElementById('deleteAnnouncementForm');
+                    form.action = `/announcement/${announcementId}`;
+                });
+            });
+        </script>
+
         <script>
             document.querySelectorAll('.filter-card').forEach(card => {
                 card.addEventListener('click', function() {
@@ -255,7 +343,7 @@
                     // Hide all existing static messages first
                     document.querySelectorAll(
                             '#announcementsCard .announcement-item, #announcementsCard .no-announcements-static'
-                            )
+                        )
                         .forEach(item => {
                             if (item.classList.contains('no-announcements-static')) {
                                 item.style.display = 'none';
@@ -273,7 +361,8 @@
                     });
 
                     // Handle the no announcements message
-                    const existingStaticMsg = document.querySelector('#announcementsCard .no-announcements-static');
+                    const existingStaticMsg = document.querySelector(
+                        '#announcementsCard .no-announcements-static');
                     let noAnnouncementsMessage = document.getElementById('noAnnouncementsMessage');
 
                     // Remove existing dynamic message if it exists
@@ -292,12 +381,14 @@
                             // Create new dynamic message
                             noAnnouncementsMessage = document.createElement('div');
                             noAnnouncementsMessage.id = 'noAnnouncementsMessage';
-                            noAnnouncementsMessage.className = 'text-center py-4 text-muted no-announcements-dynamic';
+                            noAnnouncementsMessage.className =
+                                'text-center py-4 text-muted no-announcements-dynamic';
                             noAnnouncementsMessage.innerHTML = `
                             <i class="bi bi-megaphone display-6 mb-2"></i>
                             <p class="mb-0">No ${getAnnouncementStatusText(status).toLowerCase()} announcements found</p>
                             `;
-                            document.querySelector('#announcementsCard .row').appendChild(noAnnouncementsMessage);
+                            document.querySelector('#announcementsCard .row').appendChild(
+                                noAnnouncementsMessage);
                         }
                     } else {
                         // Hide static message if announcements are visible

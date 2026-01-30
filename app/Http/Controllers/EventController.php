@@ -72,44 +72,12 @@ class EventController extends Controller
         // Finally fetch results
         $events = $query->get();
 
-        // FOR CALENDAR TAB
-
-        $birthday_colour = '#60a5fa';     // blue - Events
-        $event_colour = '#f472b6';  // pink -Birthdays
-
-        $calendarEvents = collect();
-
-        foreach ($events as $event) {
-            $calendarEvents->push([
-                'title' => $event->event_name,
-                'start' => Carbon::parse($event->event_date)->toDateString(),
-                'color' => $event_colour,
-                'url'   => route('event.show', $event->id),
-                'type'  => 'event',
-            ]);
-        }
-
-        $employees = Employee::whereNotNull('birthday')->get();
-
-        foreach ($employees as $emp) {
-            $birthdayThisYear = Carbon::parse($emp->birthday)
-                ->year(now()->year)
-                ->toDateString(); // repeats every year
-
-            $calendarEvents->push([
-                'title' => '🎂 ' . $emp->full_name,
-                'start' => $birthdayThisYear,
-                'color' => $birthday_colour,
-                'type'  => 'birthday',
-            ]);
-        }
-
         $eventCategories = setting('event_categories', []);
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
 
         $view = $user->role_id == 2 ? 'admin.admin-event' : 'employee.employee-event';
 
-        return view($view, compact('events', 'employees', 'calendarEvents', 'eventCategories', 'eventStatuses'));
+        return view($view, compact('events', 'employees', 'eventCategories', 'eventStatuses'));
     }
 
     /**
@@ -148,7 +116,7 @@ class EventController extends Controller
 
         $eventCategoriesEnum = setting('event_categories', []);
 
-        return view('employee.createevent', compact('role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum'));
+        return view('event.event-create', compact('role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum'));
     }
 
     /**
@@ -245,14 +213,14 @@ class EventController extends Controller
         $user = Auth::user();
         $employee = $user->employee;
 
+        $role_id = $user->role_id;
+
         $event = Event::findOrFail($id);
 
         $eventCategories = setting('event_categories', []);
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
 
-        $view = $user->role_id == 2 ? 'admin.admin-eventshow' : 'employee.employee-eventshow';
-
-        return view($view, compact('event', 'eventCategories', 'eventStatuses'));
+        return view('event.event-show', compact('role_id', 'event', 'eventCategories', 'eventStatuses'));
     }
 
     /**
@@ -309,7 +277,7 @@ class EventController extends Controller
 
         $eventCategoriesEnum = setting('event_categories', []);
 
-        return view('employee.editevent', compact('event', 'role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum', 'selectedDepartmentIds', 'assignedEmployees'));
+        return view('event.event-edit', compact('event', 'role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum', 'selectedDepartmentIds', 'assignedEmployees'));
     }
 
     /**
@@ -401,6 +369,24 @@ class EventController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+
+        $user = Auth::user();
+        $employee = $user->employee;
+
+        $event = Event::findOrFail($id);
+
+        if ($event->created_by !== $user->id && $user->role_id !== 2) {
+            abort(403, 'You are not allowed to delete this event.');
+        }
+
+        $event->attendees()->delete();
+        $event->delete();
+
+        $route = $user->role_id === 2
+            ? 'event.index.admin'
+            : 'event.index.employee';
+
+        return redirect()->route($route)
+            ->with('success', 'Event deleted successfully!');
     }
 }

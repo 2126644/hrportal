@@ -11,13 +11,38 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
-                                        </li>
+                                        @if ($role_id == 2)
+                                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                            </li>
+                                        @else
+                                            <li class="breadcrumb-item"><a
+                                                    href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        @endif
+
+                                        @if ($role_id == 2)
+                                            <li class="breadcrumb-item"><a href="{{ route('admin.employee') }}">Employees</a>
+                                            </li>
+                                        @endif
+
                                         <li class="breadcrumb-item active" aria-current="page">Profile</li>
                                     </ol>
                                 </nav>
                                 <h3 class="page-title"><br>Profile</h3>
                                 <p class="text-muted">Manage your personal information and settings.</p>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                @if (Auth::user()->id === $employee?->user_id)
+                                    <button class="btn btn-primary"
+                                        onclick="window.location='{{ route('employee.profile.settings') }}'">
+                                        <i class="bi bi-gear-fill me-2"></i>Profile Setting
+                                    </button>
+                                @endif
+
+                                <button class="btn btn-primary"
+                                    onclick="window.location='{{ route('profile.print', $employee->employee_id) }}'">
+                                    <i class="bi bi-file-pdf me-2"></i>Download PDF
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -33,38 +58,50 @@
             <div class="col-lg-5">
                 <div class="card h-100">
                     <div class="card-body text-center p-4">
+                        {{-- If viewing employee → use employee’s user info
+                        Else → fallback to logged-in user (own profile) 
+                        only for columns in users table: name, email, role_id/role_name, user_id, profile_photo_url --}}
+                        @php
+                            $profileUser = $employee?->user ?? $user;
+                        @endphp
 
-                        <form method="POST" action="{{ route('admin.employee.updatePhoto', $employee->employee_id) }}"
-                            enctype="multipart/form-data" id="profilePhotoForm">
+                        @if ($employee)
+                            <!-- Profile Picture with Hover Effect -->
+                            <form method="POST" action="{{ route('admin.employee.updatePhoto', $employee->employee_id) }}"
+                                enctype="multipart/form-data" id="profilePhotoForm">
 
-                            @csrf
-                            @method('PUT')
+                                @csrf
+                                @method('PUT')
 
+                                <div class="profile-pic mb-3 d-flex justify-content-center">
+                                    <label class="profile-photo-wrapper position-relative">
+
+                                        <img src="{{ $profileUser->profile_photo_path ? asset('storage/' . $profileUser->profile_photo_url) : asset('img/default-avatar.png') }}"
+                                            alt="{{ $profileUser->name }}" class="rounded-circle"
+                                            style="width:120px;height:120px;object-fit:cover;cursor:pointer;">
+
+                                        <!-- Hover overlay -->
+                                        @if (auth()->user()->role_id === 2)
+                                            <div class="photo-overlay d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </div>
+
+                                            <!-- Auto-submit when file selected -->
+                                            <input type="file" name="profile_photo" class="d-none" accept="image/*"
+                                                onchange="document.getElementById('profilePhotoForm').submit();">
+                                        @endif
+                                    </label>
+                                </div>
+                            </form>
+                        @else
                             <div class="profile-pic mb-3 d-flex justify-content-center">
-                                <label class="profile-photo-wrapper position-relative">
-
-                                    <img src="{{ $employee->user->profile_photo_url
-                                        ? asset('storage/' . $employee->user->profile_photo_url)
-                                        : asset('images/default-avatar.png') }}"
-                                        alt="{{ $employee->full_name }}" class="rounded-circle"
-                                        style="width:120px;height:120px;object-fit:cover;cursor:pointer;">
-
-                                    <!-- Hover overlay -->
-                                    @if (auth()->user()->role_id === 2)
-                                        <div class="photo-overlay d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-camera-fill"></i>
-                                        </div>
-
-                                        <!-- Auto-submit when file selected -->
-                                        <input type="file" name="profile_photo" class="d-none" accept="image/*"
-                                            onchange="document.getElementById('profilePhotoForm').submit();">
-                                    @endif
-                                </label>
+                                <img src="{{ asset('img/default-avatar.png') }}" alt="Default Avatar" class="rounded-circle"
+                                    style="width:120px;height:120px;object-fit:cover;">
                             </div>
-                        </form>
+                        @endif
 
                         <!-- Full Name -->
-                        <h4 class="employee-name">{{ $employee->full_name ?? 'Employee Name' }}</h4>
+                        <h4 class="employee-name">{{ $profileUser->name }}</h4>
 
                         <!-- Position -->
                         <p class="employee-position text-muted">{{ $employment->position ?? 'Staff' }}</p>
@@ -75,32 +112,35 @@
                         <!-- Employee ID and Date of Employment -->
                         <div class="employee-details small">
                             <div class="detail-row d-flex justify-content-between align-items-center mb-2">
-                                <span class="detail-label text-muted">Employee ID:</span>
-                                <span class="detail-value fw-semibold">
-                                    {{ $employee->employee_id ?? '-' }}
-                                </span>
-                            </div>
-
-                            <div class="detail-row d-flex justify-content-between align-items-center mb-2">
                                 <span class="detail-label text-muted">User ID:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $employee->user_id ?? '-' }}
-                                </span>
-                            </div>
-
-                            <div class="detail-row d-flex justify-content-between align-items-center mb-2">
-                                <span class="detail-label text-muted">Employment Status:</span>
-                                <span class="detail-value fw-semibold">
-                                    {{ $employment->employment_status ?? '-' }}
+                                    {{ $profileUser->id ?? '-' }}
                                 </span>
                             </div>
 
                             <div class="detail-row d-flex justify-content-between align-items-center">
                                 <span class="detail-label text-muted">Role:</span>
                                 <span class="detail-value fw-semibold">
-                                    {{ $user?->role?->role_name ?? '-' }}
+                                    {{ $profileUser->role?->role_name ?? '-' }}
                                 </span>
                             </div>
+
+                            @if ($employee)
+                                <div class="detail-row d-flex justify-content-between align-items-center mb-2">
+                                    <span class="detail-label text-muted">Employee ID:</span>
+                                    <span class="detail-value fw-semibold">
+                                        {{ $employee->employee_id ?? '-' }}
+                                    </span>
+                                </div>
+
+                                <div class="detail-row d-flex justify-content-between align-items-center mb-2">
+                                    <span class="detail-label text-muted">Employment Status:</span>
+                                    <span class="detail-value fw-semibold">
+                                        {{ ucfirst($employment->employment_status ?? '-') }}
+                                    </span>
+                                </div>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -120,8 +160,8 @@
                                 <div class="contact-display d-flex align-items-center">
                                     <i class="bi bi-person text-muted me-2"></i>
                                     <span
-                                        class="{{ empty($employee->full_name) ? 'text-muted fst-italic' : 'fw-semibold' }}">
-                                        {{ $employee->full_name ?? 'Not provided' }}
+                                        class="{{ empty($profileUser->name) ? 'text-muted fst-italic' : 'fw-semibold' }}">
+                                        {{ $profileUser->name ?? '-' }}
                                     </span>
                                 </div>
                             </div>
@@ -130,8 +170,8 @@
                                 <label class="form-label small fw-semibold text-muted">Email Address</label>
                                 <div class="contact-display d-flex align-items-center">
                                     <i class="bi bi-envelope text-muted me-2"></i>
-                                    <span class="{{ empty($employee->email) ? 'text-muted fst-italic' : '' }}">
-                                        {{ $employee->email ?? 'Not provided' }}
+                                    <span class="{{ empty($profileUser->email) ? 'text-muted fst-italic' : '' }}">
+                                        {{ $profileUser->email ?? '-' }}
                                     </span>
                                 </div>
                             </div>
@@ -163,322 +203,336 @@
 
         <div class="container-fluid mt-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <!-- Tabs navigation -->
-                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal"
-                            type="button" role="tab" aria-controls="personal" aria-selected="true">
-                            Personal
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="employment-tab" data-bs-toggle="tab" data-bs-target="#employment"
-                            type="button" role="tab" aria-controls="employment" aria-selected="false">
-                            Employment
-                        </button>
-                    </li>
-                </ul>
+                @if ($employee)
+                    <!-- Tabs navigation -->
+                    <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab"
+                                data-bs-target="#personal" type="button" role="tab" aria-controls="personal"
+                                aria-selected="true">
+                                Personal
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="employment-tab" data-bs-toggle="tab"
+                                data-bs-target="#employment" type="button" role="tab" aria-controls="employment"
+                                aria-selected="false">
+                                Employment
+                            </button>
+                        </li>
+                    </ul>
+                @endif
 
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary" onclick="window.location='{{ route('profile.settings') }}'">
-                        <i class="bi bi-gear-fill me-2"></i>Profile Setting
-                    </button>
-
-                    <button class="btn btn-primary"
-                        onclick="window.location='{{ route('profile.print', $employee->employee_id) }}'">
-                        <i class="bi bi-file-pdf me-2"></i>Download PDF
-                    </button>
-
-                </div>
             </div>
 
-            <!-- Tabs content -->
-            <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="profileTabsContent"
-                style="min-height: 500px;">
-                <!-- Personal tab -->
-                <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-person-fill me-3"></i>Personal Information
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Gender</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->gender) ? 'text-muted' : '' }}">
-                                            {{ $employee->gender ?? '-' }}
+            @if ($employee)
+                <!-- Tabs content -->
+                <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="profileTabsContent"
+                    style="min-height: 500px;">
+                    <!-- Personal tab -->
+                    <div class="tab-pane fade show active" id="personal" role="tabpanel"
+                        aria-labelledby="personal-tab">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="section-title mb-3 text-primary">
+                                    <i class="bi bi-person-fill me-3"></i>Personal Information
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Gender</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->gender) ? 'text-muted' : '' }}">
+                                                {{ $employee->gender ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Birthday</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->birthday) ? 'text-muted' : '' }}">
+                                                {{ $employee->birthday ? $employee->birthday->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Marital Status</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->marital_status) ? 'text-muted' : '' }}">
+                                                {{ $employee->marital_status ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Nationality</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->nationality) ? 'text-muted' : '' }}">
+                                                {{ $employee->nationality ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Emergency Contact Name</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->emergency_contact_name) ? 'text-muted' : '' }}">
+                                                {{ $employee->emergency_contact_name ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Emergency Contact Number</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->emergency_contact_number) ? 'text-muted' : '' }}">
+                                                {{ $employee->emergency_contact_number ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Emergency Contact Relationship</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->emergency_contact_relationship) ? 'text-muted' : '' }}">
+                                                {{ $employee->emergency_contact_relationship ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">IC Number</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->ic_number) ? 'text-muted' : '' }}">
+                                                {{ $employee->ic_number ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Highest Education Level</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->highest_education_level) ? 'text-muted' : '' }}">
+                                                {{ $employee->highest_education_level ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Highest Education Institution</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->highest_education_institution) ? 'text-muted' : '' }}">
+                                                {{ $employee->highest_education_institution ?? '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Graduation Year</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employee->graduation_year) ? 'text-muted' : '' }}">
+                                                {{ $employee->graduation_year ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Birthday</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->birthday) ? 'text-muted' : '' }}">
-                                            {{ $employee->birthday ? $employee->birthday->format('d M Y') : '-' }}
+                            </div>
+                            <div class="d-flex justify-content-end mt-3">
+                                @if (Auth::user()->role_id !== 2)
+                                    <button class="btn btn-primary"
+                                        onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
+                                        <i class="bi bi-pencil-square me-2"></i>Edit Personal Details
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Employment Tab -->
+                    <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
+                        <!-- Employment Information Row -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="section-title mb-3 text-primary">
+                                    <i class="bi bi-briefcase-fill me-3"></i>Employment Information
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Employment Type</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ ucwords(str_replace('_', ' ', $employment->employment_type ?? '-')) }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Marital Status</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->marital_status) ? 'text-muted' : '' }}">
-                                            {{ $employee->marital_status ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Date of Employment</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employment?->date_of_employment?->format('d M Y') ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Nationality</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->nationality) ? 'text-muted' : '' }}">
-                                            {{ $employee->nationality ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Company Branch</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employment->company_branch ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Emergency Contact Name</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->emergency_contact_name) ? 'text-muted' : '' }}">
-                                            {{ $employee->emergency_contact_name ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Report To</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employment?->reportToEmployee?->full_name ?? '-' }}
+                                                <span class="text-muted small">
+                                                    ({{ $employment?->reportToEmployee?->employment?->position ?? 'N/A' }})
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Emergency Contact Number</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->emergency_contact_number) ? 'text-muted' : '' }}">
-                                            {{ $employee->emergency_contact_number ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Department</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employee->employment?->department?->department_name ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Emergency Contact Relationship</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->emergency_contact_relationship) ? 'text-muted' : '' }}">
-                                            {{ $employee->emergency_contact_relationship ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Position</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employment->position ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">IC Number</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->ic_number) ? 'text-muted' : '' }}">
-                                            {{ $employee->ic_number ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Work Start</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employment?->work_start_time?->format('g:i A') ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Highest Education Level</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->highest_education_level) ? 'text-muted' : '' }}">
-                                            {{ $employee->highest_education_level ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Highest Education Institution</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->highest_education_institution) ? 'text-muted' : '' }}">
-                                            {{ $employee->highest_education_institution ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Graduation Year</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employee->graduation_year) ? 'text-muted' : '' }}">
-                                            {{ $employee->graduation_year ?? '-' }}
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Work End</div>
+                                            <div class="detail-value fw-semibold">
+                                                {{ $employment?->work_end_time?->format('g:i A') ?? '-' }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Dates Information Row -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5 class="section-title mb-3 text-primary">
+                                    <i class="bi bi-calendar-fill me-3"></i>Dates Information
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Contract Start</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->contract_start) ? 'text-muted' : '' }}">
+                                                {{ $employment?->contract_start ? $employment?->contract_start->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Contract End</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->contract_end) ? 'text-muted' : '' }}">
+                                                {{ $employment?->contract_end ? $employment?->contract_end->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Probation Start</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->probation_start) ? 'text-muted' : '' }}">
+                                                {{ $employment?->probation_start ? $employment?->probation_start->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Probation End</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->probation_end) ? 'text-muted' : '' }}">
+                                                {{ $employment?->probation_end ? $employment?->probation_end->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Suspension Start</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->suspension_start) ? 'text-muted' : '' }}">
+                                                {{ $employment?->suspension_start ? $employment?->suspension_start->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Suspension End</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->suspension_end) ? 'text-muted' : '' }}">
+                                                {{ $employment?->suspension_end ? $employment?->suspension_end->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Resignation Date</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->resignation_date) ? 'text-muted' : '' }}">
+                                                {{ $employment?->resignation_date ? $employment?->resignation_date->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Last Working Day</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->last_working_day) ? 'text-muted' : '' }}">
+                                                {{ $employment?->last_working_day ? $employment?->last_working_day->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="detail-item">
+                                            <div class="detail-label text-muted small">Termination Date</div>
+                                            <div
+                                                class="detail-value fw-semibold {{ empty($employment->termination_date) ? 'text-muted' : '' }}">
+                                                {{ $employment?->termination_date ? $employment?->termination_date->format('d M Y') : '-' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-end mt-3">
-                            @if (Auth::user()->role_id !== 2)
+                            @if (Auth::user()->role_id == 2)
                                 <button class="btn btn-primary"
-                                    onclick="window.location='{{ route('profile.editPersonal', $employee->employee_id) }}'">
-                                    <i class="bi bi-pencil-square me-2"></i>Edit Personal Details
+                                    onclick="window.location='{{ route('profile.editEmployment', $employee->employee_id) }}'">
+                                    <i class="bi bi-pencil-square me-2"></i>Edit Employment Details
                                 </button>
                             @endif
                         </div>
                     </div>
                 </div>
-
-                <!-- Employment Tab -->
-                <div class="tab-pane fade" id="employment" role="tabpanel" aria-labelledby="employment-tab">
-                    <!-- Employment Information Row -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-briefcase-fill me-3"></i>Employment Information
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Employment Type</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ ucwords(str_replace('_', ' ', $employment->employment_type ?? '-')) }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Date of Employment</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employment?->date_of_employment?->format('d M Y') ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Company Branch</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employment->company_branch ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Report To</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employment?->reportToEmployee?->full_name ?? '-' }}
-                                            <span class="text-muted small">
-                                                ({{ $employment?->reportToEmployee?->employment?->position ?? 'N/A' }})
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Department</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employee->employment?->department?->department_name ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Position</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employment->position ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Work Start</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employment?->work_start_time?->format('g:i A') ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Work End</div>
-                                        <div class="detail-value fw-semibold">
-                                            {{ $employment?->work_end_time?->format('g:i A') ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Dates Information Row -->
-                    <div class="row">
-                        <div class="col-12">
-                            <h5 class="section-title mb-3 text-primary">
-                                <i class="bi bi-calendar-fill me-3"></i>Dates Information
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Probation Start</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->probation_start) ? 'text-muted' : '' }}">
-                                            {{ $employment->probation_start ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Probation End</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->probation_end) ? 'text-muted' : '' }}">
-                                            {{ $employment->probation_end ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Suspension Start</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->suspension_start) ? 'text-muted' : '' }}">
-                                            {{ $employment->suspension_start ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Suspension End</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->suspension_end) ? 'text-muted' : '' }}">
-                                            {{ $employment->suspension_end ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Resignation Date</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->resignation_date) ? 'text-muted' : '' }}">
-                                            {{ $employment->resignation_date ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Last Working Day</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->last_working_day) ? 'text-muted' : '' }}">
-                                            {{ $employment->last_working_day ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="detail-item">
-                                        <div class="detail-label text-muted small">Termination Date</div>
-                                        <div
-                                            class="detail-value fw-semibold {{ empty($employment->termination_date) ? 'text-muted' : '' }}">
-                                            {{ $employment->termination_date ?? '-' }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end mt-3">
-                        @if (Auth::user()->role_id == 2)
-                            <button class="btn btn-primary"
-                                onclick="window.location='{{ route('profile.editEmployment', $employee->employee_id) }}'">
-                                <i class="bi bi-pencil-square me-2"></i>Edit Employment Details
-                            </button>
-                        @endif
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
     </div>
     </div>

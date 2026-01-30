@@ -79,11 +79,11 @@ class EmployeeController extends Controller
         $leaveRecords = Leave::where('employee_id', $employee->employee_id)->get();
 
         // Pending leave requests
-        $pendingLeave = $leaveRecords->where('status', 'pending')->count();
+        $pendingLeave = $leaveRecords->where('leave_status', 'pending')->count();
 
         // Upcoming approved leave
         $upcomingLeaveRecords = Leave::where('employee_id', $employee->employee_id)
-            ->where('status', 'approved')
+            ->where('leave_status', 'approved')
             ->where('start_date', '>=', now())
             ->orderBy('start_date', 'asc')
             ->get();
@@ -160,28 +160,35 @@ class EmployeeController extends Controller
     public function show(Employee $employee = null)
     {
         $user = Auth::user();
-        // $role_id = $user->role_id;
 
-        // If no employee param provided, use the logged in user's employee
+        $role_id = $user->role_id;
+
+        /**
+         * CASE 1: No employee passed in route
+         * - Show own profile
+         */
         if (! $employee) {
-            $employee = $user->employee;
-            if (! $employee) {
-                abort(404);
+            $employee = $user->employee; // may be null (admin)
+        }
+
+        /**
+         * CASE 2: Employee passed in route
+         * - Admin can view anyone
+         * - Employee can only view themselves
+         */
+        if ($employee) {
+            if ($user->role_id !== 2) {
+                if (! $user->employee || $employee->employee_id !== $user->employee->employee_id) {
+                    abort(403, 'Unauthorized action.');
+                }
             }
         }
 
-        // Admin can view anyone; regular employee can only view their own profile
-        if ($user->role_id !== 2) {
-            if ($employee->employee_id != $user->employee->employee_id) {
-                abort(403, 'Unauthorized action.');
-            }
-        }
-
-        $employment = $employee->employment()
+        $employment = $employee?->employment()
             ->with('reportToEmployee')
             ->first();
 
-        return view('profile.show', compact('employee', 'employment', 'user'));
+        return view('profile.show', compact('user', 'role_id', 'employee', 'employment'));
     }
 
     /**
@@ -281,22 +288,24 @@ class EmployeeController extends Controller
         }
 
         $validated = $request->validate([
-            'employment_type'    => 'required|string|max:100',
-            'employment_status'  => 'required|string|max:100',
-            'company_branch'     => 'required|string|max:100',
-            'report_to'          => 'nullable|exists:employees,employee_id',
+            'employment_type'       => 'required|string|max:100',
+            'employment_status'     => 'required|string|max:100',
+            'company_branch'        => 'required|string|max:100',
+            'report_to'             => 'nullable|exists:employees,employee_id',
             'department_id'         => 'required|exists:departments,id',
-            'position'           => 'nullable|string|max:100',
-            'date_of_employment'       => 'required|date',
-            'probation_start'    => 'nullable|date',
-            'probation_end'      => 'nullable|date',
-            'suspension_start'    => 'nullable|date',
-            'suspension_end'      => 'nullable|date',
+            'position'              => 'nullable|string|max:100',
+            'date_of_employment'    => 'required|date',
+            'contract_start'        => 'nullable|date',
+            'contract_end'          => 'nullable|date',
+            'probation_start'       => 'nullable|date',
+            'probation_end'         => 'nullable|date',
+            'suspension_start'      => 'nullable|date',
+            'suspension_end'        => 'nullable|date',
             'resignation_date'      => 'nullable|date',
             'last_working_day'      => 'nullable|date',
-            'termination_date'   => 'nullable|date',
-            'work_start_time'    => 'nullable|date_format:H:i',
-            'work_end_time'      => 'nullable|date_format:H:i',
+            'termination_date'      => 'nullable|date',
+            'work_start_time'       => 'nullable|date_format:H:i',
+            'work_end_time'         => 'nullable|date_format:H:i',
         ]);
 
         Employment::updateOrCreate(
@@ -320,7 +329,7 @@ class EmployeeController extends Controller
         $employee = Employee::findOrFail($id);
         $employment = Employment::where('employee_id', $id)->first();
 
-        $pdf = PDF::loadView('pdf.employee-profile', compact('employee', 'employment'));
+        $pdf = Pdf::loadView('pdf.employee-profile', compact('employee', 'employment'));
 
         return $pdf->download("employee-profile-{$id}.pdf");
     }

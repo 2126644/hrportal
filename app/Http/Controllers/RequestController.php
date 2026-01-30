@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Leave;
 use App\Models\Attendance;
+use App\Models\RequestApprover;
 
 class RequestController extends Controller
 {
@@ -65,6 +66,7 @@ class RequestController extends Controller
         //
     }
 
+    // to show requests for approval (for approvers)
     public function requests(Request $request)
     {
         $user = Auth::user();
@@ -76,10 +78,10 @@ class RequestController extends Controller
 
         // --- Leave Requests with filters ---
         $leavesQuery = Leave::with('employee')
-            ->where('status', 'pending')
+            ->where('leave_status', 'pending')
             ->whereHas('employee.approvers', function ($q) use ($employeeId) {
                 $q->where('approver_id', $employeeId)
-                    ->whereColumn('employment_approvers.level', 'leaves.approval_level');
+                    ->whereColumn('request_approvers.level', 'leaves.approval_level');
             })
             ->orderBy('created_at', 'desc');
 
@@ -139,6 +141,7 @@ class RequestController extends Controller
         ));
     }
 
+    // to show my submitted requests (for employees)
     public function myRequests(Request $request)
     {
         $user = Auth::user();
@@ -149,7 +152,7 @@ class RequestController extends Controller
         // --- Leave Requests with filters ---
         $leavesQuery = Leave::with('employee')
             ->where('employee_id', $employee->employee_id)
-            ->where('status', 'pending')
+            ->where('leave_status', 'pending')
             ->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
@@ -206,13 +209,14 @@ class RequestController extends Controller
         ));
     }
 
+    // to show all requests for approval (for admin)
     public function adminRequests(Request $request)
     {
         $leaveTypes = Leave::select('leave_type')->distinct()->pluck('leave_type');
 
         // --- Leave Requests with filters ---
         $leavesQuery = Leave::with('employee')
-            ->where('status', 'pending')
+            ->where('leave_status', 'pending')
             ->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
@@ -266,5 +270,81 @@ class RequestController extends Controller
             'pendingTimeSlips',
             'leaveTypes'
         ));
+    }
+
+    public function approveLeaves(Request $request, Leave $leave)
+    {
+        $request->validate([
+            'action' => 'required|in:approved,rejected'
+        ]);
+
+        $user = Auth::user();
+        $employeeId = optional($user->employee)->employee_id ?? null; // null if admin
+
+        // Prevent approving leaves that are already done
+        if ($leave->leave_status !== 'pending') {
+            return back()->with('error', 'This leave request has already been processed.');
+        }
+
+        // Determine current approver
+        $currentApprover = RequestApprover::where('employee_id', $leave->employee_id)
+            ->where('approver_id', $employeeId)
+            ->where('level', $leave->approval_level)
+            ->first();
+
+        // Fallback for admin (level 0 or any level with no approver assigned)
+        if (!$currentApprover && $user->role_id === 2) {
+            $currentApprover = true;
+        }
+
+        if (!$currentApprover) {
+            abort(403, 'You are not authorized to approve this leave.');
+        }
+
+        // Handle rejection: always final
+        if ($request->action === 'rejected') {
+            $leave->update([
+                'leave_status' => 'rejected',
+                'approved_by' => $employeeId,
+                'approved_at' => now(),
+            ]);
+            return back()->with('error', 'Leave request has been rejected.');
+        }
+
+        // Check if there’s a next approver
+        $nextLevelExists = RequestApprover::where('employee_id', $leave->employee_id)
+            ->where('level', '>', $leave->approval_level)
+            ->exists();
+
+        if ($nextLevelExists) {
+            // Forward to next level
+            $leave->increment('approval_level');
+            return back()->with('success', 'Leave request has been approved and forwarded to the next approver.');
+        }
+
+        // Final approval (no next approver)
+        $leave->update([
+            'leave_status' => 'approved',
+            'approved_by' => $employeeId,
+            'approved_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Leave request has been fully approved.');
+    }
+
+    public function approveTimeSlips(Request $request, Attendance $attendance)
+    {
+        $request->validate([
+            'action' => 'required|in:approved,rejected'
+        ]);
+
+        $attendance->time_slip_status = $request->action;
+        $attendance->save();
+
+        if ($request->action === 'rejected') {
+            return redirect()->back()->with('error', 'Time slip has been rejected.');
+        }
+
+        return redirect()->back()->with('success', 'Time slip has been approved.');
     }
 }

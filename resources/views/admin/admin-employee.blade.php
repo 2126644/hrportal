@@ -12,14 +12,14 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Employee Management</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Employees</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Employee Management</h3>
+                                <h3 class="page-title"><br>Employees</h3>
                                 <p class="text-muted">Manage your team members and their information</p>
                             </div>
                             <button class="btn-new" onclick="window.location='{{ route('admin.employee.create') }}'">
-                                Create New Employee
+                                Add New Employee
                             </button>
                         </div>
                     </div>
@@ -112,14 +112,15 @@
 
         <!-- Employee Stats -->
         <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card stat-card active" onclick="window.location='{{ route('admin.employee') }}'"
+                    style="cursor:pointer;">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="card-title text-muted mb-2">Total Employees</h6>
                                 <h3 class="mb-0">{{ $totalEmployees }}</h3>
-                                <small class="text-success">All departments</small>
+                                <small class="text-success">All employees</small>
                             </div>
                             <div class="stat-icon">
                                 <i class="bi bi-people-fill text-primary"></i>
@@ -128,40 +129,27 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card stat-card"
+                    onclick="window.location='{{ route('admin.employee', ['filter' => 'ending']) }}'"
+                    style="cursor:pointer;">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="card-title text-muted mb-2">Active Today</h6>
-                                <h3 class="mb-0">{{ $activeToday }}</h3>
-                                <small class="text-success">Present at work</small>
+                                <h6 class="card-title text-muted mb-2">Ending in/less than 30 days</h6>
+                                <h3 class="mb-0">{{ $employmentEnding }}</h3>
+                                <small class="text-success">Contract / intern / employment / probation / suspension</small>
                             </div>
                             <div class="stat-icon">
-                                <i class="bi bi-person-check text-success"></i>
+                                <i class="bi bi-exclamation-triangle text-warning"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted mb-2">On Leave</h6>
-                                <h3 class="mb-0">{{ $onLeave }}</h3>
-                                <small class="text-warning">Away today</small>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-airplane text-warning"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card stat-card" onclick="window.location='{{ route('admin.employee', ['filter' => 'new']) }}'"
+                    style="cursor:pointer;">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -181,15 +169,7 @@
         <!-- Employees Table -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">All Employees</h5>
-                <div>
-                    <button class="btn btn-outline-primary btn-sm me-2">
-                        <i class="bi bi-download me-2"></i>Export
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-upload me-2"></i>Import
-                    </button>
-                </div>
+                <h5 class="card-title mb-0">Employees Details</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -212,15 +192,14 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-sm me-3">
-                                                @if ($employee->user && $employee->user->profile_photo_url)
+                                                @if ($employee->user && $employee->user->profile_photo_path)
                                                     <img src="{{ asset('storage/' . $employee->user->profile_photo_url) }}"
                                                         alt="{{ $employee->full_name }}" class="rounded-circle"
                                                         style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
-                                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
-                                                        style="width: 40px; height: 40px;">
-                                                        <i class="bi bi-person text-muted"></i>
-                                                    </div>
+                                                    <img src="{{ asset('img/default-avatar.png') }}"
+                                                        alt="{{ $employee->full_name }}" class="rounded-circle"
+                                                        style="width: 40px; height: 40px; object-fit: cover;">
                                                 @endif
                                             </div>
                                             <div>
@@ -281,3 +260,6 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+@endpush

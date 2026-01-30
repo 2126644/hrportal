@@ -29,7 +29,7 @@ class AdminController extends Controller
             ->count('employee_id');
 
         // Pending Leave Requests
-        $pendingLeaves = Leave::where('status', 'pending')->count();
+        $pendingLeaves = Leave::where('leave_status', 'pending')->count();
 
         // Active Tasks (tasks that are not completed)
         $activeTasks = Task::whereIn('task_status', ['to-do', 'in-progress', 'in-review'])->count();
@@ -38,14 +38,14 @@ class AdminController extends Controller
         $absentToday = $totalEmployees - $presentToday;
 
         // Get all employees for the detailed table
-        $allEmployees = Employee::with('employment')
+        $allEmployees = Employee::with('employment.department')
             ->get()
             ->map(function ($employee) {
                 return [
                     'employee_id' => $employee->employee_id,
                     'full_name' => $employee->full_name,
-                    'department' => $employee->employment->department ?? '-',
-                    'position' => $employee->employment->position ?? '-',
+                    'department' => $employee->employment?->department?->department_name ?? '-',
+                    'position' => $employee->employment?->position ?? '-',
                 ];
             });
 
@@ -70,9 +70,9 @@ class AdminController extends Controller
         $announcements = Announcement::orderBy('created_at', 'desc')->take(5)->get();
 
         // --- Leave Counts ---
-        $totalPendingLeaves   = Leave::where('status', 'pending')->count();
-        $totalApprovedLeaves  = Leave::where('status', 'approved')->count();
-        $totalRejectedLeaves  = Leave::where('status', 'rejected')->count();
+        $totalPendingLeaves   = Leave::where('leave_status', 'pending')->count();
+        $totalApprovedLeaves  = Leave::where('leave_status', 'approved')->count();
+        $totalRejectedLeaves  = Leave::where('leave_status', 'rejected')->count();
 
         // --- Time Slip Counts ---
         $totalPendingTimeSlips   = Attendance::whereNotNull('time_slip_start')
@@ -108,7 +108,7 @@ class AdminController extends Controller
             });
 
         $leaves = Leave::with('employee')
-            ->where('status', 'pending')
+            ->where('leave_status', 'pending')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
@@ -116,7 +116,7 @@ class AdminController extends Controller
                 return [
                     'employee'        => $lv->employee->full_name,
                     'type'            => ucfirst($lv->leave_type) . ' Leave',
-                    'status'          => $lv->status,
+                    'status'          => $lv->leave_status,
                     'submitted_date'  => $lv->created_at->format('d M Y g:i A'),
                     'duration'        => $lv->start_date->format('d M Y') . ' → ' . $lv->end_date->format('d M Y'),
                     'is_time_slip'    => false,
@@ -230,21 +230,58 @@ class AdminController extends Controller
             });
         }
 
+        // Filter by date of employment
         if ($request->filled('date_of_employment')) {
             $query->whereHas('employment', function ($q) use ($request) {
                 $q->whereDate('date_of_employment', $request->date_of_employment);
             });
         }
 
+        // Card filters
+        // filter for employments ending in next 30 days
+        if ($request->filter === 'ending') {
+            $query->whereHas('employment', function ($q) {
+                $today = now();
+                $next30Days = now()->addDays(30);
+
+                $q->where(function ($sub) use ($today, $next30Days) {
+                    $sub->whereBetween('contract_end', [$today, $next30Days])
+                        ->orWhereBetween('termination_date', [$today, $next30Days])
+                        ->orWhereBetween('last_working_day', [$today, $next30Days])
+                        ->orWhereBetween('probation_end', [$today, $next30Days])
+                        ->orWhereBetween('suspension_end', [$today, $next30Days]);
+                });
+            });
+        }
+
+        // filter for new employees this month
+        if ($request->filter === 'new') {
+            $query->whereHas('employment', function ($q) {
+                $q->whereMonth('date_of_employment', now()->month)
+                    ->whereYear('date_of_employment', now()->year);
+            });
+        }
+
         $employees = $query->orderBy('full_name')->get();
 
+        // Stats for cards
         $totalEmployees = Employee::count();
-        $activeToday = Attendance::whereDate('date', Carbon::today())->distinct('employee_id')->count();
-        $onLeave = Leave::whereDate('start_date', '<=', Carbon::today())
-            ->whereDate('end_date', '>=', Carbon::today())
-            ->where('status', 'approved')
+
+        $employmentEnding = Employment::where(function ($q) {
+            $today = now();
+            $next30Days = now()->addDays(30);
+
+            $q->whereBetween('contract_end', [$today, $next30Days])
+                ->orWhereBetween('termination_date', [$today, $next30Days])
+                ->orWhereBetween('last_working_day', [$today, $next30Days])
+                ->orWhereBetween('probation_end', [$today, $next30Days])
+                ->orWhereBetween('suspension_end', [$today, $next30Days]);
+        })->count();
+
+
+        $newThisMonth = Employment::whereMonth('date_of_employment', now()->month)
+            ->whereYear('date_of_employment', now()->year)
             ->count();
-        $newThisMonth = Employment::whereMonth('date_of_employment', Carbon::now()->month)->count();
 
         // Departments for dropdown
         $departments = Department::whereHas('employment')
@@ -255,8 +292,7 @@ class AdminController extends Controller
             'employees',
             'departments',
             'totalEmployees',
-            'activeToday',
-            'onLeave',
+            'employmentEnding',
             'newThisMonth'
         ));
     }

@@ -40,7 +40,7 @@
                         <div class="mb-3">
                             <label for="task_name" class="form-label">Task Name <span class="text-danger">*</span></label>
                             <input type="text" id="task_name" name="task_name" class="form-control"
-                                placeholder="Name the task" value="{{ old('task_name') }}" required>
+                                placeholder="Enter task title" value="{{ old('task_name') }}" required>
                             @error('task_name')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -85,7 +85,8 @@
                                             <div class="col-md-4">
                                                 <div class="form-check">
                                                     <input class="form-check-input department-checkbox" type="checkbox"
-                                                        value="{{ $dept->id }}" id="dept_{{ $dept->id }}" name="department_ids[]">
+                                                        value="{{ $dept->id }}" id="dept_{{ $dept->id }}"
+                                                        name="department_ids[]">
                                                     <label class="form-check-label" for="dept_{{ $dept->id }}">
                                                         {{ $dept->department_name }}
                                                     </label>

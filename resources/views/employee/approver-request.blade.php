@@ -138,7 +138,7 @@
                                             <i class="bi bi-eye"></i>
                                         </button>
                                         <!-- Approve Button: Server-side action (wrapped in form) -->
-                                        @if ($leave->status === 'pending')
+                                        @if ($leave->leave_status === 'pending')
                                             <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
                                                 style="display: inline;"
                                                 onsubmit="return confirm('Are you sure you want to approve this leave request?');">
@@ -319,7 +319,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        @if ($leave->status === 'pending')
+                        @if ($leave->leave_status === 'pending')
                             <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this leave request?');">
                                 @csrf

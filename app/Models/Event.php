@@ -34,13 +34,13 @@ class Event extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    // 🔥 MAIN RELATION: raw pivot records
+    // MAIN RELATION: raw pivot records
     public function attendees()
     {
         return $this->hasMany(EventAttendee::class);
     }
 
-    // ✅ Convenience relation (optional, but useful)
+    // Convenience relation (optional, but useful)
     public function employees()
     {
         return $this->belongsToMany(

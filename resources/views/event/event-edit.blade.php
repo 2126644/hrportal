@@ -10,8 +10,14 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
-                                        </li>
+                                        @if ($role_id == 2)
+                                            <li class="breadcrumb-item"><a
+                                                    href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                        @else
+                                            <li class="breadcrumb-item"><a
+                                                    href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        @endif
+
                                         @if ($role_id == 2)
                                             <li class="breadcrumb-item"><a
                                                     href="{{ route('event.index.admin') }}">Events</a></li>
@@ -19,11 +25,12 @@
                                             <li class="breadcrumb-item"><a
                                                     href="{{ route('event.index.employee') }}">Events</a></li>
                                         @endif
-                                        <li class="breadcrumb-item active" aria-current="page">New Event</li>
+                                        
+                                        <li class="breadcrumb-item active" aria-current="page">Edit Event</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Create Event</h3>
-                                <p class="text-muted">Fill in the details below to create a new event.</p>
+                                <h3 class="page-title"><br>Edit Event</h3>
+                                <p class="text-muted">Edit the details of the event below.</p>
                             </div>
                         </div>
                     </div>
@@ -36,15 +43,17 @@
         <div class="col-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('event.store') }}" method="POST" enctype="multipart/form-data" novalidate>
+                    <form action="{{ route('event.update', $event->id) }}" method="POST" novalidate>
                         @csrf
+                        @method('PUT')
 
                         <!-- Event Name -->
                         <div class="mb-3">
                             <label for="event_name" class="form-label">Event Name <span class="text-danger">*</span></label>
                             <input type="text" id="event_name" name="event_name"
                                 class="form-control @error('event_name') is-invalid @enderror"
-                                placeholder="Name of the event" value="{{ old('event_name') }}" required>
+                                placeholder="Name of the event" value="{{ old('event_name', $event->event_name) }}"
+                                required>
                             @error('event_name')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -57,7 +66,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="date" id="event_date" name="event_date"
                                     class="form-control @error('event_date') is-invalid @enderror"
-                                    value="{{ old('event_date') }}" required>
+                                    value="{{ old('event_date', $event->event_date?->format('Y-m-d')) }}" required>
                                 @error('event_date')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -68,7 +77,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="time" id="event_time" name="event_time"
                                     class="form-control @error('event_time') is-invalid @enderror"
-                                    value="{{ old('event_time') }}" required>
+                                    value="{{ old('event_time', $event->event_time->format('H:i')) }}" required>
                                 @error('event_time')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -81,7 +90,8 @@
                                     class="text-danger">*</span></label>
                             <input type="text" id="event_location" name="event_location"
                                 class="form-control @error('event_location') is-invalid @enderror"
-                                placeholder="Location of the event" value="{{ old('event_location') }}" required>
+                                placeholder="Location of the event"
+                                value="{{ old('event_location', $event->event_location) }}" required>
                             @error('event_location')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -91,7 +101,7 @@
                             <label for="description" class="form-label">Description <span
                                     class="text-danger">*</span></label>
                             <textarea id="description" name="description" class="form-control @error('description') is-invalid @enderror"
-                                rows="4" placeholder="Describe the event" required>{{ old('description') }}</textarea>
+                                rows="4" placeholder="Describe the event" required>{{ old('description', $event->description) }}</textarea>
                             @error('description')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -104,7 +114,7 @@
                                 <option value="" disabled selected>Select Category</option>
                                 @foreach ($eventCategoriesEnum as $cat)
                                     <option value="{{ $cat }}"
-                                        {{ old('event_category') == $cat ? 'selected' : '' }}>
+                                        {{ old('event_category', $event->event_category) == $cat ? 'selected' : '' }}>
                                         {{ ucfirst($cat) }}
                                     </option>
                                 @endforeach
@@ -144,8 +154,8 @@
                                             <div class="col-md-4">
                                                 <div class="form-check">
                                                     <input class="form-check-input department-checkbox" type="checkbox"
-                                                        value="{{ $dept->id }}" id="dept_{{ $dept->id }}"
-                                                        name="department_ids[]">
+                                                        value="{{ $dept->id }}" name="department_ids[]"
+                                                        {{ in_array($dept->id, $selectedDepartmentIds) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="dept_{{ $dept->id }}">
                                                         {{ $dept->department_name }}
                                                     </label>
@@ -194,7 +204,7 @@
                                 class="form-select @error('event_status') is-invalid @enderror" required>
                                 @foreach (['upcoming', 'ongoing', 'completed', 'cancelled'] as $status)
                                     <option value="{{ $status }}"
-                                        {{ old('event_status', 'upcoming') === $status ? 'selected' : '' }}>
+                                        {{ old('event_status', $event->event_status) === $status ? 'selected' : '' }}>
                                         {{ ucfirst($status) }}
                                     </option>
                                 @endforeach
@@ -210,7 +220,7 @@
                                     separated)</small></label>
                             <input type="text" id="tags" name="tags"
                                 class="form-control @error('tags') is-invalid @enderror"
-                                placeholder="e.g. tech, networking, free" value="{{ old('tags') }}">
+                                placeholder="e.g. tech, networking, free" value="{{ old('tags', $event->tags) }}">
                             @error('tags')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -229,8 +239,9 @@
 
                         <!-- Submit Buttons -->
                         <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('event.index.employee') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Event</button>
+                            <a href="{{ $role_id == 2 ? route('event.index.admin') : route('event.index.employee') }}"
+                                class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Event</button>
                         </div>
                     </form>
                 </div>
@@ -324,7 +335,6 @@
         }
 
         // Script to add individual employees
-
         document.getElementById('employeeSearch').addEventListener('change', function() {
             const option = this.selectedOptions[0];
             if (!option.value) return;
@@ -371,5 +381,15 @@
                 }
             });
         });
+    </script>
+
+    <script>
+        const preloadEmployees = @json($assignedEmployees);
+
+        preloadEmployees.forEach(emp => {
+            selectedEmployees.set(emp.id, emp);
+        });
+
+        renderEmployees();
     </script>
 @endpush

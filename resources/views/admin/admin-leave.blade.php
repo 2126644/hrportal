@@ -28,13 +28,7 @@
     <!-- Tabs navigation -->
     <ul class="nav nav-tabs" id="leaveTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar" type="button"
-                role="tab" aria-controls="calendar" aria-selected="true">
-                Calendar
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="leave-application-tab" data-bs-toggle="tab" data-bs-target="#leave-application"
+            <button class="nav-link active" id="leave-application-tab" data-bs-toggle="tab" data-bs-target="#leave-application"
                 type="button" role="tab" aria-controls="leave-application" aria-selected="false">
                 Leave Application
             </button>
@@ -51,13 +45,8 @@
     <div class="tab-content border border-top-0 rounded-bottom p-4 bg-white shadow-sm" id="leaveTabsContent"
         style="min-height: 500px;">
 
-        <!-- Calendar tab -->
-        <div class="tab-pane fade show active" id="calendar" role="tabpanel" aria-labelledby="calendar-tab">
-            <div id="leaveCalendar"></div>
-        </div>
-
         <!-- Leave Application tab -->
-        <div class="tab-pane fade" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
+        <div class="tab-pane fade show active" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
             <!-- Filters and Search -->
             <form method="GET" action="{{ route('leave.index.admin') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="leave-application">
@@ -170,25 +159,25 @@
                                         <th>Leave Type</th>
                                         <th>Dates</th>
                                         <th>Duration</th>
-                                        <th>Reason</th>
+                                        <th>Leave Reason</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="leavesTable">
                                     @foreach ($leaves as $leave)
-                                        <tr data-status="{{ $leave->status }}">
+                                        <tr data-status="{{ $leave->leave_status }}">
                                             <td>{{ $leave->created_at->format('d M Y') }}</td>
                                             <td>{{ $leave->employee->full_name ?? 'N/A' }}</td>
                                             <td>{{ ucfirst($leave->leave_type) }} Leave</td>
                                             <td>{{ $leave->start_date->format('d M Y') }} →
                                                 {{ $leave->end_date->format('d M Y') }}</td>
                                             <td>{{ $leave->days }} days</td>
-                                            <td>{{ $leave->reason }}</td>
+                                            <td>{{ $leave->leave_reason }}</td>
                                             <td>
-                                                @if ($leave->status === 'approved')
+                                                @if ($leave->leave_status === 'approved')
                                                     <span class="badge bg-success">Approved</span>
-                                                @elseif ($leave->status === 'rejected')
+                                                @elseif ($leave->leave_status === 'rejected')
                                                     <span class="badge bg-danger">Rejected</span>
                                                 @else
                                                     <span class="badge bg-warning text-dark">Pending</span>
@@ -214,7 +203,7 @@
                                                         </button>
                                                     </form>
                                                     <!-- Approve Button: Server-side action (wrapped in form) -->
-                                                    @if ($leave->status === 'pending')
+                                                    @if ($leave->leave_status === 'pending')
                                                         <form action="{{ route('leave.updateStatus', $leave->id) }}"
                                                             method="POST" style="display: inline;"
                                                             onsubmit="return confirm('Are you sure you want to approve this leave request?');">
@@ -419,8 +408,8 @@
                                 <td>{{ $leave->days }} days</td>
                             </tr>
                             <tr>
-                                <th>Reason</th>
-                                <td>{{ $leave->reason }}</td>
+                                <th>Leave Reason</th>
+                                <td>{{ $leave->leave_reason }}</td>
                             </tr>
                             <tr>
                                 <th>Date Applied</th>
@@ -430,7 +419,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        @if ($leave->status === 'pending')
+                        @if ($leave->leave_status === 'pending')
                             <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this leave request?');">
                                 @csrf
@@ -452,37 +441,8 @@
     @endforeach
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('leaveCalendar');
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                height: 500,
-                themeSystem: 'bootstrap5',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: ''
-                },
-                events: @json($employeeLeaves),
-                eventDidMount: function(info) {
-                    // tooltip on hover (using Bootstrap tooltip)
-                    var tooltip = new bootstrap.Tooltip(info.el, {
-                        title: info.event.title,
-                        placement: 'top',
-                        trigger: 'hover',
-                        container: 'body'
-                    });
-                }
-            });
-
-            calendar.render();
-
-            document.getElementById('calendar-tab').addEventListener('shown.bs.tab', function() {
-                calendar.render();
-            });
-        });
-
+ 
+         // --- Leave Application Filters ---
         document.querySelectorAll('.filter-card').forEach(card => {
             card.addEventListener('click', function() {
                 // remove active class from all cards 
@@ -550,37 +510,5 @@
             };
             return statusMap[status] || status;
         }
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            // --- Restore active tab from URL ---
-            const urlParams = new URLSearchParams(window.location.search);
-            const activeTab = urlParams.get('tab') || 'calendar';
-
-            const triggerEl = document.querySelector(`#${activeTab}-tab`);
-            if (triggerEl) {
-                new bootstrap.Tab(triggerEl).show();
-            }
-
-            // --- Set hidden input before submitting any form ---
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', function() {
-                    const activeTabEl = document.querySelector('.nav-link.active');
-                    if (!activeTabEl) return;
-
-                    const tabId = activeTabEl
-                        .getAttribute('data-bs-target')
-                        .replace('#', '');
-
-                    // ✅ UPDATED LINE
-                    const hiddenInput = form.querySelector('.active-tab-input');
-                    if (hiddenInput) {
-                        hiddenInput.value = tabId;
-                    }
-                });
-            });
-        });
     </script>
 @endsection

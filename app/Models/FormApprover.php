@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class EmploymentApprover extends Model
+class FormApprover extends Model
 {
-    /** @use HasFactory<\Database\Factories\EmploymentApproverFactory> */
+    /** @use HasFactory<\Database\Factories\FormApproverFactory> */
     use HasFactory;
 }

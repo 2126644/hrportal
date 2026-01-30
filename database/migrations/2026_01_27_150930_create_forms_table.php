@@ -11,27 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leaves', function (Blueprint $table) {
+        Schema::create('forms', function (Blueprint $table) {
             $table->id();
-            $table->string('employee_id');  // add foreign key column
-            $table->string('leave_type');
-            $table->enum('leave_length', ['full_day', 'AM', 'PM']);
-            $table->text('leave_reason')->nullable();
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->integer('days');
-            $table->string('attachment')->nullable();
+            $table->string('form_type');
+            $table->string('employee_id');
+            $table->text('form_description')->nullable();
 
-            $table->string('approved_by')->nullable();  // add foreign key column
+            $table->string('approved_by')->nullable();
             $table->unsignedTinyInteger('approval_level')->default(0);
-            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('approval_at')->nullable();
 
-            $table->enum('leave_status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('form_status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('reject_reason')->nullable();
-
+            
             $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  // when the parent record is deleted, the child is deleted
             $table->foreign('approved_by')->references('employee_id')->on('employees')->nullOnDelete();
-            
+
             $table->timestamps();
         });
     }
@@ -41,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leaves');
+        Schema::dropIfExists('forms');
     }
 };

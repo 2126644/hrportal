@@ -153,10 +153,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="reason" class="form-label">Reason <span class="text-danger">*</span></label>
-                            <textarea id="reason" name="reason" rows="3" class="form-control"
-                                placeholder="Describe the reason for your leave" required>{{ old('reason') }}</textarea>
-                            @error('reason')
+                            <label for="leave_reason" class="form-label">Reason <span class="text-danger">*</span></label>
+                            <textarea id="leave_reason" name="leave_reason" rows="3" class="form-control"
+                                placeholder="Describe the reason for your leave" required>{{ old('leave_reason') }}</textarea>
+                            @error('leave_reason')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>

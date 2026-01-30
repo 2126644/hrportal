@@ -5,35 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Leave extends Model
+class Form extends Model
 {
-    /** @use HasFactory<\Database\Factories\LeaveFactory> */
+    /** @use HasFactory<\Database\Factories\FormFactory> */
     use HasFactory;
 
     protected $fillable = [
         'employee_id',
-        'leave_type',
-        'leave_length',
-        'leave_reason',   //leave_reason
-        'start_date',
-        'end_date',
-        'days',
-        'attachment',
+        'form_type',
+        'form_description',
 
         'approved_by',
         'approval_level',
         'approval_at',
 
-        'leave_status',   // leave_status
+        'form_status',   // form_status
         'reject_reason',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'approved_at' => 'datetime',
-    ];
-
+    // Who submitted the form
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id', 'employee_id');
@@ -42,5 +32,16 @@ class Leave extends Model
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by', 'employee_id');
+    }
+
+    // One-to-one detail forms
+    public function workHandover()
+    {
+        return $this->hasOne(WorkHandover::class);
+    }
+
+    public function formApprovers()
+    {
+        return $this->hasMany(FormApprover::class);
     }
 }

@@ -68,7 +68,7 @@ class AnnouncementController extends Controller
      */
     public function create()
     {
-        return view('admin.createannouncement');
+        return view('announcement.announcement-create');
     }
 
     /**
@@ -151,7 +151,7 @@ class AnnouncementController extends Controller
     {
         $announcement->delete();
 
-        return redirect()->route('announcements.index')
+        return redirect()->route('announcement.index.admin')
             ->with('success', 'Announcement deleted successfully.');
     }
 }

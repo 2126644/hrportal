@@ -22,12 +22,8 @@ class SettingController extends Controller
 // {
 //     return view('admin.settings', [
 //         'settings' => [
-//             'company_name'        => setting('company_name'),
-//             'hr_email'            => setting('hr_email'),
 //             'max_timeslip_hours'  => setting('max_timeslip_hours', 3),
 //         ],
-//         'leaveTypes'      => setting('leave_types', []),
-//         'eventCategories' => setting('event_categories', []),
 //     ]);
 // }
 
@@ -92,20 +88,10 @@ class SettingController extends Controller
 //     public function update(Request $request)
 // {
 //     $data = $request->validate([
-//         'company_name'        => 'nullable|string|max:255',
-//         'hr_email'            => 'nullable|email',
 //         'max_timeslip_hours'  => 'nullable|integer|min:1',
-
-//         'leave_types'         => 'array',
-//         'leave_types.*'       => 'string|max:50',
-
-//         'event_categories'    => 'array',
-//         'event_categories.*'  => 'string|max:50',
 //     ]);
 
 //     foreach ([
-//         'company_name',
-//         'hr_email',
 //         'max_timeslip_hours',
 //     ] as $key) {
 //         if (array_key_exists($key, $data)) {
@@ -115,19 +101,6 @@ class SettingController extends Controller
 //             );
 //         }
 //     }
-
-//     Setting::updateOrCreate(
-//         ['key' => 'leave_types'],
-//         ['value' => array_values($data['leave_types'] ?? [])]
-//     );
-
-//     Setting::updateOrCreate(
-//         ['key' => 'event_categories'],
-//         ['value' => array_values($data['event_categories'] ?? [])]
-//     );
-
-//     return back()->with('success', 'Settings updated successfully.');
-// }
 
     /**
      * Remove the specified resource from storage.

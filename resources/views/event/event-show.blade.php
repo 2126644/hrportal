@@ -121,9 +121,18 @@
             <div>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
-                        </li>
-                        <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
+                        @if ($role_id == 2)
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        @else
+                            <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                        @endif
+
+                        @if ($role_id == 2)
+                            <li class="breadcrumb-item"><a href="{{ route('event.index.admin') }}">Events</a></li>
+                        @else
+                            <li class="breadcrumb-item"><a href="{{ route('event.index.employee') }}">Events</a></li>
+                        @endif
+
                         <li class="breadcrumb-item active" aria-current="page">{{ $event->event_name }}</li>
                     </ol>
                 </nav>
@@ -247,40 +256,43 @@
                         </div>
 
                         <!-- Action Button -->
-                        <div class="mt-4">
-                            @php
-                                $employeeId = auth()->user()->employee?->employee_id;
+                        @php
+                            $employeeId = auth()->user()->employee?->employee_id;
 
-                                $myRSVP = $employeeId
-                                    ? $event->attendees->firstWhere('employee_id', $employeeId)
-                                    : null;
-                            @endphp
-                            @if (!$myRSVP || $myRSVP->response_status === 'pending')
-                                <form action="{{ route('event.attendance.confirm', $event->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-primary w-100 btn-custom">
-                                        <i class="bi bi-check-circle me-2"></i> Confirm Attendance
-                                    </button>
-                                </form>
-                                <form action="{{ route('event.attendance.decline', $event->id) }}" method="POST"
-                                    class="mt-2">
-                                    @csrf
-                                    <button type="submit" class="btn btn-outline-secondary w-100 btn-custom">
-                                        <i class="bi bi-x-circle me-2"></i> Decline
-                                    </button>
-                                </form>
-                            @elseif ($myRSVP->response_status === 'confirmed')
-                                <div class="alert alert-success border-0 text-center py-3 mb-0"
-                                    style="background: #ecfdf5; color: #065f46; border-radius: 12px;">
-                                    <i class="bi bi-check-circle-fill me-2"></i> You're on the list!
-                                </div>
-                            @elseif ($myRSVP->response_status === 'declined')
-                                <div class="alert alert-danger border-0 text-center py-3 mb-0"
-                                    style="background: #fef2f2; color: #991b1b; border-radius: 12px;">
-                                    <i class="bi bi-x-circle-fill me-2"></i> You have declined the invitation.
-                                </div>
-                            @endif
-                        </div>
+                            $myRSVP = $employeeId ? $event->attendees->firstWhere('employee_id', $employeeId) : null;
+                        @endphp
+
+
+                        @if ($myRSVP)
+                            <div class="mt-4">
+                                @if (!$myRSVP || $myRSVP->response_status === 'pending')
+                                    <form action="{{ route('event.attendance.confirm', $event->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary w-100 btn-custom">
+                                            <i class="bi bi-check-circle me-2"></i> Confirm Attendance
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('event.attendance.decline', $event->id) }}" method="POST"
+                                        class="mt-2">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-secondary w-100 btn-custom">
+                                            <i class="bi bi-x-circle me-2"></i> Decline
+                                        </button>
+                                    </form>
+                                @elseif ($myRSVP->response_status === 'confirmed')
+                                    <div class="alert alert-success border-0 text-center py-3 mb-0"
+                                        style="background: #ecfdf5; color: #065f46; border-radius: 12px;">
+                                        <i class="bi bi-check-circle-fill me-2"></i> You're on the list!
+                                    </div>
+                                @elseif ($myRSVP->response_status === 'declined')
+                                    <div class="alert alert-danger border-0 text-center py-3 mb-0"
+                                        style="background: #fef2f2; color: #991b1b; border-radius: 12px;">
+                                        <i class="bi bi-x-circle-fill me-2"></i> You have declined the invitation.
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
                     </div>
                 </div>
 
@@ -295,6 +307,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

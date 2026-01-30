@@ -18,20 +18,31 @@ class Employment extends Model
         'company_branch', // enum
         'report_to', // enum employee_id
         'position',
-        'date_of_employment',
-        'probation_start',
+
+        'date_of_employment', // for all & could be same date for contract_start
+
+        'contract_start', // for contract/intern employees
+        'contract_end',
+
+        'probation_start', // for probation employees
         'probation_end',
-        'suspension_start',
+
+        'suspension_start', // for suspended employees
         'suspension_end',
-        'resignation_date',
+
+        'resignation_date', // for resigned employees
         'last_working_day',
-        'termination_date',
-        'work_start_time',
+
+        'termination_date', // for terminated employees
+
+        'work_start_time', // not everyone has work_start/end time, e.g:part time
         'work_end_time',
     ];
 
     protected $casts = [
         'date_of_employment' => 'date',
+        'contract_start' => 'date',
+        'contract_end' => 'date',
         'probation_start' => 'date',
         'probation_end' => 'date',
         'suspension_start' => 'date',

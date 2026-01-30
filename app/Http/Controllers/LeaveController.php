@@ -11,7 +11,6 @@ use App\Exports\LeavesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\LeaveEntitlement;
 use App\Models\Employee;
-use App\Models\EmploymentApprover;
 use Illuminate\Validation\Rule;
 
 class LeaveController extends Controller
@@ -24,41 +23,6 @@ class LeaveController extends Controller
     {
         $user = Auth::user();
         $employee = $user->employee; // null for admin if no employee record
-
-        // FOR CALENDAR TAB
-        $allApprovedLeaves = Leave::with('employee')->where('status', 'approved')->get();
-
-        $colors = [
-            '#f87171', // red
-            '#60a5fa', // blue
-            '#34d399', // green
-            '#fbbf24', // yellow
-            '#a78bfa', // purple
-            '#f472b6', // pink
-            '#38bdf8', // sky
-            '#fde047', // amber
-            '#80d0b0', // light green
-            '#fca5a5', // light red
-            '#93c5fd', // light blue
-        ];
-
-        $employeeColorMap = [];
-        $colorIndex = 0;
-
-        $employeeLeaves = $allApprovedLeaves->map(function ($leave) use (&$employeeColorMap, &$colorIndex, $colors) {
-            $empName = $leave->employee->full_name;
-            // Assign color if employee has no color yet
-            if (!isset($employeeColorMap[$empName])) {
-                $employeeColorMap[$empName] = $colors[$colorIndex % count($colors)];
-                $colorIndex++;
-            }
-            return [
-                'title'         => $empName,
-                'start'         => Carbon::parse($leave->start_date)->toDateString(),
-                'end'           => Carbon::parse($leave->end_date)->addDay()->toDateString(), // include end date
-                'color'          => $employeeColorMap[$empName],
-            ];
-        });
 
         // FOR LEAVE APPLICATION TAB
         // Total approved days used
@@ -85,8 +49,8 @@ class LeaveController extends Controller
             $query->where('leave_type', $request->leave_type);
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($request->filled('leave_status')) {
+            $query->where('leave_status', $request->leave_status);
         }
 
         if ($request->filled('start_date')) {
@@ -106,12 +70,11 @@ class LeaveController extends Controller
 
         $totalRequests  = $summaryQuery->count();
 
-        $approvedLeaves = (clone $summaryQuery)->where('status', 'approved')->count();
-        $pendingLeaves  = (clone $summaryQuery)->where('status', 'pending')->count();
-        $rejectedLeaves = (clone $summaryQuery)->where('status', 'rejected')->count();
+        $approvedLeaves = (clone $summaryQuery)->where('leave_status', 'approved')->count();
+        $pendingLeaves  = (clone $summaryQuery)->where('leave_status', 'pending')->count();
+        $rejectedLeaves = (clone $summaryQuery)->where('leave_status', 'rejected')->count();
 
-        $usedDays = (clone $summaryQuery)->where('status', 'approved')->sum('days');
-
+        $usedDays = (clone $summaryQuery)->where('leave_status', 'approved')->sum('days');
         $leaves = $query->get();
 
         // FOR LEAVE REPORT TAB
@@ -213,7 +176,6 @@ class LeaveController extends Controller
             'leaves',
             'reportData',
             'leaveTypes',
-            'employeeLeaves',
             'finalEntitlements',
             'selectedYear',
             'selectedEmployeeName',
@@ -253,27 +215,18 @@ class LeaveController extends Controller
             'leave_type'    => ['required', Rule::in(setting('leave_types'))],
             'start_date'    => 'required|date',
             'end_date'      => 'required|date|after_or_equal:start_date',
-            'reason'        => 'required|string|max:255',
+            'leave_reason'  => 'required|string|max:255',
             'attachment'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048'
         ]);
 
         $days = (new \Carbon\Carbon($request->start_date))
             ->diffInDays(new \Carbon\Carbon($request->end_date)) + 1;
 
-        // Leave::create([
-        //     'employee_id' => $employee->id,
-        //     'start_date'  => $request->start_date,
-        //     'end_date'    => $request->end_date,
-        //     'days'        => $days,
-        //     'reason'      => $request->reason,
-        //     'status'      => 'pending',
-        // ]);
-
         $leave = new Leave();
         $leave->employee_id  = $employee->employee_id;
         $leave->created_at   = Carbon::now()->toDateString();
         $leave->leave_type   = $request->leave_type;
-        $leave->reason       = $request->reason;
+        $leave->leave_reason = $request->leave_reason;
         $leave->start_date   = $request->start_date;
         $leave->end_date     = $request->end_date;
         $leave->days         = $days;
@@ -283,7 +236,7 @@ class LeaveController extends Controller
             $leave->attachment = $filePath;
         }
 
-        $leave->status = 'pending';
+        $leave->leave_status = 'pending';
         $leave->save();
 
         return redirect()->route('leave.index.employee')->with('success', 'Leave request submitted successfully!');
@@ -324,11 +277,11 @@ class LeaveController extends Controller
         }
 
         // Only allow cancelling a pending leave
-        if ($leave->status !== 'pending') {
+        if ($leave->leave_status !== 'pending') {
             return redirect()->back()->with('error', 'Only pending requests can be cancelled.');
         }
 
-        $leave->delete();   // or $leave->update(['status' => 'cancelled']) for history
+        $leave->delete();   // or $leave->update(['leave_status' => 'cancelled']) for history
 
         return redirect()->back()->with('success', 'Leave request cancelled.');
     }
@@ -345,77 +298,5 @@ class LeaveController extends Controller
         $leave->delete();
 
         return redirect()->back()->with('success', 'Leave record deleted.');
-    }
-
-    public function approveLeave(Request $request, Leave $leave)
-    {
-        $request->validate([
-            'action' => 'required|in:approved,rejected'
-        ]);
-
-        $user = Auth::user();
-        $employee = $user->employee;
-
-        /**
-         * STEP 1: ADMIN APPROVAL (LEVEL 0)
-         */
-        if ($leave->approval_level === 0) {
-
-            abort_if($user->role_id !== 2, 403);
-
-            // if rejected, then done
-            if ($request->action === 'rejected') {
-                $leave->update([
-                    'status' => 'rejected',
-                    'approved_by' => $employee->employee_id,
-                    'approved_at' => now(),
-                ]);
-                return back()->with('error', 'Leave rejected by admin');
-            }
-
-            // if not rejected, then moved to next level
-            $leave->increment('approval_level');
-
-            return back()->with('success', 'Approved by admin. Assigned to next approver.');
-        }
-
-        /**
-         * STEP 2: NORMAL APPROVER FLOW
-         */
-
-        $currentApprover = EmploymentApprover::where('employee_id', $leave->employee_id)
-            ->where('level', $leave->approval_level)
-            ->firstOrFail();
-
-        // Ensure correct approver
-        abort_if($currentApprover->approver_id !== $employee->employee_id, 403);
-
-        if ($request->action === 'rejected') {
-            $leave->update([
-                'status' => 'rejected',
-                'approved_by' => $employee->employee_id,
-                'approved_at' => now(),
-            ]);
-            return back()->with('error', 'Leave rejected');
-        }
-
-        // Check next level
-        $nextLevelExists = EmploymentApprover::where('employee_id', $leave->employee_id)
-            ->where('level', '>', $leave->approval_level)
-            ->exists();
-
-        if ($nextLevelExists) {
-            $leave->increment('approval_level');
-            return back()->with('success', 'Forwarded to next approver');
-        }
-
-        // Final approval
-        $leave->update([
-            'status' => 'approved',
-            'approved_by' => $employee->employee_id,
-            'approved_at' => now(),
-        ]);
-
-        return redirect()->back()->with('success', 'Leave has been approved.');
     }
 }

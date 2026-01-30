@@ -23,7 +23,7 @@ class LeaveFactory extends Factory
             'employee_id'   => Employee::inRandomOrder()->first()->employee_id,
             'leave_type'    => fake()->randomElement(['annual', 'medical', 'emergency', 'hospitalization', 'maternity', 'compassionate', 'replacement', 'unpaid', 'marriage']),
             'leave_length'  => fake()->randomElement(['full_day', 'AM', 'PM']),
-            'reason'        => fake()->optional()->sentence(),
+            'leave_reason'  => fake()->optional()->sentence(),
             'start_date'    => $start = fake()->dateTimeBetween('now', '+1 month')->format('Y-m-d'),
             'end_date'      => fake()->dateTimeBetween($start, '+1 month')->format('Y-m-d'),
             'days'          => fake()->numberBetween(1, 10),
@@ -31,7 +31,7 @@ class LeaveFactory extends Factory
             'approved_by'   => fake()->optional()->randomElement(Employee::pluck('employee_id')->toArray()),
             'approval_level'=> fake()->numberBetween(0, 3),
             'approved_at'   => fake()->optional()->dateTimeBetween('now', '+1 month'),
-            'status'        => fake()->randomElement(['pending', 'approved', 'rejected']),
+            'leave_status'  => fake()->randomElement(['pending', 'approved', 'rejected']),
             'reject_reason' => fake()->optional()->sentence(),
         ];
     }

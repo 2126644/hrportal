@@ -48,7 +48,7 @@
         <!-- Leave Request Tab -->
         <div class="tab-pane fade show active" id="leave-request" role="tabpanel" aria-labelledby="leave-request-tab">
             <!-- Filters and Search -->
-            <form method="GET" action="{{ route('admin.request') }}">
+            <form method="GET" action="{{ route('admin.requests') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="leave-request">
                 <div class="row g-2 align-items-end">
                     @if (auth()->user()->role_id === 2)
@@ -92,7 +92,7 @@
                         </button>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-1">
-                        <a href="{{ route('admin.request') }}" class="btn btn-secondary w-100">
+                        <a href="{{ route('admin.requests') }}" class="btn btn-secondary w-100">
                             <i class="bi bi-arrow-clockwise me-2"></i>Reset
                         </a>
                     </div>
@@ -129,9 +129,23 @@
                                 <td>{{ $leave->start_date->format('d M Y') }} →
                                     {{ $leave->end_date->format('d M Y') }}</td>
                                 <td>{{ $leave->days }} days</td>
-                                <td>{{ $leave->reason }}</td>
+                                <td>{{ $leave->leave_reason }}</td>
 
                                 <td>
+                                    @php
+                                        $user = Auth::user();
+                                        $employeeId = optional($user->employee)->employee_id ?? null;
+
+                                        $currentApprover = $leave->approvers
+                                            ->where('level', $leave->approval_level)
+                                            ->where('approver_id', $employeeId)
+                                            ->first();
+
+                                        $canApprove =
+                                            $leave->leave_status === 'pending' &&
+                                            ($currentApprover || $user->role_id === 2);
+                                    @endphp
+                                    
                                     <div class="btn-group" role="group" aria-label="Leave actions">
                                         <!-- View Button: Opens modal (client-side, no form needed) -->
                                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
@@ -151,7 +165,7 @@
                                             </button>
                                         </form>
                                         <!-- Approve Button: Server-side action (wrapped in form) -->
-                                        @if ($leave->status === 'pending')
+                                        @if ($leave->leave_status === 'pending')
                                             <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
                                                 style="display: inline;"
                                                 onsubmit="return confirm('Are you sure you want to approve this leave request?');">
@@ -178,7 +192,7 @@
         <!-- Time Slip Tab -->
         <div class="tab-pane fade" id="timeslip-request" role="tabpanel" aria-labelledby="timeslip-request-tab">
             <!-- Filters and Search -->
-            <form method="GET" action="{{ route('admin.request') }}">
+            <form method="GET" action="{{ route('admin.requests') }}">
                 <input type="hidden" name="tab" class="active-tab-input" value="timeslip-request">
                 <div class="row g-2 align-items-end">
                     @if (auth()->user()->role_id === 2)
@@ -204,7 +218,7 @@
                         </button>
                     </div>
                     <div class="col-12 col-sm-6 col-lg-1">
-                        <a href="{{ route('admin.request') }}" class="btn btn-secondary w-100">
+                        <a href="{{ route('admin.requests') }}" class="btn btn-secondary w-100">
                             <i class="bi bi-arrow-clockwise me-2"></i>Reset
                         </a>
                     </div>
@@ -325,7 +339,7 @@
                             </tr>
                             <tr>
                                 <th>Reason</th>
-                                <td>{{ $leave->reason }}</td>
+                                <td>{{ $leave->leave_reason }}</td>
                             </tr>
                             <tr>
                                 <th>Date Applied</th>
@@ -335,7 +349,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        @if ($leave->status === 'pending')
+                        @if ($leave->leave_status === 'pending')
                             <form action="{{ route('leave.updateStatus', $leave->id) }}" method="POST"
                                 onsubmit="return confirm('Are you sure you want to approve this leave request?');">
                                 @csrf

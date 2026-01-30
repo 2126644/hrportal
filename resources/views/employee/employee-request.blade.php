@@ -15,6 +15,7 @@
                                         <li class="breadcrumb-item active" aria-current="page">Requests</li>
                                     </ol>
                                 </nav>
+
                                 <h3 class="page-title"><br>Leave & Time Slip Requests</h3>
                                 <p class="text-muted">Notes pending leave and time slip requests.</p>
                             </div>
@@ -99,12 +100,6 @@
                 </div>
             </form>
 
-            {{-- <div class="col-md-6 mt-4">
-                <div class="alert alert-info mb-0" role="alert">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    Approving a leave request will automatically adjust the employee's leave balance.
-                </div>
-            </div> --}}
             <div class="card-title mt-4">Pending Leave Requests</div>
 
             <div class="table-responsive">
@@ -155,7 +150,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted p-3">No pending leave requests</td>
+                                <td colspan="7" class="text-center text-muted p-3">No pending leave request</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Form;
+use App\Models\Employee;
+use App\Models\Leave;
+use App\Models\Attendance;
 
-class EmploymentApproverController extends Controller
+class FormApproverController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -24,6 +27,7 @@ class EmploymentApproverController extends Controller
         //
     }
 
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -48,20 +52,20 @@ class EmploymentApproverController extends Controller
             }
         }
 
-        $employee->approvers()->sync([]);
+        $employee->formApprovers()->sync([]);
 
         foreach ($request->approvers as $approver) {
             if (empty($approver['id'])) {
                 continue;
             }
 
-            $employee->approvers()->attach(
+            $employee->formApprovers()->attach(
                 $approver['id'],
                 ['level' => $approver['level']]
             );
         }
 
-        return redirect()->route('profile.show', $employee->employee_id)->with('success', 'Approvers assigned successfully');
+        return redirect()->back()->with('success', 'Approvers assigned successfully');
     }
 
     /**
