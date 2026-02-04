@@ -318,11 +318,21 @@ footer {
    DASHBOARD PAGE
 ============================= */
 /* Custom Helper Classes */
-.bg-primary-light { background-color: rgba(13, 110, 253, 0.08); }
-.bg-primary-soft { background-color: rgba(13, 110, 253, 0.12); }
-.bg-info-soft { background-color: rgba(13, 202, 240, 0.12); }
-.bg-warning-soft { background-color: rgba(255, 193, 7, 0.12); }
-.bg-soft-success { background-color: rgba(40, 167, 69, 0.15); }
+.bg-primary-light {
+    background-color: rgba(13, 110, 253, 0.08);
+}
+.bg-primary-soft {
+    background-color: rgba(13, 110, 253, 0.12);
+}
+.bg-info-soft {
+    background-color: rgba(13, 202, 240, 0.12);
+}
+.bg-warning-soft {
+    background-color: rgba(255, 193, 7, 0.12);
+}
+.bg-soft-success {
+    background-color: rgba(40, 167, 69, 0.15);
+}
 
 .hover-bg-light:hover {
     background-color: #f8fafc;
@@ -340,11 +350,19 @@ footer {
 }
 
 @keyframes pulse-red {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
 }
-
 
 .dashboard-header {
     margin: 1rem 0 1.5rem 0; /* Consistent spacing */
@@ -446,7 +464,71 @@ footer {
     background-color: #f8f9fa;
     border-radius: 6px;
 }
-/* ----------- */
+
+/* FOR ADMIN DASHBOARD */
+
+.card-fixed-height {
+    height: 100%;
+}
+
+.card-body-scrollable {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.card-body-scrollable-lg {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.request-list,
+.activity-timeline,
+.attendance-details,
+.list-group {
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.announcement-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.announcement-list::-webkit-scrollbar,
+.request-list::-webkit-scrollbar,
+.activity-timeline::-webkit-scrollbar,
+.attendance-details::-webkit-scrollbar,
+.list-group::-webkit-scrollbar {
+    width: 6px;
+}
+
+.announcement-list::-webkit-scrollbar-track,
+.request-list::-webkit-scrollbar-track,
+.activity-timeline::-webkit-scrollbar-track,
+.attendance-details::-webkit-scrollbar-track,
+.list-group::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.announcement-list::-webkit-scrollbar-thumb,
+.request-list::-webkit-scrollbar-thumb,
+.activity-timeline::-webkit-scrollbar-thumb,
+.attendance-details::-webkit-scrollbar-thumb,
+.list-group::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 3px;
+}
+
+.announcement-list::-webkit-scrollbar-thumb:hover,
+.request-list::-webkit-scrollbar-thumb:hover,
+.activity-timeline::-webkit-scrollbar-thumb:hover,
+.attendance-details::-webkit-scrollbar-thumb:hover,
+.list-group::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
 .request-stat-card {
     padding: 1rem 0.5rem;
     border-radius: 8px;

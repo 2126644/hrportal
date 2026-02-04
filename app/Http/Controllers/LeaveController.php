@@ -27,7 +27,7 @@ class LeaveController extends Controller
         // FOR LEAVE APPLICATION TAB
         // Total approved days used
 
-        $query = Leave::with('employee')->orderBy('created_at', 'desc');
+        $query = Leave::with(['employee', 'entitlement'])->orderBy('created_at', 'desc');
 
         // Only apply filters if the inputs exist
         if ($user->role_id === 2) {
@@ -45,8 +45,8 @@ class LeaveController extends Controller
             $query->where('employee_id', $employee->employee_id);
         }
 
-        if ($request->filled('leave_type')) {
-            $query->where('leave_type', $request->leave_type);
+        if ($request->filled('leave_entitlement_id')) {
+            $query->where('leave_entitlement_id', $request->leave_entitlement_id);
         }
 
         if ($request->filled('leave_status')) {
@@ -98,8 +98,9 @@ class LeaveController extends Controller
         // Base query
         $reportQuery = DB::table('leaves')
             ->join('employees', 'leaves.employee_id', '=', 'employees.employee_id')
+            ->leftJoin('leave_entitlements', 'leaves.leave_entitlement_id', '=', 'leave_entitlements.id')
             // combine leaves with employees to filter or display based on employee details (e.g. full name)
-            ->selectRaw('leaves.leave_type, MONTH(leaves.start_date) AS month, SUM(leaves.days) AS total')
+            ->selectRaw('leaves.leave_entitlement_id, leave_entitlements.name AS leave_type, MONTH(leaves.start_date) AS month, SUM(leaves.days) AS total')
             ->whereYear('leaves.start_date', $selectedYear);
         // Filter by whatever year the user selected instead of always now()->year
 
@@ -111,13 +112,13 @@ class LeaveController extends Controller
         }
 
         $leaveReport = $reportQuery
-            ->groupBy('leaves.leave_type', 'month')     // grouping by leave type and month
+            ->groupBy('leaves.leave_entitlement_id', 'leave_entitlements.name', 'month')     // grouping by leave type and month
             ->get();
 
         // pivot the results into [leave_type => [1=>count, 2=>count, ...]]
         $reportData = [];
         foreach ($leaveReport as $row) {
-            $reportData[$row->leave_type][(int)$row->month] = (float)$row->total;
+            $reportData[$row->leave_type ?? 'Unknown'][(int)$row->month] = (float)$row->total;
         }
 
         // -------------------------
@@ -125,13 +126,13 @@ class LeaveController extends Controller
         // Prefer the master table LeaveEntitlement. If empty, fallback to leave types present in reportData.
         // -------------------------
         $leaveTypes = LeaveEntitlement::all();
-        // returns a Collection of LeaveEntitlement MODELS (objects with ->leave_type)
+        // returns a Collection of LeaveEntitlement MODELS (objects with ->name)
 
         if ($leaveTypes->isEmpty()) {
             // fallback: convert the keys found in reportData to objects with leave_type and full_entitlement=0
             $leaveTypeNames = array_keys($reportData);
             $leaveTypes = collect(array_map(function ($name) {
-                return (object)['leave_type' => $name, 'full_entitlement' => 0];
+                return (object)['name' => $name, 'full_entitlement' => 0];
             }, $leaveTypeNames));
         }
 
@@ -152,7 +153,7 @@ class LeaveController extends Controller
 
         foreach ($leaveTypes as $lt) {
             // lt may be model or fallback object; unify to string and full value
-            $typeName = is_object($lt) ? ($lt->leave_type ?? '') : (string)$lt;
+            $typeName = is_object($lt) ? ($lt->name ?? '') : (string)$lt;
             $full     = is_object($lt) ? ($lt->full_entitlement ?? 0) : 0;
 
             if ($joinDate && $joinDate->year == now()->year) {
@@ -197,10 +198,10 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        $leaveTypeEnum = setting('leave_types', []);
+        $leaveTypes = LeaveEntitlement::orderBy('name')->get();
         $leaveLengthEnum = ['full_day', 'AM', 'PM'];
 
-        return view('employee.applyleave', compact('leaveTypeEnum', 'leaveLengthEnum'));
+        return view('employee.applyleave', compact('leaveTypes', 'leaveLengthEnum'));
     }
 
     /**
@@ -212,7 +213,7 @@ class LeaveController extends Controller
         $employee = Auth::user()->employee;
 
         $request->validate([
-            'leave_type'    => ['required', Rule::in(setting('leave_types'))],
+            'leave_entitlement_id' => ['required', Rule::exists('leave_entitlements', 'id')],
             'start_date'    => 'required|date',
             'end_date'      => 'required|date|after_or_equal:start_date',
             'leave_reason'  => 'required|string|max:255',
@@ -225,7 +226,7 @@ class LeaveController extends Controller
         $leave = new Leave();
         $leave->employee_id  = $employee->employee_id;
         $leave->created_at   = Carbon::now()->toDateString();
-        $leave->leave_type   = $request->leave_type;
+        $leave->leave_entitlement_id = $request->leave_entitlement_id;
         $leave->leave_reason = $request->leave_reason;
         $leave->start_date   = $request->start_date;
         $leave->end_date     = $request->end_date;

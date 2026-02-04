@@ -244,7 +244,7 @@
                 <table class="data-table">
                     <tr>
                         <td class="label">Department</td>
-                        <td class="value">{{ $employee->employments->department->department_name ?? '-' }}</td>
+                        <td class="value">{{ $employee->employments->department->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td class="label">Date of Employment</td>
@@ -254,15 +254,15 @@
                     </tr>
                     <tr>
                         <td class="label">Employment Status</td>
-                        <td class="value">{{ $employment->employment_status ?? '-' }}</td>
+                        <td class="value">{{ $employment->status?->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td class="label">Employment Type</td>
-                        <td class="value">{{ $employment->employment_type ?? '-' }}</td>
+                        <td class="value">{{ $employment->type?->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td class="label">Company Branch</td>
-                        <td class="value">{{ $employment->company_branch ?? '-' }}</td>
+                        <td class="value">{{ $employment->branch?->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td class="label">Report To</td>

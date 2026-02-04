@@ -1,6 +1,42 @@
 @extends('layouts.master')
 
 @section('content')
+    <style>
+        .quick-action-card {
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: all 0.25s ease;
+        }
+
+        .quick-action-card:hover {
+            background: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .quick-action-card strong {
+            font-size: 1.1rem;
+            /* main title */
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .quick-action-card small {
+            font-size: 0.9rem;
+            /* description */
+            line-height: 1.4;
+        }
+
+        .quick-action-card .icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+    </style>
     <div class="content container-fluid">
         <div class="page-header">
             <div class="row">
@@ -8,7 +44,7 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
-                                <h3 class="page-title"><br>Welcome {{ $employee->full_name }}!</h3>
+                                <h3 class="page-title"><br>Dashboard</h3>
                                 <p class="text-muted">Monitor your activities and work overview</p>
                             </div>
                             <div class="datetime-punch text-end">
@@ -21,158 +57,259 @@
             </div>
         </div>
 
-        <!-- Stats Overview -->
-        <div class="row">
-
-            <!-- Profile Summary -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted">Profile Summary</h6>
-                                <h5>{{ $profile['full_name'] }}</h5>
-
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-person-badge me-2 fs-6"></i>Employee ID: {{ $profile['employee_id'] }}
-                                </small>
-
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-briefcase me-2 fs-6"></i>Position: {{ $profile['position'] }}
-                                </small>
-
-                                {{-- <small class="text-muted d-block">
-                                    <i class="bi bi-buildings me-2 fs-6"></i>Company Branch:
-                                    {{ $profile['company_branch'] }}
-                                </small> --}}
+        <!-- Profile Summary & System Status Section -->
+        <div class="row mb-4 g-4">
+            <!-- Profile Card -->
+            <div class="col-12 col-lg-8">
+                <div class="card card-fixed-height border-0 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-body p-4 d-flex flex-column justify-content-center">
+                        <!-- Centered content vertically -->
+                        <div class="d-flex align-items-center flex-column flex-md-row">
+                            <!-- Avatar Section -->
+                            <div class="position-relative mb-3 mb-md-0 me-md-4">
+                                <img src="{{ Auth::user()->profile_photo_path ? asset('storage/' . Auth::user()->profile_photo_url) : asset('img/default-avatar.png') }}"
+                                    alt="{{ Auth::user()->name }}"
+                                    class="rounded-circle border border-4 border-light shadow-sm"
+                                    style="width:120px; height:120px; object-fit:cover;">
                             </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-person-circle text-primary"></i>
+
+                            <!-- User Info Section -->
+                            <div class="flex-grow-1 text-center text-md-start">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <small>Welcome,<br></small>
+                                        <h3 class="mb-0 fw-bold text-dark mb-2">{{ Auth::user()->name }}</h3>
+                                        <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1 mb-3"
+                                            style="font-size: 0.75rem;">
+                                            <i class="bi bi-shield-check me-1"></i>
+                                            {{ ucfirst(Auth::user()->role->role_name) }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-md-0">
+                                        <a href="{{ route('employee.profile.settings') }}"
+                                            class="btn btn-outline-primary btn-sm rounded-pill px-4 shadow-sm">
+                                            <i class="bi bi-gear-fill me-1"></i> Account Settings
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Details Section (Adjusted spacing) -->
+                                <div class="row g-3 mt-1 pt-3 border-top">
+                                    <div class="col-sm-auto me-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 text-primary me-3">
+                                                <i class="bi bi-person-badge fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block lh-1 mb-1" style="font-size: 0.7rem;">USER
+                                                    ID</small>
+                                                <span class="fw-bold text-dark">#{{ Auth::user()->id }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-auto me-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 text-primary me-3">
+                                                <i class="bi bi-person fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block lh-1 mb-1"
+                                                    style="font-size: 0.7rem;">EMPLOYEE
+                                                    ID</small>
+                                                <span class="fw-bold text-dark">{{ $employee->employee_id }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded p-2 text-primary me-3">
+                                                <i class="bi bi-envelope fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted d-block lh-1 mb-1" style="font-size: 0.7rem;">EMAIL
+                                                    ADDRESS</small>
+                                                <span class="fw-bold text-dark">{{ Auth::user()->email }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Attendance Summary -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
+            <!-- System Status Card -->
+            <div class="col-12 col-lg-4">
+                <div class="card card-fixed-height border-0 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted">Days Present</h6>
-                                <h3>{{ $attendance['days_present'] }}</h3>
-
-                                <small>Last Punch In: {{ $attendance['last_punch_in'] }}</small>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-list-check text-info"></i>
-                            </div>
+                            <h5 class="mb-0 fw-bold text-dark">Today's Attendance</h5>
                         </div>
                     </div>
-                </div>
-            </div>
+                    <div class="card-body p-4">
+                        <div class="list-group list-group-flush">
+                            @if ($todayAttendance)
+                                <div
+                                    class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info-soft rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                            style="width: 36px; height: 36px;">
+                                            <i class="bi bi-box-arrow-in-right text-info"></i>
+                                        </div>
+                                        <span class="fw-medium text-dark">Punch In</span>
+                                    </div>
+                                    <span class="text-dark small fw-bold">
+                                        {{ $todayAttendance->time_in ? $todayAttendance->time_in->format('g:i A') : '-' }}
+                                    </span>
+                                </div>
 
-            <!-- Tasks Summary -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted">Pending Tasks</h6>
-                                <h3>{{ $task['pending_task'] }}</h3>
-                                <small class="text-muted">/ {{ $task['total_task'] }} tasks</small>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-clock-history text-warning"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                <div
+                                    class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info-soft rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                            style="width: 36px; height: 36px;">
+                                            <i class="bi bi-box-arrow-right text-info"></i>
+                                        </div>
+                                        <span class="fw-medium text-dark">Punch Out</span>
+                                    </div>
+                                    <span class="fw-medium text-dark">
+                                        {{ $todayAttendance->time_out ? $todayAttendance->time_out->format('g:i A') : '-' }}
+                                    </span>
+                                </div>
 
-            <!-- Leave Summary -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card stat-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-title text-muted">Upcoming Leaves</h6>
-                                <h3>{{ $leave['upcoming_leave'] }}</h3>
-
-                                <small class="text-info">Next Leave: {{ $leave['next_leave_date'] }}</small>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="bi bi-airplane text-warning"></i>
-                            </div>
+                                <div
+                                    class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 border-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-warning-soft rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                            style="width: 36px; height: 36px;">
+                                            <i class="bi bi-clock-history text-warning"></i>
+                                        </div>
+                                        <span class="fw-medium text-dark">Attendance Status</span>
+                                    </div>
+                                    <div class="text-end">
+                                        <span
+                                            class="badge rounded-pill
+                                            @if ($todayAttendance->time_in) {{ $todayAttendance->status_time_in === 'Late' ? 'bg-warning' : 'bg-success' }}
+                                            @else
+                                                bg-danger @endif
+                                        ">
+                                            @if ($todayAttendance->time_in)
+                                                {{ $todayAttendance->status_time_in === 'Late' ? 'Late' : 'Present' }}
+                                            @else
+                                                Absent
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center text-muted">
+                                    <p><i class="bi bi-clock-history"></i>
+                                        No attendance record for today</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            {{-- Upcoming Tasks Column --}}
-            <div class="col-12 col-md-8 mb-4 d-flex">
-                <div class="card h-100 w-100">
-                    <div class="card-header">
-                        <h4 class="card-title">My Tasks</h4>
+        <div class="row mb-4 g-4">
+            <!-- Left: Today's Attendance -->
+            <div class="col-12 col-lg-8">
+                <div class="card card-fixed-height h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
                     </div>
                     <div class="card-body">
-                        {{-- Check if there are no tasks at all --}}
-                        @if ($taskRecords->count() === 0)
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox" style="font-size:4rem;"></i>
-                                <p>You have no tasks at the moment.</p>
-                            </div>
-                        @else
-                            @php
-                                // Define status groups in correct order
-                                $statusGroups = [
-                                    'to-do' => 'To-Do',
-                                    'in-progress' => 'In-Progress',
-                                    'in-review' => 'In-Review',
-                                    'completed' => 'Completed',
-                                ];
-                            @endphp
+                        <div class="row g-3">
 
-                            @foreach ($statusGroups as $statusKey => $statusLabel)
-                                @if (isset($tasksByStatus[$statusKey]) && $tasksByStatus[$statusKey]->count() > 0)
-                                    <h6 class="fw-bold mt-3">{{ $statusLabel }}</h6>
-                                    <ul class="list-unstyled mb-2">
-                                        @foreach ($tasksByStatus[$statusKey] as $taskItem)
-                                            <li class="d-flex align-items-start mb-2">
-                                                <span class="me-2 mt-1 text-primary">
-                                                    <i class="bi bi-circle-fill" style="font-size:0.5rem"></i>
-                                                </span>
-                                                <div>
-                                                    <strong>{{ $taskItem->task_name }}</strong><br>
-                                                    <small class="text-muted">
-                                                        Due
-                                                        {{ optional($taskItem->due_date)->format('d M Y h:i A') ?? '-' }}
-                                                    </small>
-                                                    @if ($taskItem->due_date && $taskItem->due_date < now() && $taskItem->task_status !== 'completed')
-                                                        <span class="badge bg-danger ms-2">Overdue</span>
-                                                    @endif
-                                                </div>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @endif
-                            @endforeach
-                        @endif
+                            {{-- New Task --}}
+                            <div class="col-12 col-md-6">
+                                <a href="{{ route('task.create') }}"
+                                    class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
+                                    <div class="icon bg-info-soft text-info me-3">
+                                        <i class="bi bi-ui-checks"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Create and assign tasks</small>
+                                        <strong class="text-dark">New Task</strong>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- New Project --}}
+                            <div class="col-12 col-md-6">
+                                <a href="{{ route('project.create') }}"
+                                    class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
+                                    <div class="icon bg-primary-soft text-primary me-3">
+                                        <i class="bi bi-ui-checks"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Start a new project</small>
+                                        <strong class="text-dark">New Project</strong>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- New Leave --}}
+                            <div class="col-12 col-md-6">
+                                <a href="{{ route('leave.create') }}"
+                                    class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
+                                    <div class="icon bg-warning-soft text-warning me-3">
+                                        <i class="bi bi-airplane"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Submit leave request for approval</small>
+                                        <strong class="text-dark">Apply Leave</strong>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- New Event --}}
+                            <div class="col-12 col-md-6">
+                                <a href="{{ route('event.create') }}"
+                                    class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
+                                    <div class="icon bg-success-soft text-success me-3">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Create event and invite others</small>
+                                        <strong class="text-dark">New Event</strong>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- New Form --}}
+                            <div class="col-12 col-md-6">
+                                <a href="{{ route('form.work-handover.create') }}"
+                                    class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
+                                    <div class="icon bg-secondary-soft text-secondary me-3">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Prepare and submit form</small>
+                                        <strong class="text-dark">Fill In Form</strong>
+                                    </div>
+                                </a>
+                            </div>
+
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <!-- Announcements -->
-            <div class="col-12 col-md-4 mb-4 d-flex">
-                <div class="card h-100 w-100">
-                    <div class="card-header">
+            <!-- Right: Announcements -->
+            <div class="col-12 col-lg-4">
+                <div class="card card-fixed-height h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Announcements</h5>
+                        <a href="{{ route('announcement.index.employee') }}" class="btn btn-outline-primary btn-sm">
+                            View All <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
                     </div>
                     <div class="card-body">
-                        <!-- Announcements List -->
                         <div class="announcement-list">
                             @forelse($announcements as $announcement)
                                 <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
@@ -187,73 +324,149 @@
                                         </span>
                                     </div>
                                     <p class="text-muted mb-1 small">{{ Str::limit($announcement->description, 100) }}</p>
-                                    <small class="text-muted">Posted at: {{ $announcement->created_at->format('M j, g:i A') }}</small>
+                                    <small class="text-muted">Posted at:
+                                        {{ $announcement->created_at->format('M j, g:i A') }}</small>
                                 </div>
                             @empty
                                 <p class="text-muted small">No recent announcements found.</p>
                             @endforelse
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- View All Link -->
-                        <div class="text-center">
-                            <a href="{{ route('announcement.index.admin') }}" class="btn btn-outline-primary btn-sm">
-                                View All Announcements <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
+        <div class="row mb-4 g-4">
+
+            <!-- Left: Leave/Time Slip Requests -->
+            <div class="col-12 col-lg-8">
+                <div class="card card-fixed-height h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">My Leave & Time Slip Requests</h5>
+                        <a href="{{ route('employee.myrequests') }}" class="btn btn-outline-primary btn-sm">
+                            View All <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <!-- Pending Requests Summary -->
+                        <div class="row text-center mb-4">
+                            <div class="col-4">
+                                <div class="request-stat-card" style="cursor: pointer;">
+                                    <h4 class="text-warning">{{ $totalPending }}</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                                {{-- <div class="request-stat-card"
+                                    style="cursor: pointer; border-radius: 8px; background: #fff3cd;">
+                                    <h4 class="text-warning mb-0" id="empPendingCount">0</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div> --}}
+                            </div>
+                            <div class="col-4">
+                                <div class="request-stat-card" style="cursor: pointer;">
+                                    <h4 class="text-success">{{ $totalApproved }}</h4>
+                                    <small class="text-muted">Approved</small>
+                                </div>
+                                {{-- <div class="request-stat-card p-3"
+                                    style="cursor: pointer; border-radius: 8px; background: #d4edda;">
+                                    <h4 class="text-success mb-0" id="empApprovedCount">0</h4>
+                                    <small class="text-muted">Approved</small>
+                                </div> --}}
+                            </div>
+                            <div class="col-4">
+                                <div class="request-stat-card" style="cursor: pointer;">
+                                    <h4 class="text-danger">{{ $totalRejected }}</h4>
+                                    <small class="text-muted">Rejected</small>
+                                </div>
+                                {{-- <div class="request-stat-card p-3"
+                                    style="cursor: pointer; border-radius: 8px; background: #f8d7da;">
+                                    <h4 class="text-danger mb-0" id="empRejectedCount">0</h4>
+                                    <small class="text-muted">Rejected</small>
+                                </div> --}}
+                            </div>
+                        </div>
+
+                        <!-- Recent Requests -->
+                        <h6 class="mb-4">Recent Requests</h6>
+                        <div class="request-list">
+                            @forelse($recentRequests as $request)
+                                <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
+                                    onclick="window.location.href='{{ route('admin.requests') }}'"
+                                    style="cursor: pointer; border-radius: 8px;">
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="avatar-sm bg-light rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ Auth::user()->name }}</strong>
+                                            <div class="text-muted small">
+                                                {{ $request['type'] }}
+                                                @if ($request['is_time_slip'])
+                                                    <span class="badge bg-info ms-1">Time Slip</span>
+                                                @else
+                                                    <span class="badge bg-primary ms-1">Leave</span>
+                                                @endif
+                                            </div>
+                                            <small class="text-muted">{{ $request['duration'] }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span
+                                            class="badge 
+                                            @if ($request['status'] == 'pending') bg-warning 
+                                            @elseif($request['status'] == 'approved') bg-success 
+                                            @else bg-danger @endif">
+                                            {{ ucfirst($request['status']) }}
+                                        </span>
+                                        <div class="text-muted small mt-1">{{ $request['submitted_date'] }}</div>
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-muted small">No pending requests found.</p>
+                            @endforelse
                         </div>
 
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row">
-            <!-- Upcoming Events Column -->
-            <div class="col-12 col-md-8 mb-4 d-flex">
-                <div class="card w-100 h-100">
-                    <div class="card-header">
-                        <h4 class="card-title">Upcoming Events</h4>
+            <!-- Right: Recent Activities -->
+            <div class="col-12 col-lg-4">
+                <div class="card card-fixed-height h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">My Recent Activities</h5>
                     </div>
                     <div class="card-body">
-                        @forelse ($upcomingEvents as $event)
-                            <div class="event-item">
-                                <div class="event-title">
-                                    <strong>{{ $event->event_name }}</strong>
+                        <div class="activity-timeline">
+                            @forelse($recentActivities as $activity)
+                                <div class="activity-item d-flex">
+                                    <div class="activity-icon me-3">
+                                        <i class="bi bi-{{ $activity['icon'] }} text-primary"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6 class="mb-1">{{ $activity['title'] }}</h6>
+                                        <p class="text-muted mb-1">{{ $activity['description'] }}</p>
+                                        <small class="text-muted">{{ $activity['time'] }}</small>
+                                    </div>
                                 </div>
-
-                                <span title="Date">📅 {{ $event->event_date->format('d F Y') }}</span>
-                                <span title="Time">⏰ {{ $event->event_time->format('g:i A') }}</span><br>
-                                <span title="Location">📍 {{ $event->event_location }}</span><br>
-                            </div>
-                        @empty
-                            <div class="alert alert-warning">
-                                No upcoming events.
-                            </div>
-                        @endforelse
+                            @empty
+                                <div class="text-center text-muted">
+                                    <p><i class="bi bi-hourglass-split"></i>
+                                        No recent activities</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Calendar Column -->
-            {{-- <div class="col-12 col-md-4 mb-4 d-flex">
-                <div class="card w-100 h-100">
-                    <div class="card-header">
-                        <h4 class="card-title">Calendar</h4>
-                    </div>
-                    <div class="card-body">
-                        <div id="calendar-doctor" class="calendar-container"></div>
-                    </div>
-                </div>
-            </div> --}}
         </div>
     </div>
 @endsection
 
 @push('scripts')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
     <script>
-        // Update date and time every second
+        // Update date and time
         function updateDateTime() {
             const now = new Date();
             const dateOptions = {

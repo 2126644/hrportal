@@ -65,12 +65,12 @@
                     @endif
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label class="form-label">Leave Type</label>
-                        <select name="leave_type" class="form-control">
+                        <select name="leave_entitlement_id" class="form-control">
                             <option value="">All Leave Types</option>
                             @foreach ($leaveTypes as $type)
-                                <option value="{{ $type->leave_type }}"
-                                    {{ request('leave_type') == $type->leave_type ? 'selected' : '' }}>
-                                    {{ ucfirst($type->leave_type) }} Leave
+                                <option value="{{ $type->id }}"
+                                    {{ request('leave_entitlement_id') == $type->id ? 'selected' : '' }}>
+                                    {{ ucfirst($type->name) }}
                                 </option>
                             @endforeach
                         </select>
@@ -169,7 +169,7 @@
                                         <tr data-status="{{ $leave->leave_status }}">
                                             <td>{{ $leave->created_at->format('d M Y') }}</td>
                                             <td>{{ $leave->employee->full_name ?? 'N/A' }}</td>
-                                            <td>{{ ucfirst($leave->leave_type) }} Leave</td>
+                                            <td>{{ ucfirst($leave->entitlement?->name ?? 'Leave') }}</td>
                                             <td>{{ $leave->start_date->format('d M Y') }} →
                                                 {{ $leave->end_date->format('d M Y') }}</td>
                                             <td>{{ $leave->days }} days</td>
@@ -300,7 +300,7 @@
                                 $rowTotal = 0;
 
                                 // Normalize type name whether $lt is a model/object or a plain string
-                                $typeName = is_object($lt) ? $lt->leave_type ?? (string) $lt : (string) $lt;
+                                $typeName = is_object($lt) ? $lt->name ?? (string) $lt : (string) $lt;
 
                                 // get entitlement for this leave type (from controller)
                                 $finalEntitlement = $finalEntitlements[$typeName] ?? 0;
@@ -393,7 +393,7 @@
                             </tr>
                             <tr>
                                 <th>Leave Type</th>
-                                <td>{{ ucfirst($leave->leave_type) }}</td>
+                                <td>{{ ucfirst($leave->entitlement?->name ?? 'Leave') }}</td>
                             </tr>
                             <tr>
                                 <th>Start Date</th>

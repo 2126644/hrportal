@@ -163,7 +163,7 @@
                 <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 20px;">
                     <div class="d-flex align-items-center gap-2 mb-4">
                         <span class="badge bg-soft-primary text-primary border px-3 py-2 text-uppercase"
-                            style="background: #eef2ff;">{{ $event->event_category }}</span>
+                            style="background: #eef2ff;">{{ $event->category?->name }}</span>
                         <span class="text-{{ $event->event_status === 'cancelled' ? 'danger' : 'success' }} fw-bold">
                             <i class="bi bi-dot" style="font-size: 1.5rem;"></i> {{ ucfirst($event->event_status) }}
                         </span>

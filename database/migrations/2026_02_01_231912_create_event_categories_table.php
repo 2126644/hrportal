@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leave_entitlements', function (Blueprint $table) {
+        Schema::create('event_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->decimal('full_entitlement', 5, 2);
+             $table->string('name')->unique();
             $table->timestamps();
         });
     }
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_entitlements');
+        Schema::dropIfExists('event_categories');
     }
 };

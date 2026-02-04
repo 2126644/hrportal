@@ -12,9 +12,9 @@ class Leave extends Model
 
     protected $fillable = [
         'employee_id',
-        'leave_type',
+        'leave_entitlement_id',
         'leave_length',
-        'leave_reason',   //leave_reason
+        'leave_reason',
         'start_date',
         'end_date',
         'days',
@@ -24,7 +24,7 @@ class Leave extends Model
         'approval_level',
         'approval_at',
 
-        'leave_status',   // leave_status
+        'leave_status',
         'reject_reason',
     ];
 
@@ -42,5 +42,15 @@ class Leave extends Model
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by', 'employee_id');
+    }
+
+    public function entitlement()
+    {
+        return $this->belongsTo(LeaveEntitlement::class, 'leave_entitlement_id', 'id');
+    }
+
+    public function approvers()
+    {
+        return $this->employee->approvers();
     }
 }

@@ -27,16 +27,17 @@ class LeavesExport implements FromView
         // Use SUM(days) so we count days, not number of records
         // -------------------------
         $leaveReport = DB::table('leaves')
-            ->selectRaw('leave_type, MONTH(start_date) AS month, SUM(days) AS total')
+            ->leftJoin('leave_entitlements', 'leaves.leave_entitlement_id', '=', 'leave_entitlements.id')
+            ->selectRaw('leaves.leave_entitlement_id, leave_entitlements.name AS leave_type, MONTH(start_date) AS month, SUM(days) AS total')
             ->where('employee_id', $employee->employee_id)
             ->whereYear('start_date', now()->year)
-            ->groupBy('leave_type', 'month')
+            ->groupBy('leaves.leave_entitlement_id', 'leave_entitlements.name', 'month')
             ->get();
 
         // pivot the results into [leave_type => [1=>count, 2=>count, ...]]
         $reportData = [];
         foreach ($leaveReport as $row) {
-            $reportData[$row->leave_type][(int)$row->month] = (float)$row->total;
+            $reportData[$row->leave_type ?? 'Unknown'][(int)$row->month] = (float)$row->total;
         }
 
         // -------------------------
@@ -44,13 +45,13 @@ class LeavesExport implements FromView
         // Prefer the master table LeaveEntitlement. If empty, fallback to leave types present in reportData.
         // -------------------------
         $leaveTypes = LeaveEntitlement::all();
-        // returns a Collection of LeaveEntitlement MODELS (objects with ->leave_type)
+        // returns a Collection of LeaveEntitlement MODELS (objects with ->name)
 
         if ($leaveTypes->isEmpty()) {
             // fallback: convert the keys found in reportData to objects with leave_type and full_entitlement=0
             $leaveTypeNames = array_keys($reportData);
             $leaveTypes = collect(array_map(function ($name) {
-                return (object)['leave_type' => $name, 'full_entitlement' => 0];
+                return (object)['name' => $name, 'full_entitlement' => 0];
             }, $leaveTypeNames));
         }
 
@@ -63,7 +64,7 @@ class LeavesExport implements FromView
 
         foreach ($leaveTypes as $lt) {
             // lt may be model or fallback object; unify to string and full value
-            $typeName = is_object($lt) ? ($lt->leave_type ?? '') : (string)$lt;
+            $typeName = is_object($lt) ? ($lt->name ?? '') : (string)$lt;
             $full     = is_object($lt) ? ($lt->full_entitlement ?? 0) : 0;
 
             if ($joinDate && $joinDate->year == now()->year) {

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('leaves', function (Blueprint $table) {
             $table->id();
             $table->string('employee_id');  // add foreign key column
-            $table->string('leave_type');
+            $table->foreignId('leave_entitlement_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('leave_length', ['full_day', 'AM', 'PM']);
             $table->text('leave_reason')->nullable();
             $table->date('start_date');
@@ -31,7 +31,7 @@ return new class extends Migration
 
             $table->foreign('employee_id')->references('employee_id')->on('employees')->cascadeOnDelete();  // when the parent record is deleted, the child is deleted
             $table->foreign('approved_by')->references('employee_id')->on('employees')->nullOnDelete();
-            
+
             $table->timestamps();
         });
     }

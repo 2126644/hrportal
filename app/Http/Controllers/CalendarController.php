@@ -89,7 +89,9 @@ class CalendarController extends Controller
         $contractColour = '#fbbf24'; // amber
         $internColour   = '#fb7185'; // rose
 
-        $employmentQuery = Employment::with('employee')->where('employment_status', 'active')->whereNotNull('contract_end');
+        $employmentQuery = Employment::with(['employee', 'type', 'status'])
+            ->whereHas('status', fn($q) => $q->where('name', 'active'))
+            ->whereNotNull('contract_end');
 
         // Employee: only their own
         if ($user->role_id !== 2 && $employee) {
@@ -100,7 +102,7 @@ class CalendarController extends Controller
 
         foreach ($employments as $emp) {
 
-            $isIntern = strtolower($emp->employment_type) === 'intern';
+            $isIntern = strtolower($emp->type?->name ?? '') === 'intern';
 
             $calendarEvents->push([
                 'title' => ($isIntern ? '🎓 Internship Ends: ' : '⏳ Contract Ends: ')

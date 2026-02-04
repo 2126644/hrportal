@@ -88,7 +88,7 @@
                                                         value="{{ $dept->id }}" id="dept_{{ $dept->id }}"
                                                         name="department_ids[]">
                                                     <label class="form-check-label" for="dept_{{ $dept->id }}">
-                                                        {{ $dept->department_name }}
+                                                        {{ $dept->name }}
                                                     </label>
                                                 </div>
                                             </div>

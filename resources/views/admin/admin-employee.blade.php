@@ -56,36 +56,24 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Employment Status</label>
-                            <select name="employment_status" class="form-select">
+                            <select name="employment_status_id" class="form-select">
                                 <option value="">All Statuses</option>
-                                @php
-                                    $statuses = \App\Models\Employment::select('employment_status')
-                                        ->distinct()
-                                        ->pluck('employment_status')
-                                        ->filter();
-                                @endphp
-                                @foreach ($statuses as $status)
-                                    <option value="{{ $status }}"
-                                        {{ request('employment_status') == $status ? 'selected' : '' }}>
-                                        {{ ucfirst($status) }}
+                                @foreach ($employmentStatuses as $status)
+                                    <option value="{{ $status->id }}"
+                                        {{ request('employment_status_id') == $status->id ? 'selected' : '' }}>
+                                        {{ ucfirst($status->name) }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Company Branch</label>
-                            <select name="company_branch" class="form-select">
+                            <select name="company_branch_id" class="form-select">
                                 <option value="">All Branches</option>
-                                @php
-                                    $branches = \App\Models\Employment::select('company_branch')
-                                        ->distinct()
-                                        ->pluck('company_branch')
-                                        ->filter();
-                                @endphp
-                                @foreach ($branches as $branch)
-                                    <option value="{{ $branch }}"
-                                        {{ request('company_branch') == $branch ? 'selected' : '' }}>
-                                        {{ $branch }}
+                                @foreach ($companyBranches as $branch)
+                                    <option value="{{ $branch->id }}"
+                                        {{ request('company_branch_id') == $branch->id ? 'selected' : '' }}>
+                                        {{ $branch->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -206,14 +194,14 @@
                                                 <strong>{{ $employee->full_name }}</strong>
                                                 <br>
                                                 <small
-                                                    class="text-muted">{{ $employee->employment->company_branch ?? 'Not assigned' }}</small>
+                                                    class="text-muted">{{ $employee->employment->branch?->name ?? 'Not assigned' }}</small>
                                             </div>
                                         </div>
                                     </td>
                                     <td>{{ $employee->employee_id }}</td>
                                     <td>
                                         <span
-                                            class="badge bg-light text-dark">{{ $employee->employment->department->department_name ?? 'Not assigned' }}</span>
+                                            class="badge bg-light text-dark">{{ $employee->employment->department->name ?? 'Not assigned' }}</span>
                                     </td>
                                     <td>{{ $employee->employment->position ?? 'Staff' }}</td>
                                     <td>
@@ -222,7 +210,7 @@
                                     </td>
                                     <td>
                                         @php
-                                            $status = $employee->employment->employment_status ?? 'active';
+                                            $status = $employee->employment->status?->name ?? 'active';
                                             $statusColors = [
                                                 'active' => 'success',
                                                 'terminated' => 'danger',

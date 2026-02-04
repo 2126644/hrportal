@@ -4,18 +4,18 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Setting;
+use App\Models\CompanyBranch;
 
-class SettingSeeder extends Seeder
+class CompanyBranchSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Setting::updateOrCreate(
-            ['key' => 'max_timeslip_hours'],
-            ['value' => 3]
-        );
+        CompanyBranch::insert([
+            ['name' => 'AHG'],
+            ['name' => 'D-8CEFC'],
+        ]);
     }
 }

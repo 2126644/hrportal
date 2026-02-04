@@ -31,7 +31,7 @@ class WorkHandoverController extends Controller
         // Employees list for "handover to"
         $employees = Employee::with('employment.department')
             ->where('employee_id', '!=', $employee->employee_id) // cannot handover to self
-            ->whereHas('employment', fn($q) => $q->where('employment_status', 'active'))
+            ->whereHas('employment.status', fn($q) => $q->where('name', 'active'))
             ->orderBy('full_name')
             ->get();
 

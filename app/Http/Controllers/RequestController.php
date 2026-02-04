@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Leave;
 use App\Models\Attendance;
 use App\Models\RequestApprover;
+use App\Models\LeaveEntitlement;
 
 class RequestController extends Controller
 {
@@ -74,10 +75,10 @@ class RequestController extends Controller
 
         $employeeId = optional(Auth::user()->employee)->employee_id;
 
-        $leaveTypes = Leave::select('leave_type')->distinct()->pluck('leave_type');
+        $leaveTypes = LeaveEntitlement::orderBy('name')->get();
 
         // --- Leave Requests with filters ---
-        $leavesQuery = Leave::with('employee')
+        $leavesQuery = Leave::with(['employee', 'entitlement'])
             ->where('leave_status', 'pending')
             ->whereHas('employee.approvers', function ($q) use ($employeeId) {
                 $q->where('approver_id', $employeeId)
@@ -93,8 +94,8 @@ class RequestController extends Controller
             });
         }
 
-        if ($request->filled('leave_type')) {
-            $leavesQuery->where('leave_type', $request->leave_type);
+        if ($request->filled('leave_entitlement_id')) {
+            $leavesQuery->where('leave_entitlement_id', $request->leave_entitlement_id);
         }
 
         if ($request->filled('start_date')) {
@@ -147,10 +148,10 @@ class RequestController extends Controller
         $user = Auth::user();
         $employee = $user->employee; // null for admin if no employee record
 
-        $leaveTypes = Leave::select('leave_type')->distinct()->pluck('leave_type');
+        $leaveTypes = LeaveEntitlement::orderBy('name')->get();
 
         // --- Leave Requests with filters ---
-        $leavesQuery = Leave::with('employee')
+        $leavesQuery = Leave::with(['employee', 'entitlement'])
             ->where('employee_id', $employee->employee_id)
             ->where('leave_status', 'pending')
             ->orderBy('created_at', 'desc');
@@ -163,8 +164,8 @@ class RequestController extends Controller
             });
         }
 
-        if ($request->filled('leave_type')) {
-            $leavesQuery->where('leave_type', $request->leave_type);
+        if ($request->filled('leave_entitlement_id')) {
+            $leavesQuery->where('leave_entitlement_id', $request->leave_entitlement_id);
         }
 
         if ($request->filled('start_date')) {
@@ -212,10 +213,10 @@ class RequestController extends Controller
     // to show all requests for approval (for admin)
     public function adminRequests(Request $request)
     {
-        $leaveTypes = Leave::select('leave_type')->distinct()->pluck('leave_type');
+        $leaveTypes = LeaveEntitlement::orderBy('name')->get();
 
         // --- Leave Requests with filters ---
-        $leavesQuery = Leave::with('employee')
+        $leavesQuery = Leave::with(['employee', 'entitlement', 'employee.approvers'])
             ->where('leave_status', 'pending')
             ->orderBy('created_at', 'desc');
 
@@ -227,8 +228,8 @@ class RequestController extends Controller
             });
         }
 
-        if ($request->filled('leave_type')) {
-            $leavesQuery->where('leave_type', $request->leave_type);
+        if ($request->filled('leave_entitlement_id')) {
+            $leavesQuery->where('leave_entitlement_id', $request->leave_entitlement_id);
         }
 
         if ($request->filled('start_date')) {

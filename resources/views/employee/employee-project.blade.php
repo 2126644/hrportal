@@ -204,11 +204,12 @@
 
                                     <div>
                                         <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>Start:</strong> {{ $project->start_date->format('d M Y') }}
+                                        <strong>Start:</strong> {{ optional($project->start_date)->format('d M Y') ?? '-' }}    
+                                        {{-- Never call ->format() directly on a nullable column --}}
                                     </div>
                                     <div>
                                         <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>End:</strong> {{ $project->end_date->format('d M Y') }}
+                                        <strong>End:</strong> {{ optional($project->end_date)->format('d M Y') ?? '-' }}
                                     </div>
                                 </div>
                             </div>

@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('employments', function (Blueprint $table) {
             $table->id();
             $table->string('employee_id');  // add foreign key column
-            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
-            $table->string('employment_type'); // full time, part time, intern, contract
-            $table->string('employment_status'); // active, probation, suspended, resigned, terminated
-            $table->enum('company_branch', ['AHG', 'D-8CEFC'])->default('AHG');
+            $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('employment_type_id')->nullable()->constrained()->nullOnDelete(); // full time, part time, intern, contract
+            $table->foreignId('employment_status_id')->nullable()->constrained()->nullOnDelete(); // active, probation, suspended, resigned, terminated
+            $table->foreignId('company_branch_id')->nullable()->constrained()->nullOnDelete();
             $table->string('report_to')->nullable();
             $table->string('position')->nullable();
 

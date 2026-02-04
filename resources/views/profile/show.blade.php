@@ -136,7 +136,7 @@
                                 <div class="detail-row d-flex justify-content-between align-items-center mb-2">
                                     <span class="detail-label text-muted">Employment Status:</span>
                                     <span class="detail-value fw-semibold">
-                                        {{ ucfirst($employment->employment_status ?? '-') }}
+                                        {{ ucfirst($employment->status?->name ?? '-') }}
                                     </span>
                                 </div>
                             @endif
@@ -363,7 +363,7 @@
                                         <div class="detail-item">
                                             <div class="detail-label text-muted small">Employment Type</div>
                                             <div class="detail-value fw-semibold">
-                                                {{ ucwords(str_replace('_', ' ', $employment->employment_type ?? '-')) }}
+                                                {{ ucwords(str_replace('_', ' ', $employment->type?->name ?? '-')) }}
                                             </div>
                                         </div>
                                     </div>
@@ -379,7 +379,7 @@
                                         <div class="detail-item">
                                             <div class="detail-label text-muted small">Company Branch</div>
                                             <div class="detail-value fw-semibold">
-                                                {{ $employment->company_branch ?? '-' }}
+                                                {{ $employment->branch?->name ?? '-' }}
                                             </div>
                                         </div>
                                     </div>
@@ -398,7 +398,7 @@
                                         <div class="detail-item">
                                             <div class="detail-label text-muted small">Department</div>
                                             <div class="detail-value fw-semibold">
-                                                {{ $employee->employment?->department?->department_name ?? '-' }}
+                                                {{ $employee->employment?->department?->name ?? '-' }}
                                             </div>
                                         </div>
                                     </div>

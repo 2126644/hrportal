@@ -6,10 +6,12 @@ use App\Models\Event;
 use App\Models\Employee;
 use App\Models\EventAttendee;
 use App\Models\Department;
+use App\Models\EventCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
+
 
 class EventController extends Controller
 {
@@ -27,6 +29,7 @@ class EventController extends Controller
             'createdBy',
             'attendees.employee',
             'attendees.department',
+            'category',
         ])->orderBy('created_at', 'desc');
 
         // Employee: only events assigned to them (via pivot)
@@ -57,8 +60,8 @@ class EventController extends Controller
             });
         }
 
-        if ($request->filled('event_category')) {
-            $query->where('event_category', $request->event_category);
+        if ($request->filled('event_category_id')) {
+            $query->where('event_category_id', $request->event_category_id);
         }
 
         if ($request->filled('event_status')) {
@@ -72,7 +75,7 @@ class EventController extends Controller
         // Finally fetch results
         $events = $query->get();
 
-        $eventCategories = setting('event_categories', []);
+        $eventCategories = EventCategory::orderBy('name')->get();
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
 
         $view = $user->role_id == 2 ? 'admin.admin-event' : 'employee.employee-event';
@@ -97,7 +100,7 @@ class EventController extends Controller
         $employees = Employee::with('employment.department')
             ->whereHas('employment', function ($q) use ($departmentId) {
                 $q->where('department_id', $departmentId)
-                    ->where('employment_status', 'active');
+                    ->whereHas('status', fn($qs) => $qs->where('name', 'active'));
             })
             ->get()
             ->map(fn($e) => [
@@ -106,15 +109,15 @@ class EventController extends Controller
                 'department' => $e->employment->department->department_name ?? 'N/A',
             ]);
 
-        $departments = Department::orderBy('department_name')->get();
+        $departments = Department::orderBy('name')->get();
 
         $allEmployees = Employee::with('employment.department')->get()->map(fn($e) => [
             'id'         => $e->employee_id,
             'name'       => $e->full_name,
-            'department' => $e->employment->department->department_name ?? 'N/A',
+            'department' => $e->employment->department->name ?? 'N/A',
         ]);
 
-        $eventCategoriesEnum = setting('event_categories', []);
+        $eventCategoriesEnum = EventCategory::orderBy('name')->get();
 
         return view('event.event-create', compact('role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum'));
     }
@@ -139,7 +142,7 @@ class EventController extends Controller
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
-            'event_category'    => ['required', Rule::in(setting('event_categories'))],
+            'event_category_id' => ['required', Rule::exists('event_categories', 'id')],
             'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // max 2MB
             'event_status'      => 'required|in:upcoming,ongoing,completed,cancelled',
             'tags'              => 'nullable|string|max:100',    // expecting an array from form
@@ -165,7 +168,7 @@ class EventController extends Controller
         $event->event_date       = $request->event_date;
         $event->event_time       = $request->event_time;
         $event->event_location   = $request->event_location;
-        $event->event_category   = $request->event_category;
+        $event->event_category_id = $request->event_category_id;
         $event->image            = $imagePath; // can be null
         $event->tags             = $request->tags;
         // event_status defaults to "upcoming" in the migration
@@ -201,8 +204,12 @@ class EventController extends Controller
                 ]);
             }
         }
+        
+        $route = $user->role_id === 2
+            ? 'event.index.admin'
+            : 'event.index.employee';
 
-        return redirect()->route('event.create')->with('success', 'Event created successfully!');
+        return redirect()->route($route)->with('success', 'Event created successfully!');
     }
 
     /**
@@ -217,7 +224,7 @@ class EventController extends Controller
 
         $event = Event::findOrFail($id);
 
-        $eventCategories = setting('event_categories', []);
+        $eventCategories = EventCategory::orderBy('name')->get();
         $eventStatuses = ['upcoming', 'ongoing', 'completed', 'cancelled']; // don’t change dynamically — they’re controlled logic states, not user input
 
         return view('event.event-show', compact('role_id', 'event', 'eventCategories', 'eventStatuses'));
@@ -243,21 +250,21 @@ class EventController extends Controller
         $employees = Employee::with('employment.department')
             ->whereHas('employment', function ($q) use ($departmentId) {
                 $q->where('department_id', $departmentId)
-                    ->where('employment_status', 'active');
+                    ->whereHas('status', fn($qs) => $qs->where('name', 'active'));
             })
             ->get()
             ->map(fn($e) => [
                 'id'         => $e->employee_id,
                 'name'       => $e->full_name,
-                'department' => $e->employment->department->department_name ?? 'N/A',
+                'department' => $e->employment->department->name ?? 'N/A',
             ]);
 
-        $departments = Department::orderBy('department_name')->get();
+        $departments = Department::orderBy('name')->get();
 
         $allEmployees = Employee::with('employment.department')->get()->map(fn($e) => [
             'id'         => $e->employee_id,
             'name'       => $e->full_name,
-            'department' => $e->employment->department?->department_name ?? 'N/A',
+            'department' => $e->employment->department?->name ?? 'N/A',
         ]);
 
         $selectedDepartmentIds = $event->attendees()
@@ -272,10 +279,10 @@ class EventController extends Controller
             ->map(fn($a) => [
                 'id' => $a->employee->employee_id,
                 'name' => $a->employee->full_name,
-                'department' => $a->employee->department?->department_name ?? 'N/A',
+                'department' => $a->employee->department?->name ?? 'N/A',
             ]);
 
-        $eventCategoriesEnum = setting('event_categories', []);
+        $eventCategoriesEnum = EventCategory::orderBy('name')->get();
 
         return view('event.event-edit', compact('event', 'role_id', 'departments', 'allEmployees', 'employees', 'eventCategoriesEnum', 'selectedDepartmentIds', 'assignedEmployees'));
     }
@@ -298,7 +305,7 @@ class EventController extends Controller
             'event_date'        => 'required|date',
             'event_time'        => 'required|date_format:H:i',
             'event_location'    => 'required|string|max:255',
-            'event_category'    => ['required', Rule::in(setting('event_categories'))],
+            'event_category_id' => ['required', Rule::exists('event_categories', 'id')],
             'image'             => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // max 2MB
             'event_status'      => 'required|in:upcoming,ongoing,completed,cancelled',
             'tags'              => 'nullable|string|max:100',    // expecting an array from form
@@ -309,10 +316,23 @@ class EventController extends Controller
 
         ]);
 
-        // ✅ 3. Create and save event
+        // 3. Create and save event
         $event = Event::findOrFail($id);
 
+        // If user clicked ❌ remove image
+        if ($request->input('remove_image') == 1) {
+            if ($event->image) {
+                Storage::delete('public/' . $event->image);
+            }
+            $event->image = null;
+        }
+
+        // If user uploaded a new image
         if ($request->hasFile('image')) {
+            if ($event->image) {
+                Storage::delete('public/' . $event->image);
+            }
+
             $event->image = $request->file('image')->store('events', 'public');
         }
 
@@ -322,7 +342,7 @@ class EventController extends Controller
             'event_date'     => $request->event_date,
             'event_time'     => $request->event_time,
             'event_location' => $request->event_location,
-            'event_category' => $request->event_category,
+            'event_category_id' => $request->event_category_id,
             'event_status'   => $request->event_status,
             'tags'           => $request->tags,
         ]);
@@ -361,7 +381,11 @@ class EventController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Event updated successfully!');
+        $route = $user->role_id === 2
+            ? 'event.index.admin'
+            : 'event.index.employee';
+
+        return redirect()->route($route)->with('success', 'Event updated successfully!');
     }
 
     /**

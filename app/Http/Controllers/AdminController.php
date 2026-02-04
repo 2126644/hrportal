@@ -12,6 +12,8 @@ use App\Models\Department;
 use App\Models\Role;
 use Carbon\Carbon;
 use App\Models\Employment;
+use App\Models\EmploymentStatus;
+use App\Models\CompanyBranch;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Http\Request;
 use App\Actions\Fortify\CreateNewUser;
@@ -20,31 +22,26 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        // Total Employees
+        // Total Employees for active users
         $totalEmployees = Employee::count();
 
-        // Present Today (employees who punched in today)
+        // For attendance card
+        // 1. Present today (employees who punched in today)
         $presentToday = Attendance::whereDate('date', Carbon::today())
             ->distinct('employee_id')
             ->count('employee_id');
 
-        // Pending Leave Requests
-        $pendingLeaves = Leave::where('leave_status', 'pending')->count();
-
-        // Active Tasks (tasks that are not completed)
-        $activeTasks = Task::whereIn('task_status', ['to-do', 'in-progress', 'in-review'])->count();
-
-        // Today's attendance breakdown
+        // 2. Absent today
         $absentToday = $totalEmployees - $presentToday;
 
-        // Get all employees for the detailed table
+        // Get all employees for attendance table
         $allEmployees = Employee::with('employment.department')
             ->get()
             ->map(function ($employee) {
                 return [
                     'employee_id' => $employee->employee_id,
                     'full_name' => $employee->full_name,
-                    'department' => $employee->employment?->department?->department_name ?? '-',
+                    'department' => $employee->employment?->department?->name ?? '-',
                     'position' => $employee->employment?->position ?? '-',
                 ];
             });
@@ -56,18 +53,18 @@ class AdminController extends Controller
             ->map(function ($attendance) {
                 return [
                     'employee_id' => $attendance->employee_id,
-                    'time_in' => $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('g:i A') : null,
-                    'time_out' => $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('g:i A') : null,
+                    'time_in' => $attendance->time_in ? $attendance->time_in->format('g:i A') : null,
+                    'time_out' => $attendance->time_out ? $attendance->time_out->format('g:i A') : null,
                     'status_time_in' => $attendance->status_time_in,
-                    'employee_name' => $attendance->employee->full_name ?? 'Unknown'
+                    'employee_name' => $attendance->employee->full_name
                 ];
             });
 
-        // Recent Activities (last 10 activities across different models)
-        $recentActivities = $this->getRecentActivities();
-
-        // recent announcements (latest 5)
+        // recent announcements
         $announcements = Announcement::orderBy('created_at', 'desc')->take(5)->get();
+
+        $recentActivities = $this->getRecentActivities();
+        $recentRequests = $this->getRecentRequests();
 
         // --- Leave Counts ---
         $totalPendingLeaves   = Leave::where('leave_status', 'pending')->count();
@@ -89,6 +86,46 @@ class AdminController extends Controller
         $totalApproved  = $totalApprovedLeaves + $totalApprovedTimeSlips;
         $totalRejected  = $totalRejectedLeaves + $totalRejectedTimeSlips;
 
+        return view('admin.admin-dashboard', compact(
+            'totalEmployees',
+            'presentToday',
+            'absentToday',
+            'allEmployees',
+            'todayAttendance',
+            'announcements',
+            'recentActivities',
+            'recentRequests',
+            'totalPending',
+            'totalApproved',
+            'totalRejected',
+            'recentRequests',
+        ));
+    }
+
+    public function showDashboardForLoggedInAdmin()
+    {
+        return $this->dashboard();
+    }
+
+    public function getRecentRequests()
+    {
+        $leaves = Leave::with(['employee', 'entitlement'])
+            ->where('leave_status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($lv) {
+                return [
+                    'is_time_slip'    => false,
+                    'employee'        => $lv->employee->full_name,
+                    'type'            => ucfirst($lv->entitlement?->name ?? 'Leave'),
+                    'status'          => $lv->leave_status,
+                    'submitted_date'  => $lv->created_at->format('d M Y g:i A'),
+                    'duration'        => $lv->start_date->format('d M Y') . ' → ' . $lv->end_date->format('d M Y'),
+                    'timestamp'       => $lv->created_at, // For sorting
+                ];
+            });
+
         $timeSlips = Attendance::with('employee')
             ->whereNotNull('time_slip_start')
             ->where('time_slip_status', 'pending')
@@ -97,30 +134,14 @@ class AdminController extends Controller
             ->get()
             ->map(function ($ts) {
                 return [
+                    'is_time_slip'    => true,
                     'employee'        => $ts->employee->full_name,
                     'type'            => 'Time Slip',
                     'status'          => $ts->time_slip_status,
                     'submitted_date'  => $ts->created_at->format('d M Y g:i A'),
                     'duration'        => $ts->time_slip_start->format('g:i A') . ' - ' . $ts->time_slip_end->format('g:i A'),
-                    'is_time_slip'    => true,
+                    
                     'timestamp'       => $ts->created_at, // For sorting
-                ];
-            });
-
-        $leaves = Leave::with('employee')
-            ->where('leave_status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get()
-            ->map(function ($lv) {
-                return [
-                    'employee'        => $lv->employee->full_name,
-                    'type'            => ucfirst($lv->leave_type) . ' Leave',
-                    'status'          => $lv->leave_status,
-                    'submitted_date'  => $lv->created_at->format('d M Y g:i A'),
-                    'duration'        => $lv->start_date->format('d M Y') . ' → ' . $lv->end_date->format('d M Y'),
-                    'is_time_slip'    => false,
-                    'timestamp'       => $lv->created_at, // For sorting
                 ];
             });
 
@@ -130,38 +151,18 @@ class AdminController extends Controller
             ->sortByDesc('timestamp')
             ->take(5)
             ->values();
-
-        return view('admin.admin-dashboard', compact(
-            'totalEmployees',
-            'presentToday',
-            'pendingLeaves',
-            'activeTasks',
-            'absentToday',
-            'recentActivities',
-            'allEmployees',
-            'todayAttendance',
-            'recentRequests',
-            'announcements',
-            'totalApproved',
-            'totalPending',
-            'totalRejected'
-        ));
+        
+        return $recentRequests;
     }
 
-    public function showDashboardForLoggedInAdmin()
-    {
-        return $this->dashboard();
-    }
-
-    private function getRecentActivities()
+    public function getRecentActivities()
     {
         $activities = [];
 
-        // Recent attendance punches (last 5)
+        // Recent attendance punches
         $recentPunches = Attendance::with('employee')
             ->whereDate('date', Carbon::today())
             ->orderBy('created_at', 'desc')
-            ->take(10)
             ->get();
 
         foreach ($recentPunches as $punch) {
@@ -174,31 +175,30 @@ class AdminController extends Controller
         }
 
         // Recent leave requests (last 3)
-        $recentLeaves = Leave::with('employee')
+        $recentLeaves = Leave::with(['employee', 'entitlement'])
             ->orderBy('created_at', 'desc')
-            ->take(3)
             ->get();
 
         foreach ($recentLeaves as $leave) {
             $activities[] = [
                 'icon' => 'calendar-plus',
                 'title' => $leave->employee->full_name ?? 'Employee',
-                'description' => 'Applied for ' . $leave->leave_type . ' leave',
+                'description' => 'Applied for ' . ($leave->entitlement?->name ?? 'leave') . ' leave',
                 'time' => $leave->created_at->diffForHumans()
             ];
         }
 
-        // Sort all activities by time and take latest 8
+        // Sort all activities by time and take latest 10
         usort($activities, function ($a, $b) {
             return strtotime($b['time']) - strtotime($a['time']);
         });
 
-        return array_slice($activities, 0, 8);
+        return array_slice($activities, 0, 10);
     }
 
     public function employee(Request $request)
     {
-        $query = Employee::with('employment.department');
+        $query = Employee::with(['employment.department', 'employment.status', 'employment.branch']);
 
         // Search by name or employee_id
         if ($request->filled('search')) {
@@ -212,21 +212,21 @@ class AdminController extends Controller
         // Filter by department NAME
         if ($request->filled('department_name')) {
             $query->whereHas('employment.department', function ($q) use ($request) {
-                $q->where('department_name', $request->department_name);
+                $q->where('name', $request->department_name);
             });
         }
 
         // Filter by status
-        if ($request->filled('employment_status')) {
+        if ($request->filled('employment_status_id')) {
             $query->whereHas('employment', function ($q) use ($request) {
-                $q->where('employment_status', $request->employment_status);
+                $q->where('employment_status_id', $request->employment_status_id);
             });
         }
 
         // Filter by branch
-        if ($request->filled('company_branch')) {
+        if ($request->filled('company_branch_id')) {
             $query->whereHas('employment', function ($q) use ($request) {
-                $q->where('company_branch', $request->company_branch);
+                $q->where('company_branch_id', $request->company_branch_id);
             });
         }
 
@@ -285,12 +285,17 @@ class AdminController extends Controller
 
         // Departments for dropdown
         $departments = Department::whereHas('employment')
-            ->orderBy('department_name')
-            ->pluck('department_name');
+            ->orderBy('name')
+            ->pluck('name');
+
+        $employmentStatuses = EmploymentStatus::orderBy('name')->get();
+        $companyBranches = CompanyBranch::orderBy('name')->get();
 
         return view('admin.admin-employee', compact(
             'employees',
             'departments',
+            'employmentStatuses',
+            'companyBranches',
             'totalEmployees',
             'employmentEnding',
             'newThisMonth'

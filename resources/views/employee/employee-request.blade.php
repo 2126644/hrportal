@@ -66,11 +66,12 @@
                     @endif
                     <div class="col-12 col-sm-6 col-lg-2">
                         <label class="form-label">Leave Type</label>
-                        <select name="leave_type" class="form-control">
+                        <select name="leave_entitlement_id" class="form-control">
                             <option value="">All Leave Types</option>
                             @foreach ($leaveTypes as $type)
-                                <option value="{{ $type }}" {{ request('leave_type') == $type ? 'selected' : '' }}>
-                                    {{ ucfirst($type) }} Leave
+                                <option value="{{ $type->id }}"
+                                    {{ request('leave_entitlement_id') == $type->id ? 'selected' : '' }}>
+                                    {{ ucfirst($type->name) }}
                                 </option>
                             @endforeach
                         </select>
@@ -120,7 +121,7 @@
                             <tr>
                                 <td>{{ $leave->created_at->format('d M Y') }}</td>
                                 <td>{{ $leave->employee->full_name }}</td>
-                                <td>{{ ucfirst($leave->leave_type) }}</td>
+                                <td>{{ ucfirst($leave->entitlement?->name ?? 'Leave') }}</td>
                                 <td>{{ $leave->start_date->format('d M Y') }} →
                                     {{ $leave->end_date->format('d M Y') }}</td>
                                 <td>{{ $leave->days }} days</td>
@@ -269,7 +270,7 @@
                             </tr>
                             <tr>
                                 <th>Leave Type</th>
-                                <td>{{ ucfirst($leave->leave_type) }}</td>
+                                <td>{{ ucfirst($leave->entitlement?->name ?? 'Leave') }}</td>
                             </tr>
                             <tr>
                                 <th>Start Date</th>

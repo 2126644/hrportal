@@ -109,7 +109,7 @@ Route::middleware(['auth', 'force.password.reset'])->group(function () { // empl
     Route::post('/attendance/punch-out', [AttendanceController::class, 'punchOut'])->name('attendance.punchOut');
     Route::put('/attendance/{attendance}', [AttendanceController::class, 'update'])->name('attendance.update');
     Route::get('/attendance/report', [AttendanceController::class, 'export'])->name('attendance.export');
-    
+
     // employee- request, destroy
     Route::post('/attendance/time-slip', [AttendanceController::class, 'requestTimeSlip'])->name('attendance.time-slip');
     Route::delete('/employee/timeslip/{attendance}', [AttendanceController::class, 'destroyTimeSlip'])->name('timeslip.destroy');
@@ -151,7 +151,7 @@ Route::middleware(['auth', 'force.password.reset'])->group(function () { // empl
     Route::get('/event', [EventController::class, 'index'])->name('event.index.employee');
     Route::post('/event/{myAttendance}/attendance/confirm', [EventAttendeeController::class, 'confirm'])->name('event.attendance.confirm');
     Route::post('/event/{myAttendance}/attendance/decline', [EventAttendeeController::class, 'decline'])->name('event.attendance.decline');
-    
+
     // employee- requests, myrequests
     // admin- index, update, store
     Route::get('/requests', [RequestController::class, 'requests'])->name('employee.requests');
@@ -194,7 +194,7 @@ Route::middleware(['auth'])->group(function () { // admin
     // no edit, show, use modal
     // cannot destroy
     Route::get('/admin/attendance', [AttendanceController::class, 'index'])->name('admin.attendance');
-    
+
     // employee- index, create, store, export, cancel
     // admin- index, destroy
     // no show, use modal
@@ -207,7 +207,7 @@ Route::middleware(['auth'])->group(function () { // admin
     // no edit, show, use modal
     // no destroy
     Route::get('/admin/tasks', [TaskController::class, 'index'])->name('task.index.admin');
-    
+
 
 
 
@@ -233,7 +233,15 @@ Route::middleware(['auth'])->group(function () { // admin
     Route::post('/admin/{form}/update-status', [FormController::class, 'approveForms'])->name('form.updateStatus');
     Route::post('/admin/{employee}/formapprovers', [FormApproverController::class, 'store'])->name('form.approvers.store');
 
-    // admin- index, update
-    Route::get('/admin/settings', [SettingController::class, 'index'])->name('settings');
-    Route::post('/admin/settings', [SettingController::class, 'update'])->name('settings.update');
+    // Settings main page
+    Route::get('/admin/settings', [SettingController::class, 'index'])->name('settings.index');
+
+    // Update general system settings
+    Route::post('/admin/settings/general', [SettingController::class, 'updateGeneral'])->name('admin.settings.general');
+
+    // Update leave entitlements
+    Route::post('/admin/settings/leave-entitlements', [SettingController::class, 'updateLeaveEntitlements'])->name('admin.settings.leave');
+
+    // Update master data (event category, employment type, etc)
+    Route::post('/admin/settings/master-data', [SettingController::class, 'updateMasterData'])->name('admin.settings.master');
 });

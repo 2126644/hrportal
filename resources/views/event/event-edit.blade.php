@@ -11,8 +11,8 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         @if ($role_id == 2)
-                                            <li class="breadcrumb-item"><a
-                                                    href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                            </li>
                                         @else
                                             <li class="breadcrumb-item"><a
                                                     href="{{ route('employee.dashboard') }}">Dashboard</a></li>
@@ -25,7 +25,7 @@
                                             <li class="breadcrumb-item"><a
                                                     href="{{ route('event.index.employee') }}">Events</a></li>
                                         @endif
-                                        
+
                                         <li class="breadcrumb-item active" aria-current="page">Edit Event</li>
                                     </ol>
                                 </nav>
@@ -43,7 +43,8 @@
         <div class="col-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('event.update', $event->id) }}" method="POST" novalidate>
+                    <form action="{{ route('event.update', $event->id) }}" method="POST" enctype="multipart/form-data"
+                        novalidate>
                         @csrf
                         @method('PUT')
 
@@ -108,18 +109,18 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="event_category" class="form-label">Event Category <span
+                                <label for="event_category_id" class="form-label">Event Category <span
                                     class="text-danger">*</span></label>
-                            <select id="event_category" name="event_category" class="form-select" required>
+                                <select id="event_category_id" name="event_category_id" class="form-select" required>
                                 <option value="" disabled selected>Select Category</option>
-                                @foreach ($eventCategoriesEnum as $cat)
-                                    <option value="{{ $cat }}"
-                                        {{ old('event_category', $event->event_category) == $cat ? 'selected' : '' }}>
-                                        {{ ucfirst($cat) }}
+                                    @foreach ($eventCategoriesEnum as $cat)
+                                        <option value="{{ $cat->id }}"
+                                            {{ old('event_category_id', $event->event_category_id) == $cat->id ? 'selected' : '' }}>
+                                            {{ ucfirst($cat->name) }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('event_category')
+                                @error('event_category_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -157,7 +158,7 @@
                                                         value="{{ $dept->id }}" name="department_ids[]"
                                                         {{ in_array($dept->id, $selectedDepartmentIds) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="dept_{{ $dept->id }}">
-                                                        {{ $dept->department_name }}
+                                                        {{ $dept->name }}
                                                     </label>
                                                 </div>
                                             </div>
@@ -226,15 +227,42 @@
                             @enderror
                         </div>
 
-                        <!-- Image Upload -->
+                        {{-- Image Upload --}}
                         <div class="mb-3">
-                            <label for="image" class="form-label">Event Image</label>
-                            <input type="file" id="image" name="image"
-                                class="form-control @error('image') is-invalid @enderror" accept=".jpg,.jpeg,.png">
+                            <label class="form-label">Event Image</label>
+
+                            {{-- Preview container --}}
+                            <div id="imagePreviewWrapper" class="mb-2">
+                                @if ($event->image)
+                                    <div class="position-relative d-inline-block">
+                                        <img id="imagePreview" src="{{ Storage::url($event->image) }}"
+                                            class="img-thumbnail" style="max-height: 180px;">
+
+                                        <button type="button" id="removeImageBtn"
+                                            class="btn btn-sm btn-danger position-absolute top-0 end-0">
+                                            ✕
+                                        </button>
+                                    </div>
+                                @else
+                                    <img id="imagePreview" class="img-thumbnail d-none" style="max-height: 180px;">
+                                @endif
+                            </div>
+
+                            {{-- File input --}}
+                            <input type="file" name="image" id="imageInput" class="form-control"
+                                accept=".jpg,.jpeg,.png">
+
                             <small class="text-muted">JPG, JPEG or PNG (max 2 MB)</small>
+
+                            {{-- Hidden input to mark deletion --}}
+                            <input type="hidden" name="remove_image" id="removeImageInput" value="0">
                             @error('image')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
+
+                            <small class="text-muted">
+                                Upload a new image to replace the existing one
+                            </small>
                         </div>
 
                         <!-- Submit Buttons -->
@@ -252,38 +280,125 @@
 
 @push('scripts')
     <script>
-        let selectedEmployees = new Map(); // id => {id, name, dept}
-        let selectedDepartments = new Set();
+        /* ===============================
+                       PRELOADED DATA FROM BACKEND
+                    ================================ */
+        const preloadEmployees = @json($assignedEmployees ?? []);
+        const preselectedDepartments = @json($selectedDepartmentIds ?? []);
+        const assignAll = @json($event->assign_all ?? false);
+
+        /* ===============================
+           STATE
+        ================================ */
+        let selectedEmployees = new Map(); // empId => {id, name, department}
         let departmentEmployees = new Map(); // deptId => Set(empIds)
 
-        // Script to handle "Select All Employees" checkbox
+        /* ===============================
+           DOM ELEMENTS
+        ================================ */
+        const selectAllCheckbox = document.getElementById('selectAllEmployees');
+        const employeeList = document.getElementById('employeeList');
+        const employeeSearch = document.getElementById('employeeSearch');
+        const departmentCheckboxes = document.querySelectorAll('.department-checkbox');
+
+        /* ===============================
+           HELPERS
+        ================================ */
         function toggleManualSelection(disabled) {
-            document.querySelectorAll('.department-checkbox').forEach(cb => {
+            departmentCheckboxes.forEach(cb => {
                 cb.disabled = disabled;
                 cb.checked = disabled;
             });
-
-            document.getElementById('employeeSearch').disabled = disabled;
+            employeeSearch.disabled = disabled;
         }
 
-        document.getElementById('selectAllEmployees').addEventListener('change', function() {
+        function renderEmployees() {
+            employeeList.innerHTML = '';
+
+            if (selectedEmployees.size === 0) {
+                employeeList.innerHTML = '<small class="text-muted">No employees selected</small>';
+                return;
+            }
+
+            selectedEmployees.forEach(emp => {
+                employeeList.innerHTML += `
+            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                <div>
+                    <strong>${emp.name}</strong>
+                    <small class="text-muted">(${emp.department})</small>
+                </div>
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger"
+                        onclick="removeEmployee('${emp.id}')">
+                    Remove
+                </button>
+                <input type="hidden" name="employee_ids[]" value="${emp.id}">
+            </div>
+        `;
+            });
+        }
+
+        function removeEmployee(id) {
+            selectedEmployees.delete(id);
+            renderEmployees();
+        }
+
+        /* ===============================
+           INIT: PRELOAD SAVED DATA
+        ================================ */
+        // preload individual + department employees
+        preloadEmployees.forEach(emp => {
+            selectedEmployees.set(String(emp.id), emp);
+        });
+
+        // restore departments
+        preselectedDepartments.forEach(deptId => {
+            const checkbox = document.querySelector(`.department-checkbox[value="${deptId}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+
+        // restore ALL employees
+        if (assignAll) {
+            selectAllCheckbox.checked = true;
+            toggleManualSelection(true);
+
+            fetch(`{{ route('employees.all') }}`)
+                .then(res => res.json())
+                .then(employees => {
+                    employees.forEach(emp => selectedEmployees.set(String(emp.id), emp));
+                    renderEmployees();
+                });
+
+            // hidden input
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'assign_all';
+            input.value = '1';
+            input.id = 'assign_all';
+            document.querySelector('form').appendChild(input);
+        } else {
+            renderEmployees();
+        }
+
+        /* ===============================
+           EVENTS
+        ================================ */
+
+        // Select All Employees
+        selectAllCheckbox.addEventListener('change', function() {
             selectedEmployees.clear();
             departmentEmployees.clear();
 
             if (this.checked) {
                 toggleManualSelection(true);
 
-                // fetch ALL employees
                 fetch(`{{ route('employees.all') }}`)
                     .then(res => res.json())
                     .then(employees => {
-                        employees.forEach(emp => {
-                            selectedEmployees.set(emp.id, emp);
-                        });
+                        employees.forEach(emp => selectedEmployees.set(String(emp.id), emp));
                         renderEmployees();
                     });
 
-                // hidden input so backend knows this is ALL
                 if (!document.getElementById('assign_all')) {
                     const input = document.createElement('input');
                     input.type = 'hidden';
@@ -296,63 +411,27 @@
                 toggleManualSelection(false);
                 selectedEmployees.clear();
                 renderEmployees();
-
                 document.getElementById('assign_all')?.remove();
             }
         });
 
-        // Script to render selected employees
-        function renderEmployees() {
-            const container = document.getElementById('employeeList');
-            container.innerHTML = '';
-
-            if (selectedEmployees.size === 0) {
-                container.innerHTML = '<small class="text-muted">No employees selected</small>';
-                return;
-            }
-
-            selectedEmployees.forEach(emp => {
-                container.innerHTML += `
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                    <div>
-                        <strong>${emp.name}</strong>
-                        <small class="text-muted">(${emp.department})</small>
-                    </div>
-                    <button type="button"
-                            class="btn btn-sm btn-outline-danger"
-                            onclick="removeEmployee('${emp.id}')">
-                        Remove
-                    </button>
-                    <input type="hidden" name="employee_ids[]" value="${emp.id}">
-                </div>
-            `;
-            });
-        }
-
-        function removeEmployee(id) {
-            selectedEmployees.delete(id);
-            renderEmployees();
-        }
-
-        // Script to add individual employees
-        document.getElementById('employeeSearch').addEventListener('change', function() {
+        // Add individual employee
+        employeeSearch.addEventListener('change', function() {
             const option = this.selectedOptions[0];
             if (!option.value) return;
 
-            const emp = {
+            selectedEmployees.set(option.value, {
                 id: option.value,
                 name: option.dataset.name,
                 department: option.dataset.dept
-            };
+            });
 
-            selectedEmployees.set(emp.id, emp);
             renderEmployees();
             this.value = '';
         });
 
-        // Script to add employees by department
-
-        document.querySelectorAll('.department-checkbox').forEach(cb => {
+        // Add/remove department employees
+        departmentCheckboxes.forEach(cb => {
             cb.addEventListener('change', function() {
                 const deptId = this.value;
 
@@ -363,20 +442,17 @@
                             const empIds = new Set();
 
                             employees.forEach(emp => {
-                                selectedEmployees.set(emp.id, emp);
-                                empIds.add(emp.id);
+                                selectedEmployees.set(String(emp.id), emp);
+                                empIds.add(String(emp.id));
                             });
 
                             departmentEmployees.set(deptId, empIds);
                             renderEmployees();
                         });
                 } else {
-                    // remove employees added by this department
                     const empIds = departmentEmployees.get(deptId) || [];
-
                     empIds.forEach(id => selectedEmployees.delete(id));
                     departmentEmployees.delete(deptId);
-
                     renderEmployees();
                 }
             });
@@ -384,12 +460,60 @@
     </script>
 
     <script>
-        const preloadEmployees = @json($assignedEmployees);
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeBtn = document.getElementById('removeImageBtn');
+            const removeInput = document.getElementById('removeImageInput');
+            const previewWrapper = document.getElementById('imagePreviewWrapper');
 
-        preloadEmployees.forEach(emp => {
-            selectedEmployees.set(emp.id, emp);
+            // ===== Image selection preview =====
+            imageInput?.addEventListener('change', function() {
+                const file = this.files[0];
+
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.remove('d-none');
+
+                    // If image replaced, reset remove flag
+                    removeInput.value = 0;
+
+                    // If remove button doesn't exist yet, create it
+                    if (!document.getElementById('removeImageBtn')) {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.id = 'removeImageBtn';
+                        btn.className = 'btn btn-sm btn-danger position-absolute top-0 end-0';
+                        btn.innerHTML = '✕';
+
+                        btn.addEventListener('click', removeImage);
+
+                        imagePreview.parentElement.classList.add('position-relative');
+                        imagePreview.parentElement.appendChild(btn);
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+            // ===== Remove image =====
+            function removeImage() {
+                imagePreview.src = '';
+                imagePreview.classList.add('d-none');
+
+                imageInput.value = '';
+                removeInput.value = 1;
+
+                this.remove();
+            }
+
+            // Attach remove handler if button exists on load
+            if (removeBtn) {
+                removeBtn.addEventListener('click', removeImage);
+            }
         });
-
-        renderEmployees();
     </script>
 @endpush

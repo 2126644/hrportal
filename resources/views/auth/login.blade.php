@@ -146,7 +146,7 @@
                                 If you don't have an account, please contact HR.
                             
                                 <small class="text-muted d-block mt-4">
-                                    &copy; {{ date('Y') }} AHG HR Portal. All rights reserved.
+                                    &copy; {{ date('Y') }} AHG HR Portal. All rights reserved. Teha's
                                 </small>
                             </div>
                         </div>

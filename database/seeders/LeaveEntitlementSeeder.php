@@ -15,15 +15,15 @@ class LeaveEntitlementSeeder extends Seeder
     public function run(): void
     {
         DB::table('leave_entitlements')->insert([
-            ['leave_type' => 'annual', 'full_entitlement' => 14],
-            ['leave_type' => 'medical', 'full_entitlement' => 14],
-            ['leave_type' => 'emergency', 'full_entitlement' => 3],
-            ['leave_type' => 'hospitalization', 'full_entitlement' => 60],
-            ['leave_type' => 'maternity', 'full_entitlement' => 90],
-            ['leave_type' => 'compassionate', 'full_entitlement' => 3],
-            ['leave_type' => 'replacement', 'full_entitlement' => 10],
-            ['leave_type' => 'unpaid', 'full_entitlement' => 90],
-            ['leave_type' => 'marriage', 'full_entitlement' => 7],
+            ['name' => 'Annual Leave', 'full_entitlement' => 14],
+            ['name' => 'Medical Leave', 'full_entitlement' => 14],
+            ['name' => 'Emergency Leave', 'full_entitlement' => 3],
+            ['name' => 'Hospitalization Leave', 'full_entitlement' => 60],
+            ['name' => 'Maternity Leave', 'full_entitlement' => 90],
+            ['name' => 'Compassionate Leave', 'full_entitlement' => 3],
+            ['name' => 'Replacement Leave', 'full_entitlement' => 10],
+            ['name' => 'Unpaid Leave', 'full_entitlement' => 90],
+            ['name' => 'Marriage Leave', 'full_entitlement' => 7],
         ]);
     }
 }

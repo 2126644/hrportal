@@ -55,7 +55,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Department</label>
                                 <input type="text" class="form-control"
-                                    value="{{ auth()->user()->employee->department->department_name ?? '' }}" readonly>
+                                    value="{{ auth()->user()->employee->department->name ?? '' }}" readonly>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Job / Position Title</label>
@@ -82,7 +82,7 @@
                                 <option value="">Select employee</option>
                                 @foreach ($employees as $emp)
                                     <option value="{{ $emp->employee_id }}">
-                                        {{ $emp->full_name }} ({{ $emp->department->department_name ?? '' }})
+                                        {{ $emp->full_name }} ({{ $emp->department->name ?? '' }})
                                     </option>
                                 @endforeach
                             </select>

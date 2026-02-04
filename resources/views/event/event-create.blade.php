@@ -105,18 +105,18 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="event_category" class="form-label">Event Category <span
+                            <label for="event_category_id" class="form-label">Event Category <span
                                     class="text-danger">*</span></label>
-                            <select id="event_category" name="event_category" class="form-select" required>
+                            <select id="event_category_id" name="event_category_id" class="form-select" required>
                                 <option value="" disabled selected>Select Category</option>
                                 @foreach ($eventCategoriesEnum as $cat)
-                                    <option value="{{ $cat }}"
-                                        {{ old('event_category') == $cat ? 'selected' : '' }}>
-                                        {{ ucfirst($cat) }}
+                                    <option value="{{ $cat->id }}"
+                                        {{ old('event_category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ ucfirst($cat->name) }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('event_category')
+                            @error('event_category_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -154,7 +154,7 @@
                                                         value="{{ $dept->id }}" id="dept_{{ $dept->id }}"
                                                         name="department_ids[]">
                                                     <label class="form-check-label" for="dept_{{ $dept->id }}">
-                                                        {{ $dept->department_name }}
+                                                        {{ $dept->name }}
                                                     </label>
                                                 </div>
                                             </div>

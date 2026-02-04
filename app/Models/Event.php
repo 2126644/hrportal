@@ -17,7 +17,7 @@ class Event extends Model
         'event_date',
         'event_time',
         'event_location',
-        'event_category',
+        'event_category_id',
         'image',
         'event_status',
         'tags',
@@ -52,5 +52,10 @@ class Event extends Model
             'employee_id',
             'response_status'
         );
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(EventCategory::class, 'event_category_id');
     }
 }

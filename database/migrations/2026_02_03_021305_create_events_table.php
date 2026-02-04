@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('event_date');
             $table->time('event_time');
             $table->string('event_location');
-            $table->string('event_category')->default('other');
+            $table->foreignId('event_category_id')->nullable()->constrained()->nullOnDelete();
             $table->string('image')->nullable();
             $table->enum('event_status', ['upcoming', 'ongoing', 'completed', 'cancelled'])->default('upcoming');
             $table->string('tags')->nullable();

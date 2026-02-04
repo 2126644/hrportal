@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class LeaveEntitlement extends Model
 {
-    /** @use HasFactory<\Database\Factories\LeaveEntitlementFactory> */
-    use HasFactory;
-
     protected $fillable = [
-        'leave_type',
+        'name',
         'full_entitlement', // number of days entitled per year
     ];
+
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class);
+    }
 }

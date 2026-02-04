@@ -57,7 +57,7 @@ class Task extends Model
 
         return [
             'employees'   => $employees->pluck('full_name')->values(),
-            'departments' => $departments->pluck('department_name')->values(),
+            'departments' => $departments->pluck('name')->values(),
         ];
     }
 }

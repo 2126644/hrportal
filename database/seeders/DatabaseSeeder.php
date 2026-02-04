@@ -13,17 +13,21 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class, // Seed fixed roles first (so the FK in users->role_id is valid)
+            RoleSeeder::class, // Seed fixed roles first
+            EventCategorySeeder::class,
+            EmploymentTypeSeeder::class,
+            EmploymentStatusSeeder::class,
+            CompanyBranchSeeder::class,
+            DepartmentSeeder::class,
+            LeaveEntitlementSeeder::class,
             AdminSeeder::class,
             UserSeeder::class,
-            DepartmentSeeder::class,
             EmployeeSeeder::class,
             EmploymentSeeder::class,
-            ProjectSeeder::class, // Seed project first
+            ProjectSeeder::class,
             TaskSeeder::class,
             AttendanceSeeder::class,
             EventSeeder::class,
-            LeaveEntitlementSeeder::class, // Seed fixed leave types & entitlement first 
             LeaveSeeder::class,
             AnnouncementSeeder::class,
             SettingSeeder::class,

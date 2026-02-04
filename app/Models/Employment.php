@@ -13,10 +13,10 @@ class Employment extends Model
     protected $fillable = [
         'employee_id',
         'department_id',
-        'employment_type',
-        'employment_status',
-        'company_branch', // enum
-        'report_to', // enum employee_id
+        'employment_type_id',
+        'employment_status_id',
+        'company_branch_id',
+        'report_to',
         'position',
 
         'date_of_employment', // for all & could be same date for contract_start
@@ -66,6 +66,21 @@ class Employment extends Model
     
     public function department()
     {
-        return $this->belongsTo(Department::class, 'department_id', 'id');
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(CompanyBranch::class, 'company_branch_id');
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(EmploymentType::class, 'employment_type_id');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(EmploymentStatus::class, 'employment_status_id');
     }
 }

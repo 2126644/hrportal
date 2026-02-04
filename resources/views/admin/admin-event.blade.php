@@ -46,12 +46,12 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Category</label>
-                    <select name="event_category" class="form-control">
+                        <select name="event_category_id" class="form-control">
                         <option value="">All Categories</option>
-                        @foreach ($eventCategories as $category)
-                            <option value="{{ $category }}"
-                                {{ request('event_category') == $category ? 'selected' : '' }}>
-                                {{ ucwords(str_replace('_', ' ', $category)) }}
+                            @foreach ($eventCategories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ request('event_category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ ucfirst($category->name) }}
                             </option>
                         @endforeach
                     </select>
@@ -89,7 +89,7 @@
                     $now = \Carbon\Carbon::now();
                     $isPast = $event->event_date->lt($now);
                     $eventImage = $event->image
-                        ? asset('storage/' . $event->image) // public/storage/events
+                        ? Storage::url($event->image) // public/storage/events
                         : asset('img/event-corporate.jpg'); // public/img-default image
                 @endphp
 
@@ -122,7 +122,7 @@
                         </div>
 
                         <div class="event-category-badge">
-                            {{ $event->event_category }}
+                               {{ $event->category?->name }}
                         </div>
 
                         <span class="status-pill event-status-{{ strtolower($event->event_status) }}">

@@ -17,7 +17,7 @@
                 $rowTotal = 0;
 
                 // Normalize type name whether $lt is a model/object or a plain string
-                $typeName = is_object($lt) ? $lt->leave_type ?? (string) $lt : (string) $lt;
+                $typeName = is_object($lt) ? $lt->name ?? (string) $lt : (string) $lt;
 
                 // get entitlement for this leave type (from controller)
                 $finalEntitlement = $finalEntitlements[$typeName] ?? 0;

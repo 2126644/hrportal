@@ -3,6 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+use App\Models\LeaveEntitlement;
+use App\Models\EventCategory;
+use App\Models\EmploymentType;
+use App\Models\EmploymentStatus;
+use App\Models\CompanyBranch;
+use App\Models\Department;
 use App\Models\Setting;
 
 class SettingController extends Controller
@@ -13,19 +21,90 @@ class SettingController extends Controller
     public function index()
     {
         return view('admin.admin-setting', [
-            'leaveTypes'      => setting('leave_types', []),
-            'eventCategories' => setting('event_categories', []),
+            'settings'           => Setting::all()->pluck('value', 'key'),
+            'leaveEntitlements'  => LeaveEntitlement::orderBy('name')->get(),
+            'eventCategories'    => EventCategory::orderBy('name')->get(),
+            'employmentTypes'    => EmploymentType::orderBy('name')->get(),
+            'employmentStatuses' => EmploymentStatus::orderBy('name')->get(),
+            'companyBranches'    => CompanyBranch::orderBy('name')->get(),
+            'departments'        => Department::orderBy('name')->get(),
         ]);
     }
 
-//     public function index()
-// {
-//     return view('admin.settings', [
-//         'settings' => [
-//             'max_timeslip_hours'  => setting('max_timeslip_hours', 3),
-//         ],
-//     ]);
-// }
+
+    /**
+     * Update numeric / simple system settings
+     */
+    public function updateGeneral(Request $request)
+    {
+        $data = $request->validate([
+            'max_timeslip_hours' => 'required|integer|min:1|max:24',
+        ]);
+
+        foreach ($data as $key => $value) {
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value]
+            );
+        }
+
+        return back()->with('success', 'System settings updated.');
+    }
+
+    /**
+     * Leave entitlement CRUD (inline)
+     */
+    public function updateLeaveEntitlements(Request $request)
+    {
+        $data = $request->validate([
+            'entitlements'               => 'array',
+            'entitlements.*.name'        => 'required|string|max:50',
+            'entitlements.*.days'        => 'required|numeric|min:0|max:365',
+        ]);
+
+        DB::transaction(function () use ($data) {
+            LeaveEntitlement::truncate();
+
+            foreach ($data['entitlements'] as $row) {
+                LeaveEntitlement::create([
+                    'name'              => $row['name'],
+                    'full_entitlement'  => $row['days'],
+                ]);
+            }
+        });
+
+        return back()->with('success', 'Leave entitlements updated.');
+    }
+
+    /**
+     * Generic master data update
+     */
+    public function updateMasterData(Request $request)
+    {
+        $maps = [
+            'event_categories'    => EventCategory::class,
+            'employment_types'    => EmploymentType::class,
+            'employment_statuses' => EmploymentStatus::class,
+            'company_branches'    => CompanyBranch::class,
+            'departments'         => Department::class,
+        ];
+
+        foreach ($maps as $input => $model) {
+            if (!$request->has($input)) continue;
+
+            DB::transaction(function () use ($request, $input, $model) {
+                $model::truncate();
+
+                foreach ($request->input($input) as $value) {
+                    if ($value !== null && trim($value) !== '') {
+                        $model::create(['name' => trim($value)]);
+                    }
+                }
+            });
+        }
+
+        return back()->with('success', 'Master data updated.');
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -50,57 +129,6 @@ class SettingController extends Controller
     {
         //
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request)
-    {
-        $data = $request->validate([
-            'leave_types'       => 'array',
-            'leave_types.*'     => 'string|max:50',
-
-            'event_categories'  => 'array',
-            'event_categories.*' => 'string|max:50',
-        ]);
-
-        Setting::updateOrCreate(
-            ['key' => 'leave_types'],
-            ['value' => json_encode(array_values($data['leave_types'] ?? []))]
-        );
-
-        Setting::updateOrCreate(
-            ['key' => 'event_categories'],
-            ['value' => json_encode(array_values($data['event_categories'] ?? []))]
-        );
-
-        return back()->with('success', 'Settings updated successfully.');
-    }
-
-//     public function update(Request $request)
-// {
-//     $data = $request->validate([
-//         'max_timeslip_hours'  => 'nullable|integer|min:1',
-//     ]);
-
-//     foreach ([
-//         'max_timeslip_hours',
-//     ] as $key) {
-//         if (array_key_exists($key, $data)) {
-//             Setting::updateOrCreate(
-//                 ['key' => $key],
-//                 ['value' => $data[$key]]
-//             );
-//         }
-//     }
 
     /**
      * Remove the specified resource from storage.

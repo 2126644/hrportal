@@ -100,16 +100,16 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="leave_type" class="form-label">Leave Type <span class="text-danger">*</span></label>
-                            <select id="leave_type" name="leave_type" class="form-select" required>
+                            <label for="leave_entitlement_id" class="form-label">Leave Type <span class="text-danger">*</span></label>
+                            <select id="leave_entitlement_id" name="leave_entitlement_id" class="form-select" required>
                                 <option value="" disabled selected>Select Type</option>
-                                @foreach ($leaveTypeEnum as $type)
-                                    <option value="{{ $type }}" {{ old('leave_type') == $type ? 'selected' : '' }}>
-                                        {{ ucfirst($type) }} Leave
+                                @foreach ($leaveTypes as $type)
+                                    <option value="{{ $type->id }}" {{ old('leave_entitlement_id') == $type->id ? 'selected' : '' }}>
+                                        {{ ucfirst($type->name) }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('leave_type')
+                            @error('leave_entitlement_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>

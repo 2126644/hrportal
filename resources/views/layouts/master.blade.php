@@ -184,7 +184,7 @@
                     </a>
                     <a class="nav-link {{ request()->routeIs('event*') ? 'active' : '' }}"
                         href="{{ route('event.index.admin') }}">
-                        <i class="bi bi-megaphone"></i>
+                        <i class="bi bi-calendar-event"></i>
                         <span>Event</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('admin.requests*') ? 'active' : '' }}"
@@ -193,7 +193,7 @@
                         <span>Request</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('settings*') ? 'active' : '' }}"
-                        href="{{ route('settings') }}">
+                        href="{{ route('settings.index') }}">
                         <i class="bi bi-gear"></i>
                         <span>System Settings</span>
                     </a>
@@ -204,7 +204,7 @@
                     </a>
                     <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
                         href="{{ route('form.admin') }}">
-                        <i class="bi bi-clipboard"></i>
+                        <i class="bi bi-file-earmark-text"></i>
                         <span>Form</span>
                     </a>
 
@@ -237,7 +237,7 @@
                     </a>
                     <a class="nav-link {{ request()->routeIs('event*') ? 'active' : '' }}"
                         href="{{ route('event.index.employee') }}">
-                        <i class="bi bi-calendar3"></i>
+                        <i class="bi bi-calendar-event"></i>
                         <span>Event</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('employee.myrequests*') ? 'active' : '' }}"
@@ -264,13 +264,13 @@
                     </a>
                     <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
                         href="{{ route('form.myforms') }}">
-                        <i class="bi bi-clipboard"></i>
+                        <i class="bi bi-file-earmark-text"></i>
                         <span>My Forms</span>
                     </a>
                     @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
                         <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
                             href="{{ route('form.employee') }}">
-                            <i class="bi bi-clipboard"></i>
+                            <i class="bi bi-file-earmark-text"></i>
                             <span>Forms</span>
                         </a>
                     @endif
@@ -336,7 +336,7 @@
     <!-- Footer -->
     <footer class="text-center py-3 mt-4 text-muted">
         <div class="container">
-            &copy; {{ date('Y') }} Teha. All Rights Reserved.
+            &copy; {{ date('Y') }} AHG HR Portal. All Rights Reserved. Teha's
         </div>
     </footer>
 </body>

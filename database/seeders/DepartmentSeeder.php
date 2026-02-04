@@ -15,12 +15,12 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         DB::table('departments')->insert([
-            ['id' => 1, 'department_name' => 'Human Resources'],
-            ['id' => 2, 'department_name' => 'Information Technology'],
-            ['id' => 3, 'department_name' => 'Finance'],
-            ['id' => 4, 'department_name' => 'Marketing'],
-            ['id' => 5, 'department_name' => 'Operations'],
-            ['id' => 6, 'department_name' => 'Others'],
+            ['id' => 1, 'name' => 'Human Resources'],
+            ['id' => 2, 'name' => 'Information Technology'],
+            ['id' => 3, 'name' => 'Finance'],
+            ['id' => 4, 'name' => 'Marketing'],
+            ['id' => 5, 'name' => 'Operations'],
+            ['id' => 6, 'name' => 'Others'],
         ]);
     }
 }

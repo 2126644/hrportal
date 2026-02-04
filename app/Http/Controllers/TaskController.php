@@ -121,21 +121,21 @@ class TaskController extends Controller
         $employees = Employee::with('employment.department')
             ->whereHas('employment', function ($q) use ($departmentId) {
                 $q->where('department_id', $departmentId)
-                    ->where('employment_status', 'active');
+                    ->whereHas('status', fn($qs) => $qs->where('name', 'active'));
             })
             ->get()
             ->map(fn($e) => [
                 'id'         => $e->employee_id,
                 'name'       => $e->full_name,
-                'department' => $e->employment->department->department_name ?? 'N/A',
+                'department' => $e->employment->department->name ?? 'N/A',
             ]);
 
-        $departments = Department::orderBy('department_name')->get();
+        $departments = Department::orderBy('name')->get();
 
         $allEmployees = Employee::with('employment.department')->get()->map(fn($e) => [
             'id'         => $e->employee_id,
             'name'       => $e->full_name,
-            'department' => $e->employment->department->department_name ?? 'N/A',
+            'department' => $e->employment->department->name ?? 'N/A',
         ]);
 
         return view('employee.createtask', compact(

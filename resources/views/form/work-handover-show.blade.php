@@ -54,7 +54,7 @@
                             <div class="col-md-6">
                                 <label class="form-label">Department</label>
                                 <input type="text" class="form-control"
-                                    value="{{ $form->employee->department->department_name ?? '' }}" readonly>
+                                    value="{{ $form->employee->department->name ?? '' }}" readonly>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Job / Position Title</label>

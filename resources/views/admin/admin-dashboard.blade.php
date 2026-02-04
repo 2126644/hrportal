@@ -8,7 +8,7 @@
                     <div class="page-sub-header">
                         <div class="d-flex justify-content-between align-items-center w-100">
                             <div>
-                                <h3 class="page-title"><br>Admin Dashboard</h3>
+                                <h3 class="page-title"><br>Dashboard</h3>
                                 <p class="text-muted">Monitor team activities and system overview</p>
                             </div>
                             <div class="datetime-punch text-end">
@@ -22,10 +22,10 @@
         </div>
 
         <!-- Profile Summary & System Status Section -->
-        <div class="row mb-4 g-4 stretch-card">
+        <div class="row mb-4 g-4">
             <!-- Profile Card -->
             <div class="col-12 col-lg-8">
-                <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                <div class="card card-fixed-height border-0 shadow-sm" style="border-radius: 15px;">
                     <div class="card-body p-4 d-flex flex-column justify-content-center">
                         <!-- Centered content vertically -->
                         <div class="d-flex align-items-center flex-column flex-md-row">
@@ -41,6 +41,7 @@
                             <div class="flex-grow-1 text-center text-md-start">
                                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
                                     <div>
+                                        <small>Welcome,<br></small>
                                         <h3 class="mb-0 fw-bold text-dark mb-2">{{ Auth::user()->name }}</h3>
                                         <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1 mb-3"
                                             style="font-size: 0.75rem;">
@@ -64,8 +65,8 @@
                                                 <i class="bi bi-person-badge fs-5"></i>
                                             </div>
                                             <div>
-                                                <small class="text-muted d-block lh-1 mb-1"
-                                                    style="font-size: 0.7rem;">EMPLOYEE ID</small>
+                                                <small class="text-muted d-block lh-1 mb-1" style="font-size: 0.7rem;">USER
+                                                    ID</small>
                                                 <span class="fw-bold text-dark">#{{ Auth::user()->id }}</span>
                                             </div>
                                         </div>
@@ -91,7 +92,7 @@
 
             <!-- System Status Card -->
             <div class="col-12 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm" style="border-radius: 15px;">
+                <div class="card card-fixed-height border-0 shadow-sm" style="border-radius: 15px;">
                     <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 fw-bold text-dark">System Overview</h5>
@@ -146,134 +147,10 @@
             </div>
         </div>
 
-        <!-- Leave/Time Slip Requests & Announcements Section -->
-        <div class="row">
-            <!-- Leave/Time Slip Requests -->
-            <div class="col-12 col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Leave/Time Slip Requests</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Pending Requests Summary -->
-                        <div class="row text-center mb-4">
-                            <div class="col-4">
-                                <div class="request-stat-card" style="cursor: pointer;">
-                                    <h4 class="text-warning">{{ $totalPending }}</h4>
-                                    <small class="text-muted">Pending</small>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="request-stat-card" style="cursor: pointer;">
-                                    <h4 class="text-success">{{ $totalApproved }}</h4>
-                                    <small class="text-muted">Approved</small>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="request-stat-card" style="cursor: pointer;">
-                                    <h4 class="text-danger">{{ $totalRejected }}</h4>
-                                    <small class="text-muted">Rejected</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recent Requests List -->
-                        <h6 class="mb-4">Recent Requests</h6>
-                        <div class="request-list">
-                            @forelse($recentRequests as $request)
-                                <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
-                                    onclick="window.location.href='{{ route('admin.requests') }}'"
-                                    style="cursor: pointer; border-radius: 8px;">
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="avatar-sm bg-light rounded-circle me-3 d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-person text-muted"></i>
-                                        </div>
-                                        <div>
-                                            <strong>{{ $request['employee'] }}</strong>
-                                            <div class="text-muted small">
-                                                {{ $request['type'] }}
-                                                @if ($request['is_time_slip'])
-                                                    <span class="badge bg-info ms-1">Time Slip</span>
-                                                @else
-                                                    <span class="badge bg-primary ms-1">Leave</span>
-                                                @endif
-                                            </div>
-                                            <small class="text-muted">{{ $request['duration'] }}</small>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <span
-                                            class="badge 
-                                            @if ($request['status'] == 'pending') bg-warning 
-                                            @elseif($request['status'] == 'approved') bg-success 
-                                            @else bg-danger @endif">
-                                            {{ ucfirst($request['status']) }}
-                                        </span>
-                                        <div class="text-muted small mt-1">{{ $request['submitted_date'] }}</div>
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-muted small">No recent requests found.</p>
-                            @endforelse
-                        </div>
-
-                        <!-- View All Link -->
-                        <div class="text-center">
-                            <a href="{{ route('admin.requests') }}" class="btn btn-outline-primary btn-sm">
-                                View All Requests <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Announcements -->
-            <div class="col-12 col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Announcements</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Announcements List -->
-                        <div class="announcement-list">
-                            @forelse($announcements as $announcement)
-                                <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
-                                    <div class="d-flex justify-content-between align-items-start mb-1">
-                                        <h6 class="mb-0">{{ $announcement->title }}</h6>
-                                        <span
-                                            class="badge 
-                                            @if ($announcement->priority == 'high') bg-danger 
-                                            @elseif($announcement->priority == 'medium') bg-warning 
-                                            @else bg-info @endif">
-                                            {{ ucfirst($announcement->priority) }}
-                                        </span>
-                                    </div>
-                                    <p class="text-muted mb-1 small">{{ Str::limit($announcement->description, 100) }}</p>
-                                    <small class="text-muted">Posted at:
-                                        {{ $announcement->created_at->format('M j, g:i A') }}</small>
-                                </div>
-                            @empty
-                                <p class="text-muted small">No recent announcements found.</p>
-                            @endforelse
-                        </div>
-
-                        <!-- View All Link -->
-                        <div class="text-center">
-                            <a href="{{ route('announcement.index.admin') }}" class="btn btn-outline-primary btn-sm">
-                                View All Announcements <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- LEFT: Attendance -->
-            <div class="col-12 col-md-8 mb-4">
-                <div class="card">
+        <div class="row mb-4 g-4">
+            <!-- Left: Today's Attendance -->
+            <div class="col-12 col-lg-8">
+                <div class="card card-fixed-height h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Today's Attendance</h5>
                         <div class="text-end">
@@ -301,7 +178,6 @@
                                 <div class="attendance-stat-card late-card" data-filter="late">
                                     @php
                                         $lateToday = \App\Models\Attendance::whereDate('date', \Carbon\Carbon::today())
-
                                             ->where('status_time_in', 'Late')
                                             ->count();
                                     @endphp
@@ -346,10 +222,124 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Recent Activities + System Status stacked -->
-            <div class="col-12 col-md-4">
+            <!-- Right: Announcements -->
+            <div class="col-12 col-lg-4">
+                <div class="card card-fixed-height h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Announcements</h5>
+                        <a href="{{ route('announcement.index.admin') }}" class="btn btn-outline-primary btn-sm">
+                            View All <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="announcement-list">
+                            @forelse($announcements as $announcement)
+                                <div class="announcement-item mb-3 p-2 hover-bg" style="border-radius: 8px;">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="mb-0">{{ $announcement->title }}</h6>
+                                        <span
+                                            class="badge 
+                                            @if ($announcement->priority == 'high') bg-danger 
+                                            @elseif($announcement->priority == 'medium') bg-warning 
+                                            @else bg-info @endif">
+                                            {{ ucfirst($announcement->priority) }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted mb-1 small">{{ Str::limit($announcement->description, 100) }}</p>
+                                    <small class="text-muted">Posted at:
+                                        {{ $announcement->created_at->format('M j, g:i A') }}</small>
+                                </div>
+                            @empty
+                                <p class="text-muted small">No recent announcements found.</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <div class="card">
+        <div class="row mb-4 g-4">
+
+            <!-- Left: Leave/Time Slip Requests -->
+            <div class="col-12 col-lg-8">
+                <div class="card card-fixed-height h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Leave & Time Slip Requests</h5>
+                        <a href="{{ route('admin.requests') }}" class="btn btn-outline-primary btn-sm">
+                            View All <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <!-- Pending Requests Summary -->
+                        <div class="row text-center mb-4">
+                            <div class="col-4">
+                                <div class="request-stat-card" style="cursor: pointer;">
+                                    <h4 class="text-warning">{{ $totalPending }}</h4>
+                                    <small class="text-muted">Pending</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="request-stat-card" style="cursor: pointer;">
+                                    <h4 class="text-success">{{ $totalApproved }}</h4>
+                                    <small class="text-muted">Approved</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="request-stat-card" style="cursor: pointer;">
+                                    <h4 class="text-danger">{{ $totalRejected }}</h4>
+                                    <small class="text-muted">Rejected</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Requests -->
+                        <h6 class="mb-4">Recent Requests</h6>
+                        <div class="request-list">
+                            @forelse($recentRequests as $request)
+                                <div class="request-item d-flex justify-content-between align-items-center mb-3 p-2 hover-bg"
+                                    onclick="window.location.href='{{ route('admin.requests') }}'"
+                                    style="cursor: pointer; border-radius: 8px;">
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="avatar-sm bg-light rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-person text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ $request['employee'] }}</strong>
+                                            <div class="text-muted small">
+                                                {{ $request['type'] }}
+                                                @if ($request['is_time_slip'])
+                                                    <span class="badge bg-info ms-1">Time Slip</span>
+                                                @else
+                                                    <span class="badge bg-primary ms-1">Leave</span>
+                                                @endif
+                                            </div>
+                                            <small class="text-muted">{{ $request['duration'] }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <span
+                                            class="badge 
+                                            @if ($request['status'] == 'pending') bg-warning 
+                                            @elseif($request['status'] == 'approved') bg-success 
+                                            @else bg-danger @endif">
+                                            {{ ucfirst($request['status']) }}
+                                        </span>
+                                        <div class="text-muted small mt-1">{{ $request['submitted_date'] }}</div>
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-muted small">No pending requests found.</p>
+                            @endforelse
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Recent Activities -->
+            <div class="col-12 col-lg-4">
+                <div class="card card-fixed-height h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Recent Activities</h5>
                     </div>
@@ -375,8 +365,8 @@
                         </div>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
 
@@ -504,9 +494,7 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
-    </script>
 
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Make request items clickable
             document.querySelectorAll('.request-item').forEach(item => {
@@ -514,22 +502,6 @@
                     // Navigation is handled by onclick attribute
                 });
             });
-
-            // Update date and time
-            function updateDateTime() {
-                const now = new Date();
-                const dateOptions = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                };
-
-                document.getElementById('currentDate').textContent = now.toLocaleDateString(undefined, dateOptions);
-                document.getElementById('currentTime').textContent = now.toLocaleTimeString();
-            }
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
         });
     </script>
 @endsection

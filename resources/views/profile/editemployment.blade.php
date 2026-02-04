@@ -84,7 +84,7 @@
                                 @foreach ($departments as $department)
                                     <option value="{{ $department->id }}"
                                         {{ old('department_id', $employment?->department_id) == $department->id ? 'selected' : '' }}>
-                                        {{ ucfirst($department->department_name) }}
+                                        {{ ucfirst($department->name) }}
                                     </option>
                                 @endforeach
                             </select>
@@ -94,22 +94,19 @@
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="company_branch" class="form-label">Company Branch <span
+                            <label for="company_branch_id" class="form-label">Company Branch <span
                                     class="text-danger">*</span></label>
-                            <select id="company_branch" name="company_branch" class="form-select" required>
-                                <option value="" disabled {{ old('company_branch') ? '' : 'selected' }}>Select
+                            <select id="company_branch_id" name="company_branch_id" class="form-select" required>
+                                <option value="" disabled {{ old('company_branch_id') ? '' : 'selected' }}>Select
                                     branch
                                 </option>
-                                @php
-                                    $company_branches = ['AHG', 'D-8CEFC'];
-                                @endphp
-                                @foreach ($company_branches as $branch)
-                                    <option value="{{ $branch }}"
-                                        {{ old('company_branch', $employment?->company_branch) === $branch ? 'selected' : '' }}>
-                                        {{ ucfirst($branch) }}</option>
+                                @foreach ($companyBranches as $branch)
+                                    <option value="{{ $branch->id }}"
+                                        {{ old('company_branch_id', $employment?->company_branch_id) == $branch->id ? 'selected' : '' }}>
+                                        {{ ucfirst($branch->name) }}</option>
                                 @endforeach
                             </select>
-                            @error('company_branch')
+                            @error('company_branch_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -163,51 +160,39 @@
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="employment_type" class="form-label">
+                            <label for="employment_type_id" class="form-label">
                                 Employment Type <span class="text-danger">*</span>
                             </label>
-                            <select id="employment_type" name="employment_type" class="form-select" required>
-                                <option value="" disabled {{ old('employment_type') ? '' : 'selected' }}>
+                            <select id="employment_type_id" name="employment_type_id" class="form-select" required>
+                                <option value="" disabled {{ old('employment_type_id') ? '' : 'selected' }}>
                                     Select type
                                 </option>
-                                @php
-                                    $employment_types = ['full_time', 'part_time', 'contract', 'intern'];
-                                @endphp
-                                @foreach ($employment_types as $type)
-                                    <option value="{{ $type }}"
-                                        {{ old('employment_type', $employment?->employment_type) === $type ? 'selected' : '' }}>
-                                        {{ ucfirst(str_replace('_', ' ', $type)) }}
+                                @foreach ($employmentTypes as $type)
+                                    <option value="{{ $type->id }}" data-name="{{ strtolower($type->name) }}"
+                                        {{ old('employment_type_id', $employment?->employment_type_id) == $type->id ? 'selected' : '' }}>
+                                        {{ ucfirst($type->name) }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('employment_type')
+                            @error('employment_type_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="col-md-12 mb-3">
-                            <label for="employment_status" class="form-label">Employment Status <span
+                            <label for="employment_status_id" class="form-label">Employment Status <span
                                     class="text-danger">*</span></label>
-                            <select id="employment_status" name="employment_status" class="form-select" required>
-                                <option value="" disabled {{ old('employment_status') ? '' : 'selected' }}>Select
+                            <select id="employment_status_id" name="employment_status_id" class="form-select" required>
+                                <option value="" disabled {{ old('employment_status_id') ? '' : 'selected' }}>Select
                                     status
                                 </option>
-                                @php
-                                    $employment_statuses = [
-                                        'active',
-                                        'probation',
-                                        'suspended',
-                                        'resigned',
-                                        'terminated',
-                                    ];
-                                @endphp
-                                @foreach ($employment_statuses as $status)
-                                    <option value="{{ $status }}"
-                                        {{ old('employment_status', $employment?->employment_status) === $status ? 'selected' : '' }}>
-                                        {{ ucfirst($status) }}</option>
+                                @foreach ($employmentStatuses as $status)
+                                    <option value="{{ $status->id }}" data-name="{{ strtolower($status->name) }}"
+                                        {{ old('employment_status_id', $employment?->employment_status_id) == $status->id ? 'selected' : '' }}>
+                                        {{ ucfirst($status->name) }}</option>
                                 @endforeach
                             </select>
-                            @error('employment_status')
+                            @error('employment_status_id')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
@@ -390,13 +375,13 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const typeSelect = document.getElementById('employment_type');
-            const statusSelect = document.getElementById('employment_status');
+            const typeSelect = document.getElementById('employment_type_id');
+            const statusSelect = document.getElementById('employment_status_id');
             const groups = document.querySelectorAll('.date-group');
 
             function updateVisibility() {
-                const type = typeSelect.value;
-                const status = statusSelect.value;
+                const type = typeSelect.selectedOptions[0]?.dataset.name || '';
+                const status = statusSelect.selectedOptions[0]?.dataset.name || '';
 
                 groups.forEach(group => {
                     const types = group.dataset.type?.split(' ') || [];

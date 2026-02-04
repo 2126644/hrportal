@@ -159,9 +159,7 @@
         <div class="row">
             @forelse ($projects as $project)
                 <div class="col-md-12 mb-3 project-item" data-status="{{ $project->project_status }}">
-                    <div class="card h-100" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#projectModal{{ $project->id }}"
+                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#projectModal{{ $project->id }}"
                         style="cursor:pointer;">
 
                         <div class="card-body">
@@ -206,11 +204,12 @@
 
                                     <div>
                                         <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>Start:</strong> {{ $project->start_date->format('d M Y') }}
+                                        <strong>Start:</strong> {{ optional($project->start_date)->format('d M Y') ?? '-' }}
+                                        {{-- Never call ->format() directly on a nullable column --}}
                                     </div>
                                     <div>
                                         <i class="bi bi-calendar-event me-1 text-secondary"></i>
-                                        <strong>End:</strong> {{ $project->end_date->format('d M Y') }}
+                                        <strong>End:</strong> {{ optional($project->end_date)->format('d M Y') ?? '-' }}
                                     </div>
                                 </div>
                             </div>
