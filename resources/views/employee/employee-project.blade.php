@@ -100,7 +100,7 @@
 
     <div class="row">
         <!-- Total Projects -->
-        <div class="col-12 col-md-3 mb-4">
+        <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card active" data-status="all">
                 <div class="card-body">
                     <i class="bi bi-list-task"></i>
@@ -111,11 +111,22 @@
         </div>
 
         <!-- Not Started Projects -->
-        <div class="col-12 col-md-3 mb-4">
+        <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="not-started">
                 <div class="card-body">
                     <i class="bi bi-circle"></i>
                     <div class="card-title">Not Started</div>
+                    <span class="stat-number not-started">{{ $notStartedProjects }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Planning Projects -->
+        <div class="col-12 col-md-2 mb-4">
+            <div class="card filter-card" data-status="not-started">
+                <div class="card-body">
+                    <i class="bi bi-circle"></i>
+                    <div class="card-title">Planning</div>
                     <span class="stat-number not-started">{{ $notStartedProjects }}</span>
                 </div>
             </div>

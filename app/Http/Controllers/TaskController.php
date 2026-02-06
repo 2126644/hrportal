@@ -26,8 +26,8 @@ class TaskController extends Controller
         $query = Task::with([
             'project',
             'createdBy',
-            'assignedTo.employee',
-            'assignedTo.department',
+            'assignedTo',
+            'assignedTo.employment.department',
         ])->orderBy('created_at', 'desc');
 
         // Employee: only tasks assigned to them (via pivot)

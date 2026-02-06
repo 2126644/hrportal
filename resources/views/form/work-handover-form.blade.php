@@ -82,7 +82,7 @@
                                 <option value="">Select employee</option>
                                 @foreach ($employees as $emp)
                                     <option value="{{ $emp->employee_id }}">
-                                        {{ $emp->full_name }} ({{ $emp->department->name ?? '' }})
+                                        {{ $emp->full_name }} ({{ $emp->employment->department->name ?? '' }})
                                     </option>
                                 @endforeach
                             </select>

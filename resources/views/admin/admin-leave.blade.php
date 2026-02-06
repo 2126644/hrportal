@@ -49,7 +49,7 @@
         <div class="tab-pane fade show active" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
             <!-- Filters and Search -->
             <form method="GET" action="{{ route('leave.index.admin') }}">
-                <input type="hidden" name="tab" class="active-tab-input" value="leave-application">
+                <input type="hidden" name="tab" value="leave-application">
                 <div class="row g-2 align-items-end">
                     @if (auth()->user()->role_id === 2)
                         <div class="col-12 col-sm-6 col-lg-2">

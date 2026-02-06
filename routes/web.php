@@ -87,7 +87,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
-    Route::get('/form/work-handover/{form}', [FormController::class, 'show'])->name('form.show');
+    Route::get('/form/work-handover/view/{form}', [FormController::class, 'show'])->name('form.show');
 });
 
 Route::middleware(['auth', 'force.password.reset'])->group(function () { // employee

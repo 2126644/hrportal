@@ -157,16 +157,6 @@
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
-                        href="{{ route('announcement.index.admin') }}">
-                        <i class="bi bi-megaphone"></i>
-                        <span>Announcement</span>
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('admin.employee*', 'profile*') ? 'active' : '' }}"
-                        href="{{ route('admin.employee') }}">
-                        <i class="bi bi-people"></i>
-                        <span>Employee</span>
-                    </a>
                     <a class="nav-link {{ request()->routeIs('admin.attendance*') ? 'active' : '' }}"
                         href="{{ route('admin.attendance') }}">
                         <i class="bi bi-clock-history"></i>
@@ -177,35 +167,45 @@
                         <i class="bi bi-airplane"></i>
                         <span>Leave</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('task*', 'project*') ? 'active' : '' }}"
-                        href="{{ route('task.index.admin') }}">
-                        <i class="bi bi-ui-checks"></i>
-                        <span>Task & Project</span>
+                    <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}"
+                        href="{{ route('calendar.index') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Calendar</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('event*') ? 'active' : '' }}"
                         href="{{ route('event.index.admin') }}">
                         <i class="bi bi-calendar-event"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('admin.requests*') ? 'active' : '' }}"
-                        href="{{ route('admin.requests') }}">
-                        <i class="bi bi-clipboard"></i>
-                        <span>Request</span>
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('settings*') ? 'active' : '' }}"
-                        href="{{ route('settings.index') }}">
-                        <i class="bi bi-gear"></i>
-                        <span>System Settings</span>
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}"
-                        href="{{ route('calendar.index') }}">
-                        <i class="bi bi-calendar3"></i>
-                        <span>Calendar</span>
+                    <a class="nav-link {{ request()->routeIs('task*', 'project*') ? 'active' : '' }}"
+                        href="{{ route('task.index.admin') }}">
+                        <i class="bi bi-ui-checks"></i>
+                        <span>Task & Project</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
                         href="{{ route('form.admin') }}">
                         <i class="bi bi-file-earmark-text"></i>
                         <span>Form</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.requests*') ? 'active' : '' }}"
+                        href="{{ route('admin.requests') }}">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Request</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('admin.employee*', 'profile*') ? 'active' : '' }}"
+                        href="{{ route('admin.employee') }}">
+                        <i class="bi bi-people"></i>
+                        <span>Employee</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
+                        href="{{ route('announcement.index.admin') }}">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Announcement</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('settings*') ? 'active' : '' }}"
+                        href="{{ route('settings.index') }}">
+                        <i class="bi bi-gear"></i>
+                        <span>System Setting</span>
                     </a>
 
                     <!-- Employee Navigation (Role ID: 3) -->
@@ -214,11 +214,6 @@
                         href="{{ route('employee.dashboard') }}">
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
-                        href="{{ route('announcement.index.employee') }}">
-                        <i class="bi bi-megaphone"></i>
-                        <span>Announcement</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('employee.attendance*') ? 'active' : '' }}"
                         href="{{ route('employee.attendance') }}">
@@ -230,50 +225,55 @@
                         <i class="bi bi-airplane"></i>
                         <span>Leave</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('task*', 'project*') ? 'active' : '' }}"
-                        href="{{ route('task.index.employee') }}">
-                        <i class="bi bi-ui-checks"></i>
-                        <span>Task & Project</span>
+                    <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}"
+                        href="{{ route('calendar.index') }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Calendar</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('event*') ? 'active' : '' }}"
                         href="{{ route('event.index.employee') }}">
                         <i class="bi bi-calendar-event"></i>
                         <span>Event</span>
                     </a>
-                    <a class="nav-link {{ request()->routeIs('employee.myrequests*') ? 'active' : '' }}"
-                        href="{{ route('employee.myrequests') }}">
-                        <i class="bi bi-clipboard"></i>
-                        <span>My Requests</span>
-                    </a>
-                    @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
-                        <a class="nav-link {{ request()->routeIs('employee.requests*') ? 'active' : '' }}"
-                            href="{{ route('employee.requests') }}">
-                            <i class="bi bi-clipboard"></i>
-                            <span>Requests</span>
-                        </a>
-                    @endif
-                    <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
-                        href="{{ route('profile.show') }}">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Profile</span>
-                    </a>
-                    <a class="nav-link {{ request()->routeIs('calendar.index') ? 'active' : '' }}"
-                        href="{{ route('calendar.index') }}">
-                        <i class="bi bi-calendar3"></i>
-                        <span>Calendar</span>
+                    <a class="nav-link {{ request()->routeIs('task*', 'project*') ? 'active' : '' }}"
+                        href="{{ route('task.index.employee') }}">
+                        <i class="bi bi-ui-checks"></i>
+                        <span>Task & Project</span>
                     </a>
                     <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
                         href="{{ route('form.myforms') }}">
                         <i class="bi bi-file-earmark-text"></i>
-                        <span>My Forms</span>
+                        <span>Form</span>
                     </a>
                     @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
                         <a class="nav-link {{ request()->routeIs('form*') ? 'active' : '' }}"
                             href="{{ route('form.employee') }}">
                             <i class="bi bi-file-earmark-text"></i>
-                            <span>Forms</span>
+                            <span>Form</span>
                         </a>
                     @endif
+                    <a class="nav-link {{ request()->routeIs('employee.myrequests*') ? 'active' : '' }}"
+                        href="{{ route('employee.myrequests') }}">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Request</span>
+                    </a>
+                    @if (Auth::user()->role_id == '4' || Auth::user()->role_id == '5' || Auth::user()->role_id == '6')
+                        <a class="nav-link {{ request()->routeIs('employee.requests*') ? 'active' : '' }}"
+                            href="{{ route('employee.requests') }}">
+                            <i class="bi bi-clipboard"></i>
+                            <span>Request</span>
+                        </a>
+                    @endif
+                    <a class="nav-link {{ request()->routeIs('announcement*') ? 'active' : '' }}"
+                        href="{{ route('announcement.index.employee') }}">
+                        <i class="bi bi-megaphone"></i>
+                        <span>Announcement</span>
+                    </a>
+                    <a class="nav-link {{ request()->routeIs('profile*') ? 'active' : '' }}"
+                        href="{{ route('profile.show') }}">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Profile</span>
+                    </a>
                 @endif
             @endauth
         </div>

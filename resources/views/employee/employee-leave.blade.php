@@ -10,7 +10,8 @@
                             <div>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Leave</li>
                                     </ol>
                                 </nav>
@@ -32,8 +33,9 @@
         <!-- Tabs navigation -->
         <ul class="nav nav-tabs" id="leaveTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="leave-application-tab" data-bs-toggle="tab" data-bs-target="#leave-application"
-                    type="button" role="tab" aria-controls="leave-application" aria-selected="false">
+                <button class="nav-link active" id="leave-application-tab" data-bs-toggle="tab"
+                    data-bs-target="#leave-application" type="button" role="tab" aria-controls="leave-application"
+                    aria-selected="false">
                     Leave Application
                 </button>
             </li>
@@ -50,10 +52,10 @@
             style="min-height: 500px;">
 
             <!-- Leave Application tab -->
-            <div class="tab-pane fade" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
+            <div class="tab-pane fade show active" id="leave-application" role="tabpanel" aria-labelledby="leave-application-tab">
                 <!-- Filters and Search -->
                 <form method="GET" action="{{ route('leave.index.employee') }}">
-                    <input type="hidden" name="tab" id="activeTabInput" value="leave-application">
+                    <input type="hidden" name="tab" id="active-tab-input" value="leave-application">
                     <div class="row g-2 align-items-end">
                         @if (auth()->user()->role_id === 2)
                             <div class="col-12 col-sm-6 col-lg-2">
@@ -346,74 +348,73 @@
         </div>
     </div>
 
-        <script>
+    <script>
+        document.querySelectorAll('.filter-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // remove active class from all cards 
+                document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
 
-            document.querySelectorAll('.filter-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    // remove active class from all cards 
-                    document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
+                let status = this.dataset.status;
+                let visibleCount = 0;
 
-                    let status = this.dataset.status;
-                    let visibleCount = 0;
+                // Hide all existing static messages first
+                document.querySelectorAll('#leavesTable tr:not([data-status])').forEach(staticMsg => {
+                    staticMsg.style.display = 'none';
+                });
 
-                    // Hide all existing static messages first
-                    document.querySelectorAll('#leavesTable tr:not([data-status])').forEach(staticMsg => {
-                        staticMsg.style.display = 'none';
-                    });
-
-                    // Show/hide leave rows based on filter
-                    document.querySelectorAll('#leavesTable tr[data-status]').forEach(row => {
-                        if (status === 'all' || row.dataset.status === status) {
-                            row.style.display = '';
-                            visibleCount++;
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-
-                    // Handle the no data message
-                    const existingStaticMsg = document.querySelector('#leavesTable tr:not([data-status])');
-                    let noDataRow = document.getElementById('noDataMessage');
-
-                    // Remove existing dynamic message if it exists
-                    if (noDataRow) {
-                        noDataRow.remove();
-                    }
-
-                    // If no rows are visible, show appropriate message
-                    if (visibleCount === 0) {
-                        // If there's already a static message (from Blade), show it and update text
-                        if (existingStaticMsg) {
-                            existingStaticMsg.style.display = '';
-                            existingStaticMsg.querySelector('td').innerHTML =
-                                `<i class="bi bi-inbox me-2"></i>No ${getStatusText(status).toLowerCase()} leave requests found`;
-                        } else {
-                            // Create new dynamic message
-                            noDataRow = document.createElement('tr');
-                            noDataRow.id = 'noDataMessage';
-                            noDataRow.innerHTML = `<td colspan="7" class="text-center py-4 text-muted">
-                    <i class="bi bi-inbox me-2"></i>No ${getStatusText(status).toLowerCase()} leave requests found
-                </td>`;
-                            document.getElementById('leavesTable').appendChild(noDataRow);
-                        }
+                // Show/hide leave rows based on filter
+                document.querySelectorAll('#leavesTable tr[data-status]').forEach(row => {
+                    if (status === 'all' || row.dataset.status === status) {
+                        row.style.display = '';
+                        visibleCount++;
                     } else {
-                        // Hide static message if rows are visible
-                        if (existingStaticMsg) {
-                            existingStaticMsg.style.display = 'none';
-                        }
+                        row.style.display = 'none';
                     }
                 });
-            });
 
-            function getStatusText(status) {
-                const statusMap = {
-                    'all': 'all',
-                    'approved': 'approved',
-                    'pending': 'pending',
-                    'rejected': 'rejected'
-                };
-                return statusMap[status] || status;
-            }
-        </script>
-    @endsection
+                // Handle the no data message
+                const existingStaticMsg = document.querySelector('#leavesTable tr:not([data-status])');
+                let noDataRow = document.getElementById('noDataMessage');
+
+                // Remove existing dynamic message if it exists
+                if (noDataRow) {
+                    noDataRow.remove();
+                }
+
+                // If no rows are visible, show appropriate message
+                if (visibleCount === 0) {
+                    // If there's already a static message (from Blade), show it and update text
+                    if (existingStaticMsg) {
+                        existingStaticMsg.style.display = '';
+                        existingStaticMsg.querySelector('td').innerHTML =
+                            `<i class="bi bi-inbox me-2"></i>No ${getStatusText(status).toLowerCase()} leave requests found`;
+                    } else {
+                        // Create new dynamic message
+                        noDataRow = document.createElement('tr');
+                        noDataRow.id = 'noDataMessage';
+                        noDataRow.innerHTML = `<td colspan="7" class="text-center py-4 text-muted">
+                    <i class="bi bi-inbox me-2"></i>No ${getStatusText(status).toLowerCase()} leave requests found
+                </td>`;
+                        document.getElementById('leavesTable').appendChild(noDataRow);
+                    }
+                } else {
+                    // Hide static message if rows are visible
+                    if (existingStaticMsg) {
+                        existingStaticMsg.style.display = 'none';
+                    }
+                }
+            });
+        });
+
+        function getStatusText(status) {
+            const statusMap = {
+                'all': 'all',
+                'approved': 'approved',
+                'pending': 'pending',
+                'rejected': 'rejected'
+            };
+            return statusMap[status] || status;
+        }
+    </script>
+@endsection

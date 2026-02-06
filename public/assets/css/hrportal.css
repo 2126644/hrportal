@@ -482,16 +482,16 @@ footer {
 }
 
 .request-list,
-.activity-timeline,
 .attendance-details,
 .list-group {
-    max-height: 350px;
+    max-height: 380px;
     overflow-y: auto;
     padding-right: 5px;
 }
 
+.activity-timeline,
 .announcement-list {
-    max-height: 500px;
+    max-height: 520px;
     overflow-y: auto;
     padding-right: 5px;
 }
@@ -1673,11 +1673,6 @@ body.sidebar-collapsed .main-content {
 }
 .stat-card:nth-child(4) {
     border-left-color: #17a2b8;
-}
-
-.activity-timeline {
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 .activity-item {

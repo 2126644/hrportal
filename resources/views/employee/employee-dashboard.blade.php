@@ -256,7 +256,7 @@
                             <div class="col-12 col-md-6">
                                 <a href="{{ route('leave.create') }}"
                                     class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
-                                    <div class="icon bg-warning-soft text-warning me-3">
+                                    <div class="icon bg-info-soft text-info me-3">
                                         <i class="bi bi-airplane"></i>
                                     </div>
                                     <div>
@@ -270,7 +270,7 @@
                             <div class="col-12 col-md-6">
                                 <a href="{{ route('event.create') }}"
                                     class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
-                                    <div class="icon bg-success-soft text-success me-3">
+                                    <div class="icon bg-primary-soft text-primary me-3">
                                         <i class="bi bi-calendar-event"></i>
                                     </div>
                                     <div>
@@ -284,12 +284,26 @@
                             <div class="col-12 col-md-6">
                                 <a href="{{ route('form.work-handover.create') }}"
                                     class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
-                                    <div class="icon bg-secondary-soft text-secondary me-3">
+                                    <div class="icon bg-info-soft text-info me-3">
                                         <i class="bi bi-file-earmark-text"></i>
                                     </div>
                                     <div>
                                         <small class="text-muted d-block">Prepare and submit form</small>
                                         <strong class="text-dark">Fill In Form</strong>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- New Time Slip --}}
+                            <div class="col-12 col-md-6">
+                                <a href="{{ route('employee.attendance') }}"
+                                    class="quick-action-card d-flex align-items-center p-3 h-100 text-decoration-none">
+                                    <div class="icon bg-primary-soft text-primary me-3">
+                                        <i class="bi bi-receipt"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Submit time slip request for approval</small>
+                                        <strong class="text-dark">Apply Time Slip</strong>
                                     </div>
                                 </a>
                             </div>
