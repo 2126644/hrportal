@@ -2,67 +2,55 @@
 
 ## Overview
 
-The Task Management system allows administrators to create, assign, and track tasks while enabling employees to view their assignments, update progress, and complete tasks efficiently.
+The Task Management system allows users to create, assign, and track tasks. Employees can view their assigned tasks, update status, and add notes on their progress.
 
 ## Purpose
 
 The Task Management system is designed to:
-- Create and assign tasks to employees
+- Create and assign tasks to team members
 - Track task progress and completion
-- Manage task priorities and deadlines
-- Monitor team workload and productivity
-- Facilitate collaboration on tasks
-- Maintain task history and records
-- Generate task reports and analytics
+- Link tasks to projects
+- Monitor workload across the team
+- Maintain task history and notes
 
 ## What Users Can See
 
 ### For Employees
 
 #### My Tasks Dashboard
-- **Active Tasks**: Currently assigned tasks
+- **Active Tasks**: Tasks assigned to you
 - **Task Status**: Progress of each task
 - **Due Dates**: Upcoming deadlines
-- **Priority Levels**: Task importance indicators
 - **Completed Tasks**: Finished task history
-- **Overdue Tasks**: Tasks past deadline
 
 #### Task Details
 When viewing a task:
-- **Task Title**: Name of the task
+- **Task Name**: Title of the task
 - **Description**: Detailed task information
-- **Assigned To**: Who is responsible
-- **Assigned By**: Who created/assigned the task
+- **Assigned To**: Team members assigned to this task
+- **Created By**: Who created the task
 - **Project**: Associated project (if any)
-- **Priority**: High, Medium, or Low
-- **Status**: Not Started, In Progress, Completed, On Hold
+- **Status**: Current progress (To Do, In Progress, In Review, To Review, Completed)
 - **Due Date**: Deadline for completion
-- **Progress**: Percentage complete
-- **Comments**: Discussion and updates
-- **Attachments**: Related files
+- **Notes**: Additional comments and updates
 
 ### For Administrators
 
 #### Admin Task Dashboard
-- **All Tasks**: Complete task overview
+- **All Tasks**: Complete task overview across all employees
 - **Create Task**: Button to add new tasks
-- **Task Statistics**: 
+- **Task Statistics**:
   - Total active tasks
-  - Tasks completed this month
-  - Overdue tasks
-  - Tasks by status
-- **Team Workload**: Task distribution across employees
+  - Tasks by status (To Do, In Progress, In Review, To Review, Completed)
+  - Tasks completed this period
 - **Task Filters**: Sort and filter options
-- **Task Reports**: Analytics and insights
 
 #### Admin Features
 - Create and assign tasks
 - Edit task details
-- Reassign tasks
-- Set priorities and deadlines
+- Assign multiple team members to tasks
 - Monitor progress across all tasks
 - View team workload
-- Generate task reports
 
 ## How to Use Task Management
 
@@ -73,26 +61,23 @@ When viewing a task:
 1. **Access Tasks**
    - Login to your dashboard
    - Click **"Tasks"** from main menu
-   - See list of assigned tasks
+   - See list of tasks assigned to you
 
 2. **Task List View**
-   - Tasks displayed in table or card format
+   - Tasks displayed in table format
    - **Columns show**:
      - Task name
      - Project (if applicable)
-     - Priority
      - Status
      - Due date
-     - Progress
-   - **Sort by**: Name, priority, due date, status
-   - **Filter by**: Status, priority, project, date range
+     - Created by
+   - **Filter by**: Status, project, due date, creator
+   - **Search**: By task name or ID
 
 3. **View Task Details**
    - Click on any task
-   - Full task page opens
-   - Review all task information
-   - See task history
-   - View comments and updates
+   - See complete task information
+   - View task notes and history
 
 #### Updating Task Status
 
@@ -101,182 +86,122 @@ When viewing a task:
    - Task details page loads
 
 2. **Update Status**
-   - Click **"Update Status"** button
+   - Locate the status field
    - Select new status:
-     - **Not Started**: Haven't begun work
+     - **To Do**: Not yet started
      - **In Progress**: Currently working on it
-     - **On Hold**: Temporarily paused
-     - **Completed**: Finished the task
-   - Add **progress notes** (optional but recommended)
-   - Update **completion percentage** (e.g., 25%, 50%, 75%, 100%)
-   - Click **"Save"**
+     - **In Review**: Submitted for review
+     - **To Review**: Needs to be reviewed
+     - **Completed**: Task finished
+   - **Save** the update
 
 3. **Confirmation**
    - Status updated in system
-   - Task assigner notified
+   - Task creator notified
    - Dashboard reflects new status
-   - Timeline updated
 
-#### Updating Task Progress
+#### Adding Notes to Tasks
 
-1. **Open Task Details**
-2. Click **"Update Progress"**
-3. **Enter Progress Percentage**: 0-100%
-4. **Add Progress Notes**:
+1. **Open Task**
+2. Find the **"Notes"** section
+3. **Add Notes**:
    - What you've accomplished
    - Current activities
    - Any challenges or blockers
    - Next steps
-5. **Upload Files** (if applicable):
-   - Work samples
-   - Supporting documents
-   - Progress screenshots
-6. **Save Update**
-7. Progress reflected on task card
-8. Supervisor notified of update
-
-#### Adding Comments to Tasks
-
-1. **Open Task**
-2. Scroll to **"Comments"** section
-3. Click **"Add Comment"**
-4. Type your message:
-   - Ask questions
-   - Provide updates
-   - Request clarification
-   - Share information
-5. **Attach files** if needed
-6. Click **"Post Comment"**
-7. Comment added to task thread
-8. Relevant parties notified
+4. **Save Update**
+5. Notes visible to task creator and team members
 
 #### Marking Task as Complete
 
 1. **Finish the task** work
 2. **Open Task Details**
-3. **Set progress to 100%**
-4. **Change status to "Completed"**
-5. **Add completion notes**:
-   - Summary of work done
-   - Final deliverables
-   - Any handoff information
-6. **Attach final files** if required
-7. Click **"Mark Complete"**
-8. Task moved to completed list
-9. Assigner notified of completion
-
-#### Requesting Task Extension
-
-If you need more time:
-1. **Open the task**
-2. **Add comment** explaining:
-   - Reason for delay
-   - Progress made so far
-   - New estimated completion date
-3. **Tag your supervisor** in comment
-4. Wait for approval
-5. Deadline may be extended by admin
+3. **Change status to "Completed"**
+4. **Add final notes** summarizing work done
+5. Click **"Save"** or **"Update"**
+6. Task moved to completed list
+7. Creator notified of completion
 
 ### For Administrators: Creating and Managing Tasks
 
 #### Creating a New Task
 
 1. **Access Task Creation**
-   - Login to Admin Dashboard
+   - Login to Dashboard
    - Click **"Tasks"** from menu
-   - Click **"Create Task"** button
+   - Click **"Create Task"** or **"New Task"** button
 
 2. **Fill Task Form**
 
    **Basic Information:**
-   - **Task Title**: Clear, descriptive name
+   - **Task Name**: Clear, descriptive title
    - **Description**: Detailed task information
      - What needs to be done
      - Why it's important
      - Expected outcome
      - Any specific requirements
-   - **Task Type**: Category or type of work
 
    **Assignment:**
-   - **Assign To**: Select employee(s)
-     - Single person
-     - Multiple people (shared task)
-     - Team/department
-   - **Project**: Link to project (if applicable)
-   - **Task Owner**: Primary responsible person
+   - **Assign To**: Select one or more employees
+     - Can assign to multiple people
+     - All assignees can view and update the task
+   - **Project**: Link to project (optional)
 
    **Scheduling:**
-   - **Start Date**: When task should begin
    - **Due Date**: Deadline for completion
-   - **Estimated Hours**: Expected time to complete
-   - **Priority Level**:
-     - **High**: Urgent, critical tasks
-     - **Medium**: Standard priority
-     - **Low**: Non-urgent tasks
+   - Leave blank if no specific deadline
+
+   **Status:**
+   - **Task Status**: Set initial status (usually "To Do")
 
    **Additional Details:**
-   - **Tags/Labels**: Categorize task
-   - **Dependencies**: Tasks that must complete first
-   - **Checklist**: Sub-tasks or steps (optional)
-   - **Attachments**: Reference materials, briefs
+   - **Notes**: Any initial notes or instructions
 
 3. **Review and Create**
    - Verify all information
-   - Check assignee has capacity
-   - Confirm realistic deadline
-   - Click **"Create Task"**
+   - Click **"Create Task"** or **"Save"**
 
 4. **Notification**
    - Task created in system
-   - Assignee notified immediately
-   - Task appears on calendars
-   - Dashboard updated
+   - Assigned employees notified
+   - Task appears on dashboards
 
 #### Editing Tasks
 
 1. **Find the Task**
-   - Go to **"All Tasks"**
+   - Go to **"All Tasks"** (admin view)
    - Search or filter to find task
    - Click on task name
 
 2. **Edit Task**
-   - Click **"Edit Task"** button
-   - Modify any field:
-     - Update description
-     - Change assignee
-     - Adjust deadline
-     - Update priority
-     - Add details
+   - Update any field:
+     - Task name or description
+     - Assigned employees
+     - Due date
+     - Status
+     - Project association
+     - Notes
    - **Save Changes**
 
-3. **Notify Changes**
-   - Option to notify assignee
-   - Check if significant changes
-   - Click **"Update"**
-   - Notifications sent automatically
+3. **Notification**
+   - Assignees notified of changes (if significant)
 
 #### Reassigning Tasks
 
 1. **Open Task Details**
-2. Click **"Reassign"** button
-3. **Select New Assignee**
-4. **Add Reason** for reassignment
-5. **Transfer Context**: 
-   - Add handoff notes
-   - Summarize current progress
-6. **Confirm Reassignment**
-7. Both employees notified:
-   - Original assignee: Task removed
-   - New assignee: Task assigned
+2. **Modify Assignees**:
+   - Add new team members
+   - Remove existing assignees
+3. **Save** changes
+4. New assignees notified
+5. Removed assignees see task removed from their list
 
 #### Monitoring Task Progress
 
 **Dashboard View:**
 1. Admin dashboard shows overview:
    - Total tasks by status
-   - Overdue tasks count
-   - Completion rate
-   - Tasks by priority
+   - Task completion statistics
 
 **Detailed Tracking:**
 1. Navigate to **"All Tasks"**
@@ -286,188 +211,71 @@ If you need more time:
    - By status
    - By project
    - By due date
-4. **Sort** by:
-   - Priority
-   - Due date
-   - Status
-   - Progress percentage
+4. **Sort** by various fields
 
 **Individual Task Review:**
 1. Click on any task
-2. See complete history:
-   - Status changes
-   - Progress updates
-   - Comments and discussions
-   - Time tracking
-3. Review employee updates
-4. Check if on track for deadline
-
-#### Managing Overdue Tasks
-
-1. **View Overdue Tasks**
-   - Filter tasks by **"Overdue"**
-   - System highlights past-deadline tasks
-   - Red indicators on task cards
-
-2. **Take Action**:
-   - **Contact Assignee**: Ask for update
-   - **Extend Deadline**: If justified
-   - **Reassign**: If employee overwhelmed
-   - **Escalate**: If critical
-   - **Cancel**: If no longer needed
-
-3. **Prevent Future Overdue**:
-   - Set realistic deadlines
-   - Monitor progress regularly
-   - Send reminder notifications
-   - Balance workload
-
-#### Task Reports and Analytics
-
-1. **Access Reports**
-   - Navigate to **"Tasks"** → **"Reports"**
-
-2. **Available Reports**:
-   - **Task Completion Report**: Tasks completed in period
-   - **Employee Productivity**: Tasks by employee
-   - **Overdue Task Report**: Late tasks analysis
-   - **Task Status Summary**: Overview by status
-   - **Priority Distribution**: Tasks by priority
-   - **Time Tracking Report**: Hours spent on tasks
-   - **Project Task Report**: Tasks within projects
-
-3. **Generate Report**:
-   - Select report type
-   - Set parameters:
-     - Date range
-     - Employees
-     - Projects
-     - Task status
-   - Click **"Generate"**
-   - View results
-   - **Export** to PDF or Excel
+2. See complete details and notes
+3. Check status and progress
+4. Review employee updates
 
 ## Task Features
 
-### Task Priorities
-
-**High Priority:**
-- Critical, urgent tasks
-- Red indicator
-- Appears at top of lists
-- Daily reminder notifications
-- Immediate attention required
-
-**Medium Priority:**
-- Standard importance
-- Yellow/orange indicator
-- Normal task flow
-- Regular reminders
-- Timely completion expected
-
-**Low Priority:**
-- Non-urgent tasks
-- Green/blue indicator
-- Can be deferred if needed
-- Minimal reminders
-- Complete when capacity allows
-
 ### Task Status Workflow
 
-Standard progression:
-1. **Not Started** → Task created, work hasn't begun
+Standard task progression:
+1. **To Do** → Task created, work hasn't begun
 2. **In Progress** → Actively working on task
-3. **Completed** → Task finished
-4. **On Hold** → Temporarily paused
+3. **In Review** / **To Review** → Task submitted or awaiting review
+4. **Completed** → Task finished
 
-Optional statuses:
-- **Under Review**: Submitted for approval
-- **Cancelled**: No longer needed
-- **Blocked**: Waiting on dependency
+### Task Assignment
 
-### Task Dependencies
+- **Multiple Assignees**: Tasks can be assigned to multiple employees
+- **Team Collaboration**: All assignees can view and update task
+- **Flexible Assignment**: Can add or remove assignees anytime
 
-Create task relationships:
-1. **Set Dependencies** when creating task
-2. **Select Preceding Tasks**: Tasks that must complete first
-3. **System Logic**:
-   - Dependent task can't start until prerequisite completes
-   - Notifications when blockers are removed
-   - Visual dependency chain
+### Project Integration
 
-### Recurring Tasks
-
-For regular, repeating tasks:
-1. **Enable** "Recurring Task"
-2. **Set Pattern**: Daily, weekly, monthly
-3. **Define End**: By date or number of occurrences
-4. **Auto-create**: New tasks generated automatically
-5. **Individual Updates**: Each instance tracked separately
-
-### Task Checklist/Sub-tasks
-
-Break down complex tasks:
-1. **Add Checklist Items** when creating task
-2. **Each item** is a sub-step
-3. **Track Progress**:
-   - Check off completed items
-   - Progress percentage auto-updates
-   - Clear visibility of remaining work
-4. **Completion**: All items must be checked for task completion
-
-### Time Tracking
-
-Track time spent on tasks:
-1. **Start Timer** when beginning work
-2. **Pause/Resume** as needed
-3. **Stop Timer** when finished
-4. **Manual Entry**: Add time retrospectively
-5. **Reports**: Analyze time spent
-6. **Project Budgets**: Track against estimates
+- Tasks can be linked to projects
+- View all tasks within a project
+- Filter tasks by project
+- Project progress reflected by task completion
 
 ### Task Notifications
 
-Receive notifications for:
+Employees notified when:
 - **New Assignment**: When task is assigned to you
-- **Due Date Approaching**: Reminder before deadline
-- **Overdue**: When past due date
 - **Status Changed**: When task status updates
-- **Comments Added**: New discussion on your task
-- **Reassignment**: When task is reassigned
-- **Completion**: When marked complete
+- **Due Date Approaching**: Reminder before deadline (if configured)
+- **Task Updated**: When details change
 
-### Task Calendar Integration
+### Task History
 
-Tasks appear on calendar:
-- Due dates shown
-- Color-coded by priority
-- Click to open task details
-- Helps with daily planning
-- Deadline visibility
+- All updates are tracked
+- Notes show chronological updates
+- Status changes logged
+- Assignment changes recorded
 
 ## Best Practices
 
 ### For Employees
 
-- **Review daily**: Check tasks each morning
-- **Update regularly**: Keep status current
-- **Communicate proactively**: Report issues early
-- **Ask questions**: Clarify requirements immediately
-- **Set realistic progress**: Be honest about percentage complete
-- **Meet deadlines**: Or request extension early
-- **Document work**: Add notes as you progress
-- **Prioritize**: Focus on high-priority tasks first
+- **Check tasks daily**: Review your task list each morning
+- **Update status regularly**: Keep task status current
+- **Add meaningful notes**: Document your progress
+- **Communicate blockers**: Note any obstacles promptly
+- **Meet deadlines**: Complete tasks by due date
+- **Mark complete**: Update status when finished
 
 ### For Administrators
 
 - **Clear descriptions**: Provide detailed task information
-- **Realistic deadlines**: Allow adequate time
-- **Appropriate assignment**: Match task to skills
-- **Balance workload**: Don't overload employees
-- **Regular check-ins**: Monitor progress
-- **Provide resources**: Ensure employees have what they need
-- **Recognize completion**: Acknowledge good work
-- **Learn and adjust**: Improve task planning over time
+- **Realistic deadlines**: Allow adequate time for completion
+- **Appropriate assignment**: Match task to employee skills
+- **Monitor regularly**: Check task progress frequently
+- **Provide feedback**: Comment on task updates
+- **Recognize completion**: Acknowledge finished work
 
 ## Troubleshooting
 
@@ -476,38 +284,28 @@ Tasks appear on calendar:
 **Cannot See Assigned Task**
 - Check task filters (might be filtered out)
 - Refresh the page
-- Verify you're in correct view (Active Tasks)
-- Contact task assigner
+- Verify you're assigned to the task
+- Contact task creator
 
 **Cannot Update Task Status**
-- Check if task is locked
-- Verify you're the assignee
-- Ensure you have permissions
+- Verify you're assigned to the task
+- Check your permissions
+- Refresh page and try again
 - Contact administrator
 
-**Task Not Showing on Calendar**
-- Verify task has due date set
-- Check calendar filters
-- Refresh calendar view
-- Verify calendar sync settings
-
-**Notifications Not Received**
-- Check notification settings
-- Verify email preferences
-- Look in spam folder
-- Enable browser notifications
+**Task Not Showing Correct Project**
+- Task may not be linked to project
+- Contact administrator to update project link
 
 ## Tips for Effective Task Management
 
-- **Break down large tasks**: Create smaller, manageable chunks
-- **Set milestones**: Track progress with interim goals
-- **Use comments**: Keep communication in task thread
-- **Attach files**: Store all task-related docs together
-- **Update promptly**: Don't let status go stale
-- **Be realistic**: Set achievable deadlines and estimates
-- **Collaborate**: Use task system for team coordination
-- **Review completed**: Learn from finished tasks
-- **Archive old tasks**: Keep active list manageable
+- **Break down large tasks**: Create smaller, manageable tasks
+- **Use clear names**: Make task titles descriptive
+- **Update promptly**: Change status as work progresses
+- **Add detailed notes**: Keep team informed of progress
+- **Set realistic deadlines**: Allow enough time for quality work
+- **Link to projects**: Organize related tasks under projects
+- **Review completed tasks**: Learn from finished work
 
 ---
 
