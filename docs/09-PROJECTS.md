@@ -80,7 +80,7 @@ Projects displayed with:
 
 #### Viewing Project Details
 
-1. **Click on Project**name
+1. **Click on Project name**
 2. See complete information:
    - Project description
    - Timeline
