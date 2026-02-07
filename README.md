@@ -1,3 +1,36 @@
+# HR Portal
+
+A comprehensive Human Resources Management System built with Laravel.
+
+## 📚 Documentation
+
+**[View Complete User Manual](docs/README.md)** - Comprehensive guides for all HR Portal features
+
+### Quick Links
+- [Login Guide](docs/01-LOGIN.md)
+- [Employee Dashboard](docs/04-EMPLOYEE-DASHBOARD.md)
+- [Admin Dashboard](docs/02-ADMIN-DASHBOARD.md)
+- [Attendance System](docs/03-ATTENDANCE.md)
+- [Leave Management](docs/05-LEAVE.md)
+- [Calendar & Events](docs/06-CALENDAR.md)
+- [Task Management](docs/08-TASKS.md)
+- [Project Management](docs/09-PROJECTS.md)
+- [Forms & Requests](docs/10-FORMS.md)
+
+## Features
+
+- **Employee Management**: Complete employee profiles and records
+- **Attendance Tracking**: Check-in/check-out with reporting
+- **Leave Management**: Request and approval workflows
+- **Event Management**: Company events and RSVP system
+- **Task & Project Management**: Collaborative work tracking
+- **Forms System**: Digital form submission and approval
+- **Request Management**: Centralized request handling
+- **Calendar Integration**: Unified schedule view
+- **Reports & Analytics**: Comprehensive reporting tools
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
