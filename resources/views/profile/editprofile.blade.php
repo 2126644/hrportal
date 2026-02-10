@@ -82,6 +82,17 @@
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
+                        
+                        <div class="mb-3">
+                            <label for="ic_number" class="form-label">IC Number <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" id="ic_number" name="ic_number" class="form-control"
+                                placeholder="Enter IC Number" value="{{ old('ic_number', $employee->ic_number) }}"
+                                required>
+                            @error('ic_number')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <div class="row g-3 mb-3">
 
@@ -155,6 +166,8 @@
                             </div>
                         </div>
 
+                        <hr class="my-3">
+
                         <div class="mb-3">
                             <label for="emergency_contact_name" class="form-label">Emergency Contact Name <span
                                     class="text-danger">*</span></label>
@@ -190,17 +203,8 @@
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
-
-                        <div class="mb-3">
-                            <label for="ic_number" class="form-label">IC Number <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="ic_number" name="ic_number" class="form-control"
-                                placeholder="Enter IC Number" value="{{ old('ic_number', $employee->ic_number) }}"
-                                required>
-                            @error('ic_number')
-                                <div class="text-danger small">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        
+                        <hr class="my-3">
 
                         <div class="mb-3">
                             <label for="highest_education_level" class="form-label">Highest Education Level <span

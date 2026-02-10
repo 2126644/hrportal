@@ -19,13 +19,13 @@ class ForcePasswordReset
             $request->user() &&
             $request->user()->force_password_reset &&
             ! $request->routeIs([
-                'admin.profile.settings',
+                'profile.settings.admin',
                 'password.update',
                 'logout',
             ])
         ) {
             return redirect()
-                ->route('admin.profile.settings')
+                ->route('profile.settings.admin')
                 ->with('warning', 'You must reset your password before proceeding.');
         }
 

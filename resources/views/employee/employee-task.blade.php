@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Tasks</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Task</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Tasks</h3>
+                                <h3 class="page-title"><br>Task</h3>
                                 <p class="text-muted">Manage your tasks and track their progress.</p>
                             </div>
                             <div class="d-flex gap-3">
@@ -24,14 +24,14 @@
                                         class="btn btn-outline-primary {{ request()->routeIs('task.index.employee') ? 'active disabled' : '' }}"
                                         onclick="window.location='{{ route('task.index.employee') }}'"
                                         {{ request()->routeIs('task.index.employee') ? 'disabled' : '' }}>
-                                        Tasks
+                                        Task
                                     </button>
 
                                     <button
                                         class="btn btn-outline-primary {{ request()->routeIs('project.index.employee') ? 'active disabled' : '' }}"
                                         onclick="window.location='{{ route('project.index.employee') }}'"
                                         {{ request()->routeIs('project.index.employee') ? 'disabled' : '' }}>
-                                        Projects
+                                        Project
                                     </button>
                                 </div>
 

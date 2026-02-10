@@ -86,7 +86,7 @@
                                         </span>
                                     </div>
                                     <div class="mt-md-0">
-                                        <a href="{{ route('employee.profile.settings') }}"
+                                        <a href="{{ route('profile.settings.employee') }}"
                                             class="btn btn-outline-primary btn-sm rounded-pill px-4 shadow-sm">
                                             <i class="bi bi-gear-fill me-1"></i> Account Settings
                                         </a>

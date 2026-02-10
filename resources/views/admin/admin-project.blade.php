@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Projects</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Project</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Projects</h3>
+                                <h3 class="page-title"><br>Project</h3>
                                 <p class="text-muted">Manage your projects and track their progress.</p>
                             </div>
                             <div class="d-flex gap-3">
@@ -24,14 +24,14 @@
                                         class="btn btn-outline-primary {{ request()->routeIs('task.index.admin') ? 'active disabled' : '' }}"
                                         onclick="window.location='{{ route('task.index.admin') }}'"
                                         {{ request()->routeIs('task.index.admin') ? 'disabled' : '' }}>
-                                        Tasks
+                                        Task
                                     </button>
 
                                     <button
                                         class="btn btn-outline-primary {{ request()->routeIs('project.index.admin') ? 'active disabled' : '' }}"
                                         onclick="window.location='{{ route('project.index.admin') }}'"
                                         {{ request()->routeIs('project.index.admin') ? 'disabled' : '' }}>
-                                        Projects
+                                        Project
                                     </button>
                                 </div>
 
@@ -100,7 +100,7 @@
 
     <div class="row">
         <!-- Total Projects -->
-        <div class="col-12 col-md-3 mb-4">
+        <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card active" data-status="all">
                 <div class="card-body">
                     <i class="bi bi-list-task"></i>
@@ -111,11 +111,22 @@
         </div>
 
         <!-- Not Started Projects -->
-        <div class="col-12 col-md-3 mb-4">
+        <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="not-started">
                 <div class="card-body">
                     <i class="bi bi-circle"></i>
                     <div class="card-title">Not Started</div>
+                    <span class="stat-number not-started">{{ $notStartedProjects }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- In-Planning Projects -->
+        <div class="col-12 col-md-2 mb-4">
+            <div class="card filter-card" data-status="not-started">
+                <div class="card-body">
+                    <i class="bi bi-circle"></i>
+                    <div class="card-title">In Planning</div>
                     <span class="stat-number not-started">{{ $notStartedProjects }}</span>
                 </div>
             </div>

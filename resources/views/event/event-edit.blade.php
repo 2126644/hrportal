@@ -20,10 +20,10 @@
 
                                         @if ($role_id == 2)
                                             <li class="breadcrumb-item"><a
-                                                    href="{{ route('event.index.admin') }}">Events</a></li>
+                                                    href="{{ route('event.index.admin') }}">Event</a></li>
                                         @else
                                             <li class="breadcrumb-item"><a
-                                                    href="{{ route('event.index.employee') }}">Events</a></li>
+                                                    href="{{ route('event.index.employee') }}">Event</a></li>
                                         @endif
 
                                         <li class="breadcrumb-item active" aria-current="page">Edit Event</li>

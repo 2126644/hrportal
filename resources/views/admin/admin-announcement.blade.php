@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Announcements</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Announcement</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Announcements</h3>
+                                <h3 class="page-title"><br>Announcement</h3>
                                 <p class="text-muted">Manage and publish important announcements.</p>
                             </div>
                             <div class="d-flex gap-3">

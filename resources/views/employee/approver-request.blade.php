@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Requests</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Request</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Leave & Time Slip Requests</h3>
+                                <h3 class="page-title"><br>Leave & Time Slip Request</h3>
                                 <p class="text-muted">Approve/reject pending leave and time slip requests.</p>
                             </div>
                         </div>
@@ -30,13 +30,13 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="leave-request-tab" data-bs-toggle="tab" data-bs-target="#leave-request"
                 type="button" role="tab" aria-controls="leave-request" aria-selected="true">
-                Leave Requests
+                Leave Request
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="timeslip-request-tab" data-bs-toggle="tab" data-bs-target="#timeslip-request"
                 type="button" role="tab" aria-controls="timeslip-request" aria-selected="false">
-                Time Slip Requests
+                Time Slip Request
             </button>
         </li>
     </ul>

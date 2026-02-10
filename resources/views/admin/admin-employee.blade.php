@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Employees</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Employee</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Employees</h3>
+                                <h3 class="page-title"><br>Employee</h3>
                                 <p class="text-muted">Manage your team members and their information</p>
                             </div>
                             <button class="btn-new" onclick="window.location='{{ route('admin.employee.create') }}'">

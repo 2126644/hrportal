@@ -55,12 +55,12 @@
                             <div class="col-md-6">
                                 <label class="form-label">Department</label>
                                 <input type="text" class="form-control"
-                                    value="{{ auth()->user()->employee->department->name ?? '' }}" readonly>
+                                    value="{{ auth()->user()->employee->employment?->department?->name ?? '' }}" readonly>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Job / Position Title</label>
                                 <input type="text" class="form-control"
-                                    value="{{ auth()->user()->employee->position ?? '' }}" readonly>
+                                    value="{{ auth()->user()->employee->employment?->position ?? '' }}" readonly>
                             </div>
                         </div>
 

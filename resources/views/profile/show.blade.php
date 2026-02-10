@@ -34,7 +34,7 @@
                             <div class="d-flex gap-2">
                                 @if (Auth::user()->id === $employee?->user_id)
                                     <button class="btn btn-primary"
-                                        onclick="window.location='{{ route('employee.profile.settings') }}'">
+                                        onclick="window.location='{{ route('profile.settings.employee') }}'">
                                         <i class="bi bi-gear-fill me-2"></i>Profile Setting
                                     </button>
                                 @endif
@@ -243,7 +243,7 @@
                                             <div class="detail-label text-muted small">Gender</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->gender) ? 'text-muted' : '' }}">
-                                                {{ $employee->gender ?? '-' }}
+                                                {{ ucfirst($employee->gender ?? '-') }}
                                             </div>
                                         </div>
                                     </div>
@@ -261,7 +261,7 @@
                                             <div class="detail-label text-muted small">Marital Status</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->marital_status) ? 'text-muted' : '' }}">
-                                                {{ $employee->marital_status ?? '-' }}
+                                                {{ ucfirst($employee->marital_status ?? '-') }}
                                             </div>
                                         </div>
                                     </div>
@@ -270,7 +270,7 @@
                                             <div class="detail-label text-muted small">Nationality</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->nationality) ? 'text-muted' : '' }}">
-                                                {{ $employee->nationality ?? '-' }}
+                                                {{ ucfirst($employee->nationality ?? '-') }}
                                             </div>
                                         </div>
                                     </div>
@@ -279,7 +279,7 @@
                                             <div class="detail-label text-muted small">Emergency Contact Name</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->emergency_contact_name) ? 'text-muted' : '' }}">
-                                                {{ $employee->emergency_contact_name ?? '-' }}
+                                                {{ ucwords($employee->emergency_contact_name ?? '-') }}
                                             </div>
                                         </div>
                                     </div>
@@ -297,7 +297,7 @@
                                             <div class="detail-label text-muted small">Emergency Contact Relationship</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->emergency_contact_relationship) ? 'text-muted' : '' }}">
-                                                {{ $employee->emergency_contact_relationship ?? '-' }}
+                                                {{ ucwords($employee->emergency_contact_relationship ?? '-') }}
                                             </div>
                                         </div>
                                     </div>
@@ -315,7 +315,7 @@
                                             <div class="detail-label text-muted small">Highest Education Level</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->highest_education_level) ? 'text-muted' : '' }}">
-                                                {{ $employee->highest_education_level ?? '-' }}
+                                                {{ ucwords($employee->highest_education_level ?? '-') }}
                                             </div>
                                         </div>
                                     </div>
@@ -324,7 +324,7 @@
                                             <div class="detail-label text-muted small">Highest Education Institution</div>
                                             <div
                                                 class="detail-value fw-semibold {{ empty($employee->highest_education_institution) ? 'text-muted' : '' }}">
-                                                {{ $employee->highest_education_institution ?? '-' }}
+                                                {{ ucwords($employee->highest_education_institution ?? '-') }}
                                             </div>
                                         </div>
                                     </div>

@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">System Settings</li>
+                                        <li class="breadcrumb-item active" aria-current="page">System Setting</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>System Settings</h3>
+                                <h3 class="page-title"><br>System Setting</h3>
                                 <p class="text-muted">Manage company-wide rules and master data configurations.</p>
                             </div>
                         </div>

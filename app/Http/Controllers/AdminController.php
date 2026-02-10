@@ -183,7 +183,7 @@ class AdminController extends Controller
             $activities[] = [
                 'icon' => 'calendar-plus',
                 'title' => $leave->employee->full_name ?? 'Employee',
-                'description' => 'Applied for ' . ($leave->entitlement?->name ?? 'leave') . ' leave',
+                'description' => 'Applied for ' . ($leave->entitlement?->name ?? 'leave'),
                 'time' => $leave->created_at->diffForHumans()
             ];
         }

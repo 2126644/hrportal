@@ -13,7 +13,7 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item"><a href="{{ route('project.index.employee') }}">Projects</a>
+                                        <li class="breadcrumb-item"><a href="{{ route('project.index.employee') }}">Project</a>
                                         </li>
                                         <li class="breadcrumb-item active" aria-current="page">New Project</li>
                                     </ol>

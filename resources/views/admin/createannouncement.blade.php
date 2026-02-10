@@ -14,7 +14,7 @@
                                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         </li>
                                         <li class="breadcrumb-item"><a
-                                                href="{{ route('announcement.index.admin') }}">Announcements</a></li>
+                                                href="{{ route('announcement.index.admin') }}">Announcement</a></li>
                                         <li class="breadcrumb-item active" aria-current="page">New Announcement</li>
                                     </ol>
                                 </nav>

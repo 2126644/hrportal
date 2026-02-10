@@ -50,7 +50,7 @@
                                         </span>
                                     </div>
                                     <div class="mt-md-0">
-                                        <a href="{{ route('admin.profile.settings') }}"
+                                        <a href="{{ route('profile.settings.admin') }}"
                                             class="btn btn-outline-primary btn-sm rounded-pill px-4 shadow-sm">
                                             <i class="bi bi-gear-fill me-1"></i> Account Settings
                                         </a>

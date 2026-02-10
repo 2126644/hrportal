@@ -17,11 +17,11 @@
                                         @else
                                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a>
                                         @endif
-                                        <li class="breadcrumb-item active" aria-current="page">Forms</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Form</li>
                                     </ol>
                                 </nav>
 
-                                <h3 class="page-title"><br>Forms</h3>
+                                <h3 class="page-title"><br>Form</h3>
                                 @if ($viewType === 'employee')
                                     <p class="text-muted">Submit and track your form requests.</p>
                                 @elseif($viewType === 'approver')

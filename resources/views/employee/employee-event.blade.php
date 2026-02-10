@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Events</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Event</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Events</h3>
+                                <h3 class="page-title"><br>Event</h3>
                                 <p class="text-muted">Manage your events and schedule.</p>
                             </div>
                             <button class="btn-new" onclick="window.location='{{ route('event.create') }}'">

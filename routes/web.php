@@ -72,12 +72,12 @@ Route::middleware(['auth'])->group(function () {
     // for employee only
     Route::get('/employee/profile/edit/personal/{employee}', [EmployeeController::class, 'editPersonal'])->name('profile.editPersonal');
     Route::put('/employee/profile/update/personal/{employee}', [EmployeeController::class, 'updatePersonal'])->name('profile.updatePersonal');
-    Route::get('/employee/profile/settings', [EmployeeController::class, 'settings'])->name('employee.profile.settings');
+    Route::get('/employee/profile/settings', [EmployeeController::class, 'settings'])->name('profile.settings.employee');
 
     // for admin only
     Route::get('/admin/profile/edit/employment/{employee}', [EmployeeController::class, 'editEmployment'])->name('profile.editEmployment');
     Route::put('/admin/profile/update/employment/{employee}', [EmployeeController::class, 'updateEmployment'])->name('profile.updateEmployment');
-    Route::get('/admin/profile/settings', [EmployeeController::class, 'settings'])->name('admin.profile.settings');
+    Route::get('/admin/profile/settings', [EmployeeController::class, 'settings'])->name('profile.settings.admin');
 
     // for admin and employee
     Route::get('/profile/show/{employee?}', [EmployeeController::class, 'show'])->name('profile.show');

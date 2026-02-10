@@ -12,10 +12,10 @@
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="{{ route('employee.dashboard') }}">Dashboard</a>
                                         </li>
-                                        <li class="breadcrumb-item active" aria-current="page">Projects</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Project</li>
                                     </ol>
                                 </nav>
-                                <h3 class="page-title"><br>Projects</h3>
+                                <h3 class="page-title"><br>Project</h3>
                                 <p class="text-muted">Manage your projects and track their progress.</p>
                             </div>
                             <div class="d-flex gap-3">
@@ -24,14 +24,14 @@
                                         class="btn btn-outline-primary {{ request()->routeIs('task.index.employee') ? 'active disabled' : '' }}"
                                         onclick="window.location='{{ route('task.index.employee') }}'"
                                         {{ request()->routeIs('task.index.employee') ? 'disabled' : '' }}>
-                                        Tasks
+                                        Task
                                     </button>
 
                                     <button
                                         class="btn btn-outline-primary {{ request()->routeIs('project.index.employee') ? 'active disabled' : '' }}"
                                         onclick="window.location='{{ route('project.index.employee') }}'"
                                         {{ request()->routeIs('project.index.employee') ? 'disabled' : '' }}>
-                                        Projects
+                                        Project
                                     </button>
                                 </div>
 
@@ -121,12 +121,12 @@
             </div>
         </div>
 
-        <!-- Planning Projects -->
+        <!-- In-Planning Projects -->
         <div class="col-12 col-md-2 mb-4">
             <div class="card filter-card" data-status="not-started">
                 <div class="card-body">
                     <i class="bi bi-circle"></i>
-                    <div class="card-title">Planning</div>
+                    <div class="card-title">In Planning</div>
                     <span class="stat-number not-started">{{ $notStartedProjects }}</span>
                 </div>
             </div>
